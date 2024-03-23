@@ -77,7 +77,7 @@ const handleSelect = (index: string) => {
 .el-container {
   height: 100%;
   width: 100%;
-  min-height: 100vh;
+  min-height: 500px;
   background-color: #fcf7f4;
 }
 .el-header {
@@ -94,7 +94,6 @@ const handleSelect = (index: string) => {
   height: 87vh;
   width: 100%;
   display: grid;
-  align-items: center;
 }
 .el-footer{
   height: 3vh;
@@ -109,24 +108,24 @@ const handleSelect = (index: string) => {
   height: 6vh;
   flex-grow: 1;
   justify-content: center;
-  align-items: center;
   background-color: #f6efef;
+  --active-color: #be9367
 }
 .el-menu-item{
-  width: 30vh;
+  width: 15vw;
   font-size: large;
 }
 .content-area{
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 75vh;
-  width: 100%;
+  min-height: 650px;
+  margin-top: 10px;
+  margin-bottom: 20px;
 }
 .el-card{
   margin-top: 10px;
   width: 12vw;
-  height: 100px;
+  height: 90px;
   background-color: #f6efef;
   .el-avatar{
     margin-left: 100px;
