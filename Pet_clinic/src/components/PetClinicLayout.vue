@@ -119,7 +119,6 @@ const handleSelect = (index: string) => {
 .content-area{
   display: flex;
   justify-content: center;
-  align-items: center;
   height: 75vh;
   width: 100%;
 }
