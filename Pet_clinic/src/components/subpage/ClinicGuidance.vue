@@ -25,16 +25,16 @@
 
 <script setup lang="ts">
 import {defineComponent, ref} from "vue";
+import 'leaflet/dist/leaflet.css';
 import {LImageOverlay, LMap, LMarker, LIcon, LTooltip} from "@vue-leaflet/vue-leaflet";
 import type {LatLngTuple} from "leaflet";
-import 'leaflet/dist/leaflet.css';
 
 defineComponent({
   name: "ClinicGuidance"
 })
 const url = 'image/clinic-layout.png'
-const markerUrl = new URL('/image/marker.png', import.meta.url).href;
-const shadowMarkerUrl = new URL('/image/marker-shadow.png', import.meta.url).href;
+const markerUrl = '/image/marker.png'
+const shadowMarkerUrl = '/image/marker-shadow.png'
 interface MarkerData {
   id: number;
   name: string;
@@ -70,6 +70,8 @@ const imageBounds: [LatLngTuple, LatLngTuple] = [[39.5, 38.5], [40.5, 40.5]];
   position: relative;
 }
 .l-map{
+  height: 100%;
+  width: 100%;
   position: relative;
 }
 </style>

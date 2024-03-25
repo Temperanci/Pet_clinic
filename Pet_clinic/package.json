@@ -15,7 +15,7 @@
   "dependencies": {
     "element-plus": "^2.6.0",
     "marker": "^0.1.2",
-    "three": "^0.162.0",
+    "photo-sphere-viewer": "^4.8.1",
     "vue": "^3.4.15",
     "vue-leaflet": "^0.1.0",
     "vue-router": "^4.2.5"
