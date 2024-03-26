@@ -1,18 +1,20 @@
 <template>
-  <el-container style="margin-top: 2vw;">
-    <el-aside style="margin-left: 5vw; z-index: 99;">
+  <el-container style="margin-top: 1vw; border:solid lightgrey 2px; border-radius: 30px; ">
+    <el-aside style="margin-left: 5vw; width: 30%;">
       <el-select v-model="value" placeholder="Select" style="margin-top: 3vw;">
         <el-option v-for="dep in departments" :key="dep.departmentId" :label="dep.name" :value="dep.name" 
          @click="selectDepartment(dep.departmentId)"/>
       </el-select>
-      <el-table :data="bedList" style="width:100%; margin-top: 3vw;">
-        <el-table-column prop="bedId" label="床位号" width="50%" />
-        <el-table-column prop="location" label="位置" width="50%" />
+      <el-table :data="loadBedList()" style="margin-top: 3vw;">
+        <el-table-column prop="bedId" label="床位号"/>
+        <el-table-column prop="location" label="位置"/>
+        <el-table-column prop="availability" label="使用状况"/>
       </el-table>
     </el-aside>
-    <el-main style="margin-left: 10vw; margin-top: 2vw;">
-      <div class="bed-image">
-          <el-image style="width: 45vw; height: 25vw;" :src="url"/>
+    <el-main style="margin-left: 5vw;">
+      <h3 style="color:grey; text-align:center; font-size:20px">{{ currentDepartment.name }} 床位图</h3>
+      <div class="bed-image" style="display: flex; justify-content:center;">
+          <el-image style="width: 70%; height: 70%;" :src="url"/>
       </div>
     </el-main>
   </el-container>
@@ -29,10 +31,30 @@ defineComponent({
   name: "BedInquiry"
 })
 
+// 选择科室
 function selectDepartment(id: string) {
   var temp = departments.find(dep => dep.departmentId === id);
   if (temp != null) currentDepartment = temp;
-  console.log(currentDepartment.departmentId);
+  console.log(currentDepartment.name);
+}
+function currentDepartmentName(){
+  return currentDepartment.name;
+}
+
+// 返回所选科室的床位列表
+function loadBedList(){
+  var currentBedList:{bedId:string;departmentId:string;location:string;availability:boolean}[]=[];
+  for(var index in bedList){
+    if(bedList[index].departmentId==currentDepartment.departmentId){
+      currentBedList.push(bedList[index]);
+    }
+  }
+  return currentBedList;
+}
+
+// 返回所选科室的床位图
+function loadBedMap(){
+  return url;
 }
 
 const value = ref('')
@@ -53,27 +75,47 @@ var departments = [
     desc: '略'
   }
 ]
-var currentDepartment = {
-  departmentId: '001',
-  name: '部门1',
-  desc: '略'
-}
+var currentDepartment = departments[0];
 var bedList = [
   {
     bedId: '001001',
     departmentId: '001',
-    location: '001A'
+    location: '001A',
+    availability: true
+    
   },
   {
     bedId: '001002',
     departmentId: '001',
-    location: '001B'
+    location: '001B',
+    availability: true
   },
   {
     bedId: '001003',
     departmentId: '001',
-    location: '001C'
+    location: '001C',
+    availability: false
+  },
+  {
+    bedId: '001004',
+    departmentId: '001',
+    location: '001D',
+    availability: false
+  },
+  {
+    bedId: '001005',
+    departmentId: '001',
+    location: '001E',
+    availability: false
+  },
+  {
+    bedId: '002001',
+    departmentId: '002',
+    location: '002A',
+    availability: true
+    
   }
+  
 ]
 
 const fits = ['fill']
