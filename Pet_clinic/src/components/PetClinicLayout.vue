@@ -26,7 +26,13 @@
       </el-menu>
       <div class="content-area">
         <!-- 动态组件会在这里渲染 -->
-        <component :is="currentComponent" />
+<!--        <component :is="currentComponent" />-->
+        <ClinicGuidance v-if="activeIndex === '1'" @marker-clicked="markerClicked" />
+        <DepartmentDetails v-if="activeIndex === '2'" :selected-id="selectedDepartmentId" />
+        <DrugResource v-if="activeIndex === '3'" />
+        <ServiceCharge v-if="activeIndex === '4'" />
+        <BedInquiry v-if="activeIndex === '5'" />
+        <FunctionalStudy v-if="activeIndex === '6'" />
       </div>
     </el-main>
     <el-footer>
@@ -50,7 +56,6 @@ defineComponent({
   name: "PetClinicLayout"
 })
 
-const activeIndex = ref('1')
 interface ComponentsMap {
   [key: string]: DefineComponent<{}, {}, any>;
 }
@@ -64,12 +69,22 @@ const componentsMap: ComponentsMap = {
   // 对应的其他组件...
 }
 
+const activeIndex = ref('1')
 const currentComponent = ref(componentsMap[activeIndex.value])
+const selectedDepartmentId = ref(1);
 
 const handleSelect = (index: string) => {
   activeIndex.value = index
   currentComponent.value = componentsMap[index]
 }
+// 当 marker 被点击时调用
+const markerClicked = (id: number) => {
+  // 切换到科室详情页面
+  activeIndex.value = '2';
+  // 设置选中的科室 ID
+  selectedDepartmentId.value = id;
+};
+
 </script>
 
 

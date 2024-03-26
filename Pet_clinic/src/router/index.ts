@@ -10,9 +10,8 @@ const routes = [
 
 // 创建路由器实例
 const router = createRouter({
-    // 使用 HTML5 历史模式
-    history: createWebHistory(),
-    routes // 简写，相当于 routes: routes
+    history: createWebHistory(import.meta.env.VITE_BASE_URL),
+    routes
 })
 
 export default router

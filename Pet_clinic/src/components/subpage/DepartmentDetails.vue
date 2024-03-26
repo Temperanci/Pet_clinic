@@ -66,7 +66,13 @@ const consultations = ref([
 
 
 // 当前选中科室的状态
-const selectedConsultation = ref(consultations.value[0]);
+const selectedConsultation = ref({
+  id: 0,
+  name: '',
+  description: '',
+  staff: '',
+  panorama: ''
+});
 
 // 处理菜单选项被选中的事件
 const handleSelect = (id: string) => {
@@ -77,15 +83,22 @@ const handleSelect = (id: string) => {
 };
 // 定义视图容器
 let viewer: Viewer | null;
-//注意这里应该在onMounted初始化，不然可能找不到html元素
+const props = defineProps({
+  selectedId: Number
+});
+
 onMounted(() => {
-  viewer = new Viewer({
-    container: "viewer",
-    //全景图路径，全景图放置在public路径下的写法；放置在src路径下需要改写为require("路径")
-    panorama: selectedConsultation.value.panorama,
-    navbar: undefined,
-    plugins: [],
-  });
+  const consultation = consultations.value.find(c => c.id === props.selectedId);
+  if (consultation) {
+    selectedConsultation.value = consultation;
+    viewer = new Viewer({
+      container: "viewer",
+      //全景图路径，全景图放置在public路径下的写法；放置在src路径下需要改写为require("路径")
+      panorama: selectedConsultation.value.panorama,
+      navbar: undefined,
+      plugins: [],
+    });
+  }
 });
 
 // 使用watch侦听selectedConsultation的变化，并相应地更新全景图

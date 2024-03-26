@@ -8,7 +8,8 @@
       <l-marker v-for="marker in markers"
                 :key="marker.id"
                 :id="marker.id.toString()"
-                :lat-lng="marker.position" >
+                :lat-lng="marker.position"
+                @click="onMarkerClicked(marker.id)">
         <l-icon
             :icon-url="markerUrl"
             :shadow-url="shadowMarkerUrl"
@@ -24,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import {defineComponent, ref} from "vue";
+import { defineComponent, ref} from "vue";
 import 'leaflet/dist/leaflet.css';
 import {LImageOverlay, LMap, LMarker, LIcon, LTooltip} from "@vue-leaflet/vue-leaflet";
 import type {LatLngTuple} from "leaflet";
@@ -32,7 +33,7 @@ import type {LatLngTuple} from "leaflet";
 defineComponent({
   name: "ClinicGuidance"
 })
-const url = 'image/clinic-layout.png'
+const url = '/image/clinic-layout.png'
 const markerUrl = '/image/marker.png'
 const shadowMarkerUrl = '/image/marker-shadow.png'
 interface MarkerData {
@@ -60,6 +61,12 @@ const markers = ref<MarkerData[]>([
 const zoom = ref(9);
 const imageBounds: [LatLngTuple, LatLngTuple] = [[39.5, 38.5], [40.5, 40.5]];
 
+const emit = defineEmits(['marker-clicked']);
+
+function onMarkerClicked(id: number) {
+  // 直接调用 emit 发送事件
+  emit('marker-clicked', id);
+}
 
 </script>
 
