@@ -2,24 +2,29 @@
   <el-row>
     <el-col :span="4">
       <div class="grid-content ep-bg-purple" >
-        <el-menu
-            default-active="1"
-            class="el-menu-vertical-demo"
-            @select="handleSelect"
-        >
-          <el-sub-menu index="1">
-            <template #title>
-              <span>所有科室</span>
-            </template>
-              <el-menu-item
+        <el-dropdown>
+          <span>
+              <el-button type="primary" color="#f4eded"  class="full-width-button">
+                所有科室<el-icon class="el-icon--right"><arrow-down /></el-icon>
+              </el-button>
+          </span>
+          <template #dropdown>
+            <el-dropdown-menu
+                default-active="1"
+            >
+              <el-dropdown-item
                   v-for="consultation in consultations"
                   :key="consultation.id"
-                  :index="consultation.id.toString()">
+                  :index="consultation.id.toString()"
+                  @click="handleSelect(consultation.id.toString())"
+                  >
                 {{ consultation.name }}
-              </el-menu-item>
-          </el-sub-menu>
-        </el-menu>
-        <el-text>{{ selectedConsultation.description }}</el-text>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+        <el-text class="departmentTitle"><h1>{{ selectedConsultation.name }}</h1></el-text>
+        <el-text class="content">{{ selectedConsultation.description }}</el-text>
       </div>
     </el-col>
     <el-col :span="14">
@@ -29,7 +34,9 @@
     </el-col>
     <el-col :span="6">
       <div class="grid-content ep-bg-purple" >
-        <el-text>{{ selectedConsultation.staff }}</el-text>
+        <el-text class="title">科室人员:</el-text>
+        <el-divider />
+        <el-text class="content">{{ selectedConsultation.staff }}</el-text>
       </div>
     </el-col>
   </el-row>
@@ -41,6 +48,7 @@ import { ref } from 'vue';
 import 'element-plus/dist/index.css';
 import { Viewer } from "photo-sphere-viewer";
 import "photo-sphere-viewer/dist/photo-sphere-viewer.css";
+import { ArrowDown } from '@element-plus/icons-vue'
 
 defineComponent({
   name: "DepartmentDetails"
@@ -112,12 +120,18 @@ watch(selectedConsultation, (newValue, oldValue) => {
 
 <style scoped lang="scss">
 .el-row{
-  width: 80vw;
+  width: 90vw;
 }
 .el-col {
   border-radius: 4px;
 }
-
+.el-dropdown{
+  width: 100%;
+  justify-content: center;
+}
+.full-width-button{
+  width: 15vw;
+}
 .grid-content {
   border-radius: 4px;
   height: 70vh;
@@ -127,5 +141,20 @@ watch(selectedConsultation, (newValue, oldValue) => {
 }
 .ep-bg-purple-light{
   background: #f4eded;
+}
+.departmentTitle{
+  font-size: 1.3em;
+  color: #2a1f1f;
+  text-align: center;
+}
+.title{
+  font-size: 1.8em;
+  color: #2a1f1f;
+}
+.content{
+  font-size: 1em;
+  color: #2a1f1f;
+  margin-top: 10px;
+  margin-left: 10px;
 }
 </style>
