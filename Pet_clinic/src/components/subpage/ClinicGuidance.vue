@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <l-map ref="map" v-model:zoom="zoom" :center="[40, 39.5]">
+    <l-map ref="map" v-model:zoom="zoom" :center="[40, 39.5]" :useGlobalLeaflet=false>
       <l-image-overlay
           :url="url"
           :bounds="imageBounds"
