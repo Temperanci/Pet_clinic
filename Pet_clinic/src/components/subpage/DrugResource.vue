@@ -44,7 +44,6 @@
           </el-select>
           <el-button class="optionButton">筛选</el-button>
       </div>
-    <p>aside</p>
   </el-aside>
   <el-main>
     <el-table class="table" :data="chargeData" style="width: 100%">
@@ -59,7 +58,6 @@
       <el-table-column prop="department" label="科室" >
       </el-table-column>
     </el-table>
-    <p>main</p>
   </el-main>
   </el-container>
   </div>

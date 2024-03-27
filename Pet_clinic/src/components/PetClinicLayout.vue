@@ -8,8 +8,10 @@
         <template #header>
           <el-text>用户名</el-text>
           <el-avatar :size="30" />
-        </template>
+          <el-button @click="Switch(0)">后台页面</el-button>
         <el-text>后台管理 管理/注销</el-text>
+        </template>
+        
       </el-card>
     </el-header>
     <el-main>
@@ -55,7 +57,10 @@ import FunctionalStudy from './subpage/FunctionalStudy.vue'
 defineComponent({
   name: "PetClinicLayout"
 })
-
+const emit = defineEmits(['switch'])
+function Switch(n:number){
+    emit('switch',n)
+}
 interface ComponentsMap {
   [key: string]: DefineComponent<{}, {}, any>;
 }
