@@ -2,16 +2,21 @@
   <el-container>
     <el-header>
       <div class="h1">
-        <h1>Pet Clinic 宠物医院在线导览</h1>
+        Pet Clinic 宠物医院在线导览
       </div>
       <el-card shadow="hover">
-        <template #header>
-          <el-text>用户名</el-text>
-          <el-avatar :size="30" />
-          <el-button @click="Switch(0)">后台页面</el-button>
-        <el-text>后台管理 管理/注销</el-text>
-        </template>
-        
+        <div class="card-container">
+          <div class="card-left">
+            <el-avatar :size="40" />
+            <el-text>用户名用户名</el-text>
+          </div>
+          <div class="card-right">
+            <el-button @click="Switch(0)">后台页面</el-button>
+            <el-text>后台管理</el-text>
+            <el-divider />
+            <el-text>注销</el-text>
+          </div>
+        </div>
       </el-card>
     </el-header>
     <el-main>
@@ -95,9 +100,8 @@ const markerClicked = (id: number) => {
 
 <style scoped lang="scss">
 .el-container {
-  height: 100%;
-  width: 100%;
-  min-height: 500px;
+  height: 100vh;
+  width: 100vw;
   background-color: #fcf7f4;
 }
 .el-header {
@@ -106,14 +110,60 @@ const markerClicked = (id: number) => {
   font-size: x-large;
   font-weight: bold;
   color: #be9367;
+  align-items: center;
   .h1{
     width: 90%;
+    font-size: xx-large;
+  }
+  .el-card{
+    width: 15vw;
+    height: 10vh;
+    background-color: #f6efef;
+    margin-top: 2vh;
+    .card-container {
+      display: flex;
+      justify-content: space-between; /* 根据需要选择 space-between 或其他 */
+      align-items: center; /* 垂直居中 */
+      margin-top: -1.5vh;
+      .card-left{
+        display: flex;
+        justify-content: center;
+        padding: 1vw 1vw 1vw 0 ;
+        border-right: #DCDFE6 solid 2px;
+        .el-avatar{
+          margin-right: 0.5vw;
+          margin-left: -0.5vw;
+        }
+      }
+      .card-right{
+        display: flex;
+        flex-direction: column;
+        line-height: 0;
+      }
+    }
   }
 }
 .el-main{
   height: 87vh;
   width: 100%;
   display: grid;
+  .el-menu{
+    height: 6vh;
+    flex-grow: 1;
+    justify-content: center;
+    background-color: #f6efef;
+    --active-color: #be9367
+  }
+  .el-menu-item{
+    width: 15vw;
+    font-size: large;
+  }
+  .content-area{
+    height: 70vh;
+    display: flex;
+    justify-content: center;
+    overflow: auto;
+  }
 }
 .el-footer{
   height: 3vh;
@@ -124,31 +174,6 @@ const markerClicked = (id: number) => {
   background-color: #ece2e2;
   color: #909399;
 }
-.el-menu{
-  height: 6vh;
-  flex-grow: 1;
-  justify-content: center;
-  background-color: #f6efef;
-  --active-color: #be9367
-}
-.el-menu-item{
-  width: 15vw;
-  font-size: large;
-}
-.content-area{
-  display: flex;
-  justify-content: center;
-  min-height: 650px;
-  margin-top: 10px;
-  margin-bottom: 20px;
-}
-.el-card{
-  margin-top: 10px;
-  width: 12vw;
-  height: 90px;
-  background-color: #f6efef;
-  .el-avatar{
-    margin-left: 100px;
-  }
-}
+
+
 </style>
