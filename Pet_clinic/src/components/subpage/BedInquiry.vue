@@ -1,8 +1,8 @@
 <template>
-  <el-container style="margin-top: 1vw; border:solid lightgrey 2px; border-radius: 30px; ">
+  <div class="container" >
     <el-aside style="margin-left: 5vw; width: 30%;">
       <el-select v-model="value" placeholder="Select" style="margin-top: 3vw;">
-        <el-option v-for="dep in departments" :key="dep.departmentId" :label="dep.name" :value="dep.name" 
+        <el-option v-for="dep in departments" :key="dep.departmentId" :label="dep.name" :value="dep.name"
          @click="selectDepartment(dep.departmentId)"/>
       </el-select>
       <el-table :data="loadBedList()" style="margin-top: 3vw;">
@@ -14,13 +14,10 @@
     <el-main style="margin-left: 5vw;">
       <h3 style="color:grey; text-align:center; font-size:20px">{{ currentDepartment.name }} 床位图</h3>
       <div class="bed-image" style="display: flex; justify-content:center;">
-          <el-image style="width: 70%; height: 70%;" :src="url"/>
+          <el-image style="width: 60%; height: 60%;" :src="url"/>
       </div>
     </el-main>
-  </el-container>
-
-
-
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -82,7 +79,7 @@ var bedList = [
     departmentId: '001',
     location: '001A',
     availability: true
-    
+
   },
   {
     bedId: '001002',
@@ -113,9 +110,9 @@ var bedList = [
     departmentId: '002',
     location: '002A',
     availability: true
-    
+
   }
-  
+
 ]
 
 const fits = ['fill']
@@ -124,7 +121,11 @@ const url =
 </script>
 
 <style scoped lang="scss">
-// .el-table__body, .el-table__header{
-//     width: 100%;
-//   }
+.container{
+  height: 65vh;
+  width: 100%;
+  border:solid lightgrey 2px;
+  border-radius: 30px;
+  display: flex;
+}
 </style>
