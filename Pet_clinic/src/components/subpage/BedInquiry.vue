@@ -1,4 +1,5 @@
-<template>
+<template> 
+
   <el-container style="margin-top: 1vw; border:solid lightgrey 2px; border-radius: 30px; ">
     <el-aside style="margin-left: 5vw; width: 30%;">
       <el-select v-model="value" placeholder="Select" style="margin-top: 3vw;">
@@ -18,8 +19,6 @@
       </div>
     </el-main>
   </el-container>
-
-
 
 </template>
 
