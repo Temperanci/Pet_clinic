@@ -24,8 +24,8 @@
     <div class="aside" v-if="aside">
       <div class="console">
           <div class="consoleBtn" v-for="guidance in guidanceMap" 
-          :key="guidance[0]" >
-              <p @click="handleSelect(guidance[0])">{{ guidance[1] }}</p>
+          :key="guidance[0]" @click="handleSelect(guidance[0])">
+              <p >{{ guidance[1] }}</p>
           </div>
       </div>
     </div>

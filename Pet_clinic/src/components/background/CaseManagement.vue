@@ -2,13 +2,22 @@
 <p>
   {{ component.name }}
 </p>
-  
+<el-table class="table" :data="tableData">
+        <el-table-column v-for="column in columnMap" :prop="column[0]" :label="column[1]" />
+  </el-table>
 </template>
 
 <script setup lang="ts">
 import { defineComponent } from "vue";
 import { ref } from 'vue'
-
+const tableData = ref('')
+const columnMap = new Map([
+  ['instanceId','病例编号'],
+  ['diseaseId','病种编号'],
+  ['time','时间'],
+  ['pictureUrlList','图片列表'],
+  ['fileUrlList','文件列表']
+])
 const component = defineComponent({
   name: "CaseManagement"
 })
@@ -19,4 +28,8 @@ const component = defineComponent({
 // .el-table__body, .el-table__header{
 //     width: 100%;
 //   }
+.table {
+  width: 98%;
+  margin: auto;
+}
 </style>
