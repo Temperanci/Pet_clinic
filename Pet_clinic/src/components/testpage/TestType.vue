@@ -6,7 +6,7 @@
             <el-image src="url" />
           </template>
           <template #extra>
-            <el-button type="primary" @click="selectStudyType('ProblemSet')">进入</el-button>
+            <el-button type="primary" @click="selectTestType('ProblemSet')">进入</el-button>
           </template>
         </el-result>
       </el-col>
@@ -16,7 +16,7 @@
             <el-image src="url" />
           </template>
           <template #extra>
-            <el-button type="primary"  @click="selectStudyType('SingleProblem')">进入</el-button>
+            <el-button type="primary"  @click="selectTestType('SingleProblem')">进入</el-button>
           </template>
         </el-result>
       </el-col>
@@ -30,7 +30,7 @@
     name: "TestType"
   })
   const emit = defineEmits(['page'])
-  function selectStudyType(n:string){
+  function selectTestType(n:string){
     emit('page',n)
   }
 

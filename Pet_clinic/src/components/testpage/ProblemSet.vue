@@ -2,11 +2,11 @@
     <el-container>
         <el-main>
             <el-table :data="ProblemSetList" border width="100%">
-                <el-table-column prop="title" label="名称" width=""/>
-                <el-table-column prop="desc" label="描述" width=""/>
-                <el-table-column prop="startTime" label="开始时间" width=""/>
-                <el-table-column prop="endTime" label="结束时间" width=""/>
-                <el-table-column prop="duration" label="时长限制" width=""/>
+                <el-table-column prop="title" label="名称" width="" />
+                <el-table-column prop="desc" label="描述" width="" />
+                <el-table-column prop="startTime" label="开始时间" width="" />
+                <el-table-column prop="endTime" label="结束时间" width="" />
+                <el-table-column prop="duration" label="时长限制" width="" />
                 <el-table-column label="" width="100vw">
                     <template #default="scope">
                         <el-button size="small" @click="enterTest(scope.$index, scope.row)">进入测试</el-button>
@@ -26,11 +26,14 @@ import { defineComponent } from "vue";
 import { ref } from 'vue'
 
 defineComponent({
-    name: "ProblemSet",
+    name: "ProblemSet"
 })
 
+
+const emit = defineEmits(['page'])
 const enterTest = (index: number, row: number) => {
-  console.log(index, row)
+    emit('page', 'Test');
+    console.log(index, row)
 }
 
 
