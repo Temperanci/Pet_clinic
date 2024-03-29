@@ -11,6 +11,7 @@
             <el-text>用户名用户名</el-text>
           </div>
           <div class="card-right">
+            <el-button @click="Switch(0)">后台页面</el-button>
             <el-text>后台管理</el-text>
             <el-divider />
             <el-text>注销</el-text>
@@ -61,7 +62,10 @@ import FunctionalStudy from './subpage/FunctionalStudy.vue'
 defineComponent({
   name: "PetClinicLayout"
 })
-
+const emit = defineEmits(['switch'])
+function Switch(n:number){
+    emit('switch',n)
+}
 interface ComponentsMap {
   [key: string]: DefineComponent<{}, {}, any>;
 }

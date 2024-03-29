@@ -7,9 +7,16 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    BackgroundLayout: typeof import('./src/components/BackgroundLayout.vue')['default']
     BedInquiry: typeof import('./src/components/subpage/BedInquiry.vue')['default']
+    BedManagement: typeof import('./src/components/background/BedManagement.vue')['default']
+    CaseManagement: typeof import('./src/components/background/CaseManagement.vue')['default']
+    ChargeManagement: typeof import('./src/components/background/ChargeManagement.vue')['default']
     ClinicGuidance: typeof import('./src/components/subpage/ClinicGuidance.vue')['default']
+    CreateTest: typeof import('./src/components/background/CreateTest.vue')['default']
     DepartmentDetails: typeof import('./src/components/subpage/DepartmentDetails.vue')['default']
+    DepartmentManagement: typeof import('./src/components/background/DepartmentManagement.vue')['default']
+    DrugManagement: typeof import('./src/components/background/DrugManagement.vue')['default']
     DrugResource: typeof import('./src/components/subpage/DrugResource.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
@@ -36,10 +43,15 @@ declare module 'vue' {
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElText: typeof import('element-plus/es')['ElText']
+    FinishedTest: typeof import('./src/components/background/FinishedTest.vue')['default']
     FunctionalStudy: typeof import('./src/components/subpage/FunctionalStudy.vue')['default']
     PetClinicLayout: typeof import('./src/components/PetClinicLayout.vue')['default']
+    QuestionBank: typeof import('./src/components/background/QuestionBank.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ServiceCharge: typeof import('./src/components/subpage/ServiceCharge.vue')['default']
+    StaffManagement: typeof import('./src/components/background/StaffManagement.vue')['default']
+    StudyManagement: typeof import('./src/components/background/StudyManagement.vue')['default']
+    VaccineManagement: typeof import('./src/components/background/VaccineManagement.vue')['default']
   }
 }
