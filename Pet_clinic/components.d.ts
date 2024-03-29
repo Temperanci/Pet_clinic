@@ -48,7 +48,6 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     ServiceCharge: typeof import('./src/components/subpage/ServiceCharge.vue')['default']
     SingleProblem: typeof import('./src/components/testpage/SingleProblem.vue')['default']
-    StudyType: typeof import('./src/components/subpage/StudyType.vue')['default']
     Test: typeof import('./src/components/testpage/Test.vue')['default']
     TestType: typeof import('./src/components/testpage/TestType.vue')['default']
   }
