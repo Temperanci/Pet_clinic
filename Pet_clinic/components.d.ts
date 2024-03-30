@@ -50,6 +50,7 @@ declare module 'vue' {
     OverlayComponent: typeof import('./src/components/subpage/OverlayComponent.vue')['default']
     PetClinicLayout: typeof import('./src/components/PetClinicLayout.vue')['default']
     QuestionBank: typeof import('./src/components/background/QuestionBank.vue')['default']
+    RoleDetail: typeof import('./src/components/subpage/RoleDetail.vue')['default']
     RolePlayComponent: typeof import('./src/components/subpage/RolePlayComponent.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

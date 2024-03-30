@@ -1,40 +1,68 @@
 <template>
+  <div class="role-selection">
+    <h1>请选择你要扮演的角色：</h1>
+  </div>
   <div class="container">
-    <el-card shadow="hover" class="card-content">
+    <el-card
+        shadow="hover"
+        class="card-content"
+        v-for="(role, index) in roles"
+        :key="index"
+        @click="showDetails(role.nameCN)"
+    >
       <div class="content-wrapper">
-        <img src="/avatar/receptionist.png" alt="" class="img"/>
-        <el-text>前台</el-text>
-        <el-text>RECEPTIONIST</el-text>
+        <img :src="role.img" alt="" class="img"/>
+        <el-text>{{ role.nameCN }}</el-text>
+        <el-text>{{ role.nameEN }}</el-text>
       </div>
     </el-card>
-    <el-card shadow="hover" class="card-content">
-      <div class="content-wrapper">
-        <img src="/avatar/technician.png" alt="" class="img"/>
-        <el-text>医助</el-text>
-        <el-text>TECHNICIAN</el-text>
-      </div>
-    </el-card>
-    <el-card shadow="hover" class="card-content">
-      <div class="content-wrapper">
-        <img src="/avatar/veterinarian.png" alt="" class="img"/>
-        <el-text>医师</el-text>
-        <el-text>VETERINARIAN</el-text>
-      </div>
-    </el-card>
+    <role-detail v-if="selectedRoleName" :name="selectedRoleName" @close="closeDetails"></role-detail>
   </div>
 </template>
 
 <script setup lang="ts">
-import {defineComponent} from "vue";
+import { ref } from 'vue';
+import RoleDetail from './RoleDetail.vue';
 
-defineComponent({
-  name: "RolePlayComponent"
-})
 
-// const close = defineEmits(['close'])
+
+const roles = ref<Role[]>([
+  { img: "/avatar/receptionist.png", nameCN: "前台", nameEN: "RECEPTIONIST", content: "这里是前台的职责和介绍..." },
+  { img: "/avatar/technician.png", nameCN: "医助", nameEN: "TECHNICIAN", content: "这里是医助的职责和介绍..." },
+  { img: "/avatar/veterinarian.png", nameCN: "医师", nameEN: "VETERINARIAN", content: "这里是医师的职责和介绍..." }
+  // ... 更多角色
+]);
+
+interface Role {
+  img: string;
+  nameCN: string;
+  nameEN: string;
+  content: string;
+}
+// 这里我们用一个字符串代替了整个对象
+const selectedRoleName = ref<string | null>(null);
+
+const showDetails = (roleName: string) => {
+  selectedRoleName.value = roleName;
+};
+
+const closeDetails = () => {
+  selectedRoleName.value = null;
+};
 </script>
 
+
 <style scoped lang="scss">
+.role-selection {
+  text-align: center;
+  width: 100%; // 确保占满全宽
+
+  h1 {
+    font-size: 50px;
+    color: #fcf7f4;
+    margin-bottom: 10vh; // 根据需要调整
+  }
+}
 .container {
   display: flex;
   justify-content: space-around;

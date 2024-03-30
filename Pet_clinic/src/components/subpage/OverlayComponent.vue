@@ -20,8 +20,8 @@ const closeOverlay = () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .overlay{
-  background-color: #836a6a;
+  background-color: #fcf7f4;
 }
 </style>
