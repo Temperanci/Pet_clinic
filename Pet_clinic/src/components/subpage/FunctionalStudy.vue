@@ -91,6 +91,5 @@ function openOverlayWithComponent(componentName: string){
   width: 100vw; /* 视口宽度 */
   height: 100vh; /* 视口高度 */
   z-index: 1000; /* 确保它位于其他内容之上 */
-  background-color: rgba(131, 106, 106); /* 半透明背景 */
 }
 </style>

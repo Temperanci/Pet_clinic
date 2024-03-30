@@ -56,10 +56,9 @@ const closeDetails = () => {
 .role-selection {
   text-align: center;
   width: 100%; // 确保占满全宽
-
   h1 {
     font-size: 50px;
-    color: #fcf7f4;
+    color: #af7d5f;
     margin-bottom: 10vh; // 根据需要调整
   }
 }

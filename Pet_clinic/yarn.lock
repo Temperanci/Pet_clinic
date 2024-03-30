@@ -791,7 +791,7 @@
     "@vue/reactivity" "3.4.21"
     "@vue/shared" "3.4.21"
 
-"@vue/runtime-dom@3.4.21":
+"@vue/runtime-dom@^3.4.21", "@vue/runtime-dom@3.4.21":
   version "3.4.21"
   resolved "https://registry.npmjs.org/@vue/runtime-dom/-/runtime-dom-3.4.21.tgz"
   integrity sha512-gvf+C9cFpevsQxbkRBS1NpU8CqxKw0ebqMvLwcGQrNpx6gqRDodqKqA+A2VZZpQ9RpK2f9yfg8VbW/EpdFUOJw==

@@ -3,12 +3,16 @@
     <div class="overlay-content">
       <!-- 左侧条目列表 -->
       <div class="entries-list">
-        <h3>{{ selectedRole.name }}</h3>
-        <ul>
-          <li v-for="entry in selectedRole.entries" :key="entry.id" @click="selectEntry(entry)">
+        <h1 class="h1">{{ selectedRole.name }}</h1>
+        <el-menu default-active="1" class="menu-list" @select="selectEntry">
+          <el-menu-item
+              v-for="entry in selectedRole.entries"
+              :key="entry.id"
+              :index="entry.id.toString()"
+          >
             {{ entry.title }}
-          </li>
-        </ul>
+          </el-menu-item>
+        </el-menu>
       </div>
       <!-- 右侧条目详情 -->
       <div class="entry-detail" v-if="selectedEntry">
@@ -22,9 +26,13 @@
 </template>
 
 
-
 <script setup lang="ts">
-import {ref, computed} from 'vue';
+import {computed, defineComponent, ref} from 'vue';
+
+defineComponent({
+  name: "RoleDetail",
+})
+
 const props = defineProps({
   name: String
 });
@@ -36,9 +44,13 @@ const emit = defineEmits(['close']);
 const selectedEntry = ref<Entry | null>(null);
 
 // Function to handle entry selection
-const selectEntry = (entry) => {
-  selectedEntry.value = entry;
+const selectEntry = (index) => {
+  // 因为 index 是字符串，所以我们需要转换为数字
+  const entryId = parseInt(index, 10);
+  // 通过 entryId 查找条目
+  selectedEntry.value = selectedRole.value.entries.find(e => e.id === entryId);
 };
+
 
 // Close overlay function
 const closeOverlay = () => {
@@ -57,6 +69,10 @@ interface Role {
   name: string;
   entries: Entry[]; // 每个角色都有相关的条目列表
 }
+
+const selectedRole = computed(() => {
+  return roles.find(role => role.name === props.name);
+});
 
 // 示例数据
 const roles: Role[] = [
@@ -96,9 +112,7 @@ const roles: Role[] = [
 
   // ... 其他角色及其条目
 ];
-const selectedRole = computed(() => {
-  return roles.find(role => role.name === props.name);
-});
+
 </script>
 
 
@@ -122,10 +136,23 @@ const selectedRole = computed(() => {
   background: white;
   width: 80%; /* 调整为所需的宽度 */
   height: 80%; /* 调整为所需的高度 */
+  border-radius: 10px;
 }
 
-.entries-list, .entry-detail {
+.entries-list {
   flex: 1;
+  padding: 20px;
+  .h1{
+    font-size: 38px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    margin-left: 1vw;
+    margin-top: 5px;
+    justify-content: center;
+  }
+}
+.entry-detail {
+  flex: 2;
   padding: 20px;
 }
 

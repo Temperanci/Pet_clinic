@@ -12,7 +12,6 @@
           </div>
           <div class="card-right">
             <el-button @click="Switch(0)">后台页面</el-button>
-            <el-text>后台管理</el-text>
             <el-divider />
             <el-text>注销</el-text>
           </div>
