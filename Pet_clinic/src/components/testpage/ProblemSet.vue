@@ -9,7 +9,7 @@
                 <el-table-column prop="duration" label="时长限制" width="" />
                 <el-table-column label="" width="100vw">
                     <template #default="scope">
-                        <el-button size="small" @click="enterTest(scope.$index, scope.row)">进入测试</el-button>
+                        <el-button size="small" @click="enterTest(scope.row.problemSetId)">进入测试</el-button>
                     </template>
                 </el-table-column>
 
@@ -31,9 +31,9 @@ defineComponent({
 
 
 const emit = defineEmits(['page'])
-const enterTest = (index: number, row: number) => {
+const enterTest = (id:string) => {
     emit('page', 3);
-    console.log(index, row)
+    console.log(id)
 }
 
 
