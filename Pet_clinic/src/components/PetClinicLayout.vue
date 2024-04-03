@@ -12,7 +12,6 @@
           </div>
           <div class="card-right">
             <el-button @click="Switch(0)">后台页面</el-button>
-            <el-text>后台管理</el-text>
             <el-divider />
             <el-text>注销</el-text>
           </div>
@@ -33,7 +32,6 @@
       </el-menu>
       <div class="content-area">
         <!-- 动态组件会在这里渲染 -->
-<!--        <component :is="currentComponent" />-->
         <ClinicGuidance v-if="activeIndex === '1'" @marker-clicked="markerClicked" />
         <DepartmentDetails v-if="activeIndex === '2'" :selected-id="selectedDepartmentId" />
         <DrugResource v-if="activeIndex === '3'" />

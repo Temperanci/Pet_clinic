@@ -32,7 +32,7 @@ defineComponent({
 
 const emit = defineEmits(['page'])
 const enterTest = (index: number, row: number) => {
-    emit('page', 'Test');
+    emit('page', 3);
     console.log(index, row)
 }
 

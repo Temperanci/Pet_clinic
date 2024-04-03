@@ -1,6 +1,6 @@
 <template>
-  <el-container>
-    <l-map ref="map" v-model:zoom="zoom" :center="[39.8, 39.5]" :useGlobalLeaflet=false>
+  <div class="container">
+    <l-map ref="map" v-model:zoom="zoom" :center="[40, 39.5]" :useGlobalLeaflet=false>
       <l-image-overlay
           :url="url"
           :bounds="imageBounds"
@@ -21,7 +21,7 @@
         <l-tooltip>{{ marker.name }}</l-tooltip>
       </l-marker>
     </l-map>
-  </el-container>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -71,7 +71,9 @@ function onMarkerClicked(id: number) {
 </script>
 
 <style scoped lang="scss">
-.el-container{
+.container{
+  height: 70vh;
+  width: 100%;
   display: flex;
   justify-content: center;
   position: relative;
