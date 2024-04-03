@@ -4,20 +4,61 @@
       <div class="h1">
         Pet Clinic 宠物医院在线导览
       </div>
-      <el-card shadow="hover">
+      <el-card v-if="ifLogined" shadow="hover">
         <div class="card-container">
           <div class="card-left">
             <el-avatar :size="40" />
             <el-text>用户名用户名</el-text>
           </div>
           <div class="card-right">
-            <el-button @click="Switch(0)">后台页面</el-button>
-            <el-text>后台管理</el-text>
+            <el-button v-if="userStatus === 0" @click="Switch(0)">后台页面</el-button>
             <el-divider />
             <el-text>注销</el-text>
           </div>
         </div>
       </el-card>
+      <div v-else class="login">
+        <el-popover
+          :visible="loginVisible"
+          placement="left"
+          :width="300">
+          <template #reference>
+            <el-button class="loginBtn" @click="()=>{loginVisible=!loginVisible;registerVisible=false;}">登录</el-button>
+          </template>
+          <div >
+            <el-input v-model="userName" class="input" placeholder="用户名" />
+          </div>
+          <div>
+            <el-input v-model="userPwd" class="input" placeholder="密码" />
+          </div>
+          <div style="width: 100%;">
+            <el-button class="Btn" @click="Login">登录</el-button>
+            <el-button class="Btn" @click="()=>loginVisible=false">取消</el-button>
+          </div>
+        </el-popover>
+        <el-popover
+          :visible="registerVisible"
+          placement="left"
+          :width="300">
+          <template #reference>
+            <el-button class="registerBtn" @click="()=>{registerVisible=!registerVisible;loginVisible=false;}">注册</el-button>
+          </template>
+          <div >
+            <el-input v-model="userName" class="input" placeholder="用户名" />
+          </div>
+          <div>
+            <el-input v-model="userPwd" class="input" placeholder="密码" />
+          </div>
+          <div>
+            <el-input v-model="userPwdConfirm" class="input" placeholder="确认密码" />
+          </div>
+          <div style="width: 100%;">
+            <el-button class="Btn" @click="Login">注册</el-button>
+            <el-button class="Btn" @click="()=>registerVisible=false">取消</el-button>
+          </div>
+        </el-popover>
+      </div>
+      
     </el-header>
     <el-main>
       <el-menu mode="horizontal"
@@ -33,7 +74,6 @@
       </el-menu>
       <div class="content-area">
         <!-- 动态组件会在这里渲染 -->
-<!--        <component :is="currentComponent" />-->
         <ClinicGuidance v-if="activeIndex === '1'" @marker-clicked="markerClicked" />
         <DepartmentDetails v-if="activeIndex === '2'" :selected-id="selectedDepartmentId" />
         <DrugResource v-if="activeIndex === '3'" />
@@ -82,10 +122,22 @@ const componentsMap: ComponentsMap = {
 const activeIndex = ref('1')
 const currentComponent = ref(componentsMap[activeIndex.value])
 const selectedDepartmentId = ref(1);
-
+const userStatus = ref(0)//0:管理 1:路人
+const ifLogined = ref(true)//false:未登录
+const loginVisible = ref(false)
+const registerVisible = ref(false)
 const handleSelect = (index: string) => {
   activeIndex.value = index
   currentComponent.value = componentsMap[index]
+}
+const userName = ref('')
+const userPwd = ref('')
+const userPwdConfirm = ref('')
+function Login(){
+
+}
+function Register(){
+
 }
 // 当 marker 被点击时调用
 const markerClicked = (id: number) => {
@@ -99,6 +151,9 @@ const markerClicked = (id: number) => {
 
 
 <style scoped lang="scss">
+.test{
+  z-index: 999;
+}
 .el-container {
   height: 100vh;
   width: 100vw;
@@ -174,6 +229,24 @@ const markerClicked = (id: number) => {
   background-color: #ece2e2;
   color: #909399;
 }
-
-
+.login {
+  width: 10%;
+  display: flex;
+  .loginBtn{
+    margin: 0%;
+    border-radius: 0%;
+  }
+  .registerBtn{
+    margin: 0%;
+    border-radius: 0%;
+  }
+}
+.input {
+      margin-bottom: 10px;
+      width:300;
+      }
+.Btn{
+  margin-left: 60px;
+  width:47px;
+}
 </style>
