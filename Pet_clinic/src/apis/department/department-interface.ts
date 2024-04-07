@@ -1,4 +1,4 @@
-import { DepartmentBO } from "@/apis/schemas";
+import type { DepartmentBO } from "@/apis/schemas";
 
 export interface DepartmentPageRequest {
     desc?: string;
