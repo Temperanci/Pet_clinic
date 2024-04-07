@@ -43,6 +43,7 @@ declare module 'vue' {
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
     ElOption: typeof import('element-plus/es')['ElOption']
     ElPagination: typeof import('element-plus/es')['ElPagination']
+    ElPopover: typeof import('element-plus/es')['ElPopover']
     ElRadio: typeof import('element-plus/es')['ElRadio']
     ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
     ElResult: typeof import('element-plus/es')['ElResult']
@@ -68,7 +69,6 @@ declare module 'vue' {
     StaffManagement: typeof import('./src/components/background/StaffManagement.vue')['default']
     StudyManagement: typeof import('./src/components/background/StudyManagement.vue')['default']
     Test: typeof import('./src/components/testpage/Test.vue')['default']
-    TestType: typeof import('./src/components/testpage/TestType.vue')['default']
     VaccineManagement: typeof import('./src/components/background/VaccineManagement.vue')['default']
   }
 }
