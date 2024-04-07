@@ -1,6 +1,6 @@
 <template>
   <div class="online-test-component">
-    <el-button class="back-button" @click="returnUpper">返回上一级</el-button>
+    <el-button class="back-button" @click="returnUpper" v-if="content !== 0">返回上一级</el-button>
     <!-- 在这里添加在线测试相关的内容 -->
     <div class="test-content">
       <template v-if="content === 0">

@@ -55,6 +55,38 @@
         <OnlineTestComponent v-if="activeComponent === 'OnlineTestComponent'" @close="showOverlay = false" />
       </OverlayComponent>
     </el-row>
+    <el-button plain @click="dialogOverflowVisible = true">
+      智能医生
+    </el-button>
+
+
+    <el-dialog v-model="dialogOverflowVisible" title="智能医生" width="600" draggable overflow>
+      <div class="dialog-content">
+        <el-container>
+          <el-header>
+            对话内容
+          </el-header>
+          <el-main>
+            <div v-for="(message, index) in dialog">
+              <div v-if="index % 2 == 0" class="user-message">
+                <div class="message-wrapper-right">{{ message }}</div>
+              </div>
+              <div v-else class="ai-message">
+                <div class="message-wrapper-left">{{ message }}</div>
+              </div>
+            </div>
+          </el-main>
+          <el-footer>
+          </el-footer>
+        </el-container>
+      </div>
+      <el-input type="textarea" placeholder="在此输入" v-model="input" />
+      <el-button size="small" @click="sendMessage">
+        Send
+      </el-button>
+    </el-dialog>
+
+
   </div>
 </template>
 
@@ -77,6 +109,15 @@ defineComponent({
 const showOverlay = ref(false);
 const activeComponent = ref(''); // 这里你可以根据逻辑设置为相应的组件名
 
+const dialogOverflowVisible = ref(false);
+const input = ref('');
+const dialog = ref(['Hi', 'Hello, can I help you?', 'How to solve the question?', 'The answer is...']);
+
+function sendMessage() {
+  dialog.value.push(input.value);
+  console.log('用户输入: ', input.value);
+}
+
 // 你还需要定义打开覆盖层时设置 activeComponent 的逻辑
 function openOverlayWithComponent(componentName: string) {
   activeComponent.value = componentName;
@@ -86,6 +127,38 @@ function openOverlayWithComponent(componentName: string) {
 </script>
 
 <style scoped lang="scss">
+.dialog-content {
+  min-height: 400px;
+  max-height: 400px;
+  overflow: auto;
+}
+
+.user-message {
+  display: flex;
+  flex-direction: row-reverse;
+  margin-bottom: 10px;
+}
+
+.ai-message {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 10px;
+}
+
+.message-wrapper-right {
+  max-width: 230px;
+  word-wrap: break-word;
+  background-color: powderblue;
+  border-radius: 12px 0px 12px 12px;
+}
+
+.message-wrapper-left {
+  max-width: 230px;
+  word-wrap: break-word;
+  background-color: lightslategray;
+  border-radius: 0px 12px 12px 12px;
+}
+
 .container {
   height: 70vh;
   align-items: center;
