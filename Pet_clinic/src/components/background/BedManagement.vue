@@ -9,18 +9,18 @@
     </el-table>
     </div>
     <div class="pagination-block">
-      <el-pagination @current-change="pagination"  layout="prev, pager, next" :total="getPagination(queryData)" />
+      <el-pagination style="margin-top: 5%;" @current-change="pagination"  layout="prev, pager, next" :total="getPagination(queryData)" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { defineComponent } from "vue";
-import { ref ,getCurrentInstance} from 'vue'
 //分页
-import {updateTab,selectPage,Table,getPagination} from './paginate.ts'
-import {bedData} from './data.ts'
-import { TableCell } from "element-plus/es/components/table-v2/src/components/index.mjs";
+import { ref ,getCurrentInstance} from 'vue'
+import {updateTab,selectPage,Table,getPagination} from '../../scripts/paginate.ts'
+import {bedData} from '../../scripts/data.ts'
+import '@/assets/table.css'
 var tableData:Table = new Table([]);
 var queryData = bedData;
 var currentPage = 1;
@@ -30,6 +30,7 @@ function pagination(val:number){
   currentPage = val
   updateTab(currentPage,tableData,queryData,ctx)
 }
+//分页
 const columnMap = new Map([
   ['bedId','床位编号'],
   ['departmentId','科室编号'],
@@ -46,16 +47,5 @@ const component = defineComponent({
 // .el-table__body, .el-table__header{
 //     width: 100%;
 //   }
-.pagination-block{
-  margin: auto;
-}
-.table {
-  width: 98%;
-  height:auto;
-  margin-top:1%;
-  margin-left:1%;
-  margin-right:1;
-  margin-bottom:1%;
-  overflow:hidden;
-}
 </style>
+../../scripts/data.js../../scripts/paginate.js
