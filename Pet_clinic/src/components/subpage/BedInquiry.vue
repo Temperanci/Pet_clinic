@@ -12,7 +12,7 @@
       </el-table>
     </el-aside>
     <el-main style="margin-left: 5vw;">
-      <h3 style="color:grey; text-align:center; font-size:20px">{{ currentDepartment.name }} 床位图</h3>
+      <h3 style="color:grey; text-align:center; font-size:20px">{{ currentDepartmentRef.name }} 床位图</h3>
       <div class="bed-image" style="display: flex; justify-content:center;">
           <el-image style="width: 60%; height: 60%;" :src="url"/>
       </div>
@@ -31,18 +31,15 @@ defineComponent({
 // 选择科室
 function selectDepartment(id: string) {
   var temp = departments.find(dep => dep.departmentId === id);
-  if (temp != null) currentDepartment = temp;
-  console.log(currentDepartment.name);
-}
-function currentDepartmentName(){
-  return currentDepartment.name;
+  if (temp != null) currentDepartmentRef.value = temp;
+  console.log(currentDepartmentRef.value.name);
 }
 
 // 返回所选科室的床位列表
 function loadBedList(){
   var currentBedList:{bedId:string;departmentId:string;location:string;availability:boolean}[]=[];
   for(var index in bedList){
-    if(bedList[index].departmentId==currentDepartment.departmentId){
+    if(bedList[index].departmentId==currentDepartmentRef.value.departmentId){
       currentBedList.push(bedList[index]);
     }
   }
@@ -73,6 +70,8 @@ var departments = [
   }
 ]
 var currentDepartment = departments[0];
+var currentDepartmentRef = ref(currentDepartment);
+
 var bedList = [
   {
     bedId: '001001',
