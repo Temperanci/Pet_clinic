@@ -40,7 +40,7 @@
                         <el-table-column prop="title" label="题目" />
                         <el-table-column prop="subjectId" label="知识点" />
                         <el-table-column prop="type" label="题型" />
-                        <el-table-column label="" width="100vw">
+                        <el-table-column label="" width="100px">
                             <template #default="scope">
                                 <el-button size="small"
                                     @click="chooseSingleProblem(scope.row.problemId)">选择</el-button>
