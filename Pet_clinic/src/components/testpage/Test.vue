@@ -8,14 +8,13 @@
                 <el-main>
                     <div class="problemContent">
                         <p>{{ currentProblemRef.content }}</p>
-                        <el-radio-group v-if="currentProblemRef.type === '单选'">
-                            <el-radio v-for="(choice, index) in currentProblemRef.choices" :key="index" :label="1"
-                                v-model="chosenAnswer">
+                        <el-radio-group v-if="currentProblemRef.type === '单选'" v-model="chosenAnswer">
+                            <el-radio v-for="(choice, index) in currentProblemRef.choices" :key="index" :label="index+1">
                                 {{ choice }}
                             </el-radio>
                         </el-radio-group>
-                        <el-checkbox-group v-else-if="currentProblemRef.type === '多选'">
-                            <el-checkbox v-for="(choice, index) in currentProblemRef.choices" :key="index">
+                        <el-checkbox-group v-else-if="currentProblemRef.type === '多选'"  v-model="chosenAnswers">
+                            <el-checkbox v-for="(choice, index) in currentProblemRef.choices" :key="index" :label="index+1">
                                 {{ choice }}
                             </el-checkbox>
                         </el-checkbox-group>
@@ -153,6 +152,7 @@ var currentProblem = ProblemList[0];
 var currentProblemRef = ref(currentProblem);
 var inputAnswer = ref('');
 var chosenAnswer = ref(0);
+var chosenAnswers = ref([0]);
 
 const url = ''
 </script>

@@ -26,7 +26,7 @@ export const pageQuery = async (request: BedPageRequest): Promise<Result<BedPage
 };
 
 // 假设 BedUpdateRequest 和 BedBO 已经定义好了
-import type { BedUpdateRequest } from "./path/to/BedUpdateRequest";
+import type { BedUpdateRequest } from "@/apis/bed/bed-interface";
 
 export const update = async (request: BedUpdateRequest): Promise<Result<BedBO>> => {
     try {
