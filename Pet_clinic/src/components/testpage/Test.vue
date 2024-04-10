@@ -3,24 +3,23 @@
         <el-container>
             <el-container width="60%">
                 <el-header>
-                    <h3>{{ currentProblemRef.title }}</h3>
+                    <h3>{{ currentProblem.title }}</h3>
                 </el-header>
                 <el-main>
                     <div class="problemContent">
-                        <p>{{ currentProblemRef.content }}</p>
-                        <el-radio-group v-if="currentProblemRef.type === '单选'" v-model="chosenAnswer">
-                            <el-radio v-for="(choice, index) in currentProblemRef.choices" :key="index"
-                                :label="index + 1">
+                        <p>{{ currentProblem.content }}</p>
+                        <el-radio-group v-if="currentProblem.type === '单选'" v-model="chosenAnswer">
+                            <el-radio v-for="(choice, index) in currentProblem.choices" :key="index" :label="choices[index]">
                                 {{ choice }}
                             </el-radio>
                         </el-radio-group>
-                        <el-checkbox-group v-else-if="currentProblemRef.type === '多选'" v-model="chosenAnswers">
-                            <el-checkbox v-for="(choice, index) in currentProblemRef.choices" :key="index"
-                                :label="index + 1">
+                        <el-checkbox-group v-else-if="currentProblem.type === '多选'" v-model="chosenAnswers">
+                            <el-checkbox v-for="(choice, index) in currentProblem.choices" :key="index"
+                                :label="choices[index]">
                                 {{ choice }}
                             </el-checkbox>
                         </el-checkbox-group>
-                        <el-input v-else-if="currentProblemRef.type === '简答'" type="textarea" placeholder="在此输入答案"
+                        <el-input v-else-if="currentProblem.type === '简答'" type="textarea" placeholder="在此输入答案"
                             v-model="inputAnswer" />
                     </div>
                 </el-main>
@@ -35,9 +34,10 @@
             </el-container>
             <el-aside>
                 <div class="problemTable">
-                    <div class="problemNumber" v-for="(problem, index) in ProblemList">
-                        <el-button @click="jumpProblem(problem.problemId)">{{ index + 1 }}</el-button>
-
+                    <div class="problemNumber" v-for="(pro, index) in ProblemList">
+                        <el-button style="width: 45px" @click="jumpProblem(pro.problemId)"
+                            :style="{ background: pro.problemId === currentProblem.problemId ? 'aquamarine' : '' }">{{
+                        index + 1 }}</el-button>
                     </div>
                 </div>
             </el-aside>
@@ -51,29 +51,50 @@ import { ref } from 'vue'
 
 defineComponent({
     name: "Test",
+    props: {
+        testId: String
+    }
 })
 
 function jumpProblem(n: number) {
+    saveAnswer();
     var temp = ProblemList.find(pro => pro.problemId === n);
     if (temp != null) {
-        currentProblemRef.value = temp;
-        console.log('跳转至题', currentProblemRef.value.problemId, currentProblemRef.value.title);
+        currentProblem.value = temp;
+        console.log('跳转至题', currentProblem.value.problemId);
     } else {
         console.log('跳转失败');
     }
 }
 function nextProblem() {
-    jumpProblem(currentProblemRef.value.problemId + 1)
+    saveAnswer();
+    jumpProblem(currentProblem.value.problemId + 1)
     console.log('下一题');
 }
 function priorProblem() {
-    jumpProblem(currentProblemRef.value.problemId - 1)
+    saveAnswer();
+    jumpProblem(currentProblem.value.problemId - 1)
     console.log('上一题');
 }
-function submit() {
-    console.log('提交测试');
+function saveAnswer() { //切换题目时自动保存答案
+    var temp = currentProblem.value;
+    if (temp.type == '单选') {
+        console.log("单选:", chosenAnswer.value);
+        answerMap.set(temp.problemId, chosenAnswer.value);
+    } else if(temp.type == '多选'){
+        console.log("多选:", chosenAnswers.value);
+        answerMap.set(temp.problemId, chosenAnswers.value[0]);
+    } else if(temp.type == '简答'){
+        console.log("简答:", inputAnswer.value);
+        answerMap.set(temp.problemId, inputAnswer.value);        
+    }
 }
 
+
+function submit() {
+    console.log('提交测试');
+    console.log(answerMap);
+}
 
 
 const ProblemList = [{
@@ -193,13 +214,15 @@ const ProblemList = [{
 }
 ]
 
-var currentProblem = ProblemList[0];
-var currentProblemRef = ref(currentProblem);
-var inputAnswer = ref('');
-var chosenAnswer = ref(0);
-var chosenAnswers = ref([0]);
+const currentProblem = ref(ProblemList[0]);
 
-const url = ''
+const choices=ref(['A','B','C','D']);
+const chosenAnswer = ref('');
+const chosenAnswers = ref([]);
+const inputAnswer = ref('');
+
+const answerMap = new Map();
+
 </script>
 
 <style scoped lang="scss">
@@ -219,7 +242,7 @@ const url = ''
 .problemTable {
     display: flex;
     flex-wrap: wrap;
-    padding: 2vw;
+    padding: 3vw;
 }
 
 ;
