@@ -28,11 +28,27 @@
 
 <script setup lang="ts">
 import { defineComponent } from "vue";
-import { ref } from 'vue'
+import { ref,onMounted } from 'vue'
+import { pageQuery } from '@/apis/problemSet/problemSet';
+import type { ProblemSetPageRequest, ProblemSetPageResponse, ProblemSetUpdateRequest } from '@/apis/problemSet/problemSet-interface';
+import type { ProblemSetBO } from '@/apis/schemas';
 
 defineComponent({
     name: "ProblemSet"
 })
+
+const problemSetList = ref<ProblemSetPageResponse>();
+const fetchData = async () => {
+    try {
+        const response = await pageQuery({});
+        problemSetList.value = response.data;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+};
+onMounted(fetchData);
+console.log("数据量: ",problemSetList.value?.datas.length);
+console.log("获取数据: ",problemSetList.value?.datas); 
 
 
 const emit = defineEmits(['page', 'id'])

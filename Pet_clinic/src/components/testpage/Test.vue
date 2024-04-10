@@ -7,15 +7,14 @@
                 </el-header>
                 <el-main>
                     <div class="problemContent">
-                        <p>{{ currentProblem.content }}</p>
+                        <pre style="font-size: larger;">{{ currentProblem.content }}</pre>
                         <el-radio-group v-if="currentProblem.type === '单选'" v-model="chosenAnswer">
-                            <el-radio v-for="(choice, index) in currentProblem.choices" :key="index" :label="choices[index]">
+                            <el-radio v-for="(choice, index) in choices" :key="index" :label="choice">
                                 {{ choice }}
                             </el-radio>
                         </el-radio-group>
                         <el-checkbox-group v-else-if="currentProblem.type === '多选'" v-model="chosenAnswers">
-                            <el-checkbox v-for="(choice, index) in currentProblem.choices" :key="index"
-                                :label="choices[index]">
+                            <el-checkbox v-for="(choice, index) in choices" :key="index" :label="choices">
                                 {{ choice }}
                             </el-checkbox>
                         </el-checkbox-group>
@@ -47,13 +46,33 @@
 
 <script setup lang="ts">
 import { defineComponent } from "vue";
-import { ref } from 'vue'
+import { ref,onMounted } from 'vue';
+import { pageQuery } from '@/apis/problem/problem';
+import type { ProblemPageRequest, ProblemPageResponse, ProblemUpdateRequest } from '@/apis/problem/problem-interface';
+import type { ProblemBO } from '@/apis/schemas';
 
 defineComponent({
     name: "Test",
-    props: {
-        testId: String
+})
+
+
+const problemList = ref<ProblemPageResponse>();
+const fetchData = async () => {
+    try {
+        const response = await pageQuery({});
+        problemList.value = response.data;
+    } catch (error) {
+        console.error('Error fetching data:', error);
     }
+};
+onMounted(fetchData);
+console.log("数据量: ",problemList.value?.datas.length);
+console.log("获取数据: ",problemList.value?.datas); 
+
+
+
+const props = defineProps({
+    testId: String
 })
 
 function jumpProblem(n: number) {
@@ -81,12 +100,12 @@ function saveAnswer() { //切换题目时自动保存答案
     if (temp.type == '单选') {
         console.log("单选:", chosenAnswer.value);
         answerMap.set(temp.problemId, chosenAnswer.value);
-    } else if(temp.type == '多选'){
+    } else if (temp.type == '多选') {
         console.log("多选:", chosenAnswers.value);
         answerMap.set(temp.problemId, chosenAnswers.value[0]);
-    } else if(temp.type == '简答'){
+    } else if (temp.type == '简答') {
         console.log("简答:", inputAnswer.value);
-        answerMap.set(temp.problemId, inputAnswer.value);        
+        answerMap.set(temp.problemId, inputAnswer.value);
     }
 }
 
@@ -101,17 +120,15 @@ const ProblemList = [{
     problemId: 1,
     type: '单选',
     subjectId: '',
-    title: '题1',
-    content: '犬细小病毒感染通常通过以下哪种途径传播？',
-    choices: ['A. 空气飞沫传播', 'B. 食物或饮水传播', 'C. 虫媒传播', 'D. 直接接触传播']
+    title: '犬细小病毒',
+    content: '犬细小病毒感染通常通过以下哪种途径传播？\nA. 空气飞沫传播\nB. 食物或饮水传播\nC. 虫媒传播\nD. 直接接触传播',
 },
 {
     problemId: 2,
     type: '多选',
     subjectId: '宠物疾病',
     title: '题2',
-    content: '以下哪些症状可能表明猫患上了猫白血病病毒感染？',
-    choices: ['A. 慢性呕吐', 'B. 鼻血', 'C. 脱毛', 'D. 昏睡不醒']
+    content: '以下哪些症状可能表明猫患上了猫白血病病毒感染？以下哪些症状可能表明猫患上了猫白血病病毒感染？\nA. 慢性呕吐\nB. 鼻血\nC. 脱毛\nD. 昏睡不醒'
 },
 {
     problemId: 3,
@@ -216,7 +233,7 @@ const ProblemList = [{
 
 const currentProblem = ref(ProblemList[0]);
 
-const choices=ref(['A','B','C','D']);
+const choices = ref(['A', 'B', 'C', 'D']);
 const chosenAnswer = ref('');
 const chosenAnswers = ref([]);
 const inputAnswer = ref('');

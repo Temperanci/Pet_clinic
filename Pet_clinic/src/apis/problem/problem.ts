@@ -11,7 +11,7 @@ interface Result<T> {
 }
 
 // Base URL for your API
-const API_BASE_URL = 'http://localhost:8084';
+const API_BASE_URL = '/api';
 
 // Function to query problems with pagination
 export const pageQuery = async (request: ProblemPageRequest): Promise<Result<ProblemPageResponse>> => {
