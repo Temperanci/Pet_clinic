@@ -6,7 +6,7 @@
     </el-table>
     </div>
     <div class="pagination-block">
-      <el-pagination style="margin-top: 5%;" @current-change="pagination"  layout="prev, pager, next" :total="getPagination(queryData)" />
+      <el-pagination @current-change="pagination"  layout="prev, pager, next" :total="getPagination(queryData)" />
     </div>
   </div>
 </template>
@@ -18,7 +18,7 @@ import {updateTab,selectPage,Table,getPagination} from '../../scripts/paginate.t
 import {staffData} from '../../scripts/data.ts'
 import '@/assets/table.css'
 var tableData:Table = new Table([]);
-var queryData = staffData;
+var queryData = ref<any[]>([]);
 var currentPage = 1;
 const {ctx} = getCurrentInstance() as any;
 selectPage(currentPage-1,tableData,queryData)

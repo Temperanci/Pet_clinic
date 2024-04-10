@@ -2,11 +2,16 @@
   <div style="height: 100%;display: flex;flex-flow: column;">
     <div style="height: 90%;">
       <el-table class="table" :data="tableData.tab">
-        <el-table-column v-for="column in columnMap" :prop="column[0]" :label="column[1]" />
+        <el-table-column v-for="column in textColumnMap" :prop="column[0]" :label="column[1]" />
+        <el-table-column v-for="column in linkColumnMap" :label="column[1]">
+          <template #default="scope">
+              <a :href=tableData.tab[scope.$index].picture>图片</a>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
     <div class="pagination-block">
-      <el-pagination style="margin-top: 5%;" @current-change="pagination" layout="prev, pager, next"
+      <el-pagination @current-change="pagination" layout="prev, pager, next"
         :total="getPagination(queryData)" />
     </div>
   </div>
@@ -19,7 +24,7 @@ import { updateTab, selectPage, Table, getPagination } from '../../scripts/pagin
 import { departmentData } from '../../scripts/data.ts'
 import '@/assets/table.css'
 var tableData: Table = new Table([]);
-var queryData = departmentData;
+var queryData = ref<any[]>([]);
 var currentPage = 1;
 const { ctx } = getCurrentInstance() as any;
 selectPage(currentPage - 1, tableData, queryData)
@@ -31,10 +36,12 @@ function pagination(val: number) {
 const component = defineComponent({
   name: "DepartmentManagement"
 })
-const columnMap = new Map([
+const textColumnMap = new Map([
   ['departmentId', '科室编号'],
   ['name', '科室名'],
   ['location', '位置'],
+])
+const linkColumnMap = new Map([
   ['picture', '图片']
 ])
 </script>

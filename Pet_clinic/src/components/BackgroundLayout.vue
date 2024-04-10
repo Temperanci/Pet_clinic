@@ -1,26 +1,28 @@
 <template>
-  <el-container>
-    <el-header>
-      <div class="h1">
-        Pet Clinic 宠物医院在线导览
-      </div>
-      <el-card shadow="hover">
-        <div class="card-container">
-          <div class="card-left">
-            <el-avatar :size="40" />
-            <el-text>用户名用户名</el-text>
-          </div>
-          <div class="card-right">
-            <el-button @click="Switch(1)">前台页面</el-button>
-            <el-text>后台管理</el-text>
-            <el-divider />
-            <el-text>注销</el-text>
-          </div>
+  <div class="background">
+    <div style="height: 10%;">
+      <el-header>
+        <div class="h1">
+          Pet Clinic 宠物医院在线导览
         </div>
-      </el-card>
-    </el-header>
+        <el-card shadow="hover">
+          <div class="card-container">
+            <div class="card-left">
+              <el-avatar :size="40" />
+              <el-text>用户名用户名</el-text>
+            </div>
+            <div class="card-right">
+              <el-button @click="Switch(1)">前台页面</el-button>
+              <el-text>后台管理</el-text>
+              <el-divider />
+              <el-text>注销</el-text>
+            </div>
+          </div>
+        </el-card>
+      </el-header>
+    </div>
 
-    <el-container class="mainPage">
+    <div class="mainPage">
       <div class="aside" v-if="aside">
         <div class="console">
           <div class="consoleBtn" v-for="guidance in guidanceMap" :key="guidance[0]" @click="handleSelect(guidance[0])">
@@ -64,9 +66,9 @@
 
         </component>
       </div>
-    </el-container>
+    </div>
 
-  </el-container>
+  </div>
 </template>
 <script setup lang="ts">
 import { defineComponent, ref } from 'vue'
@@ -141,7 +143,7 @@ const currentComponent = ref(componentsMap['1']);
   border-width: 1px;
 }
 
-.el-container {
+.background {
   height: 100vh;
   width: 100vw;
   background-color: #fcf7f4;
@@ -164,6 +166,8 @@ const currentComponent = ref(componentsMap['1']);
   margin-left: 1%;
   margin-right: 1%;
   width: 98%;
+  height: 80%;
+  display: flex;
   border-style: solid;
   border-radius: 10px;
   border-color: #DCDFE6;
@@ -242,7 +246,7 @@ const currentComponent = ref(componentsMap['1']);
   width: 100%;
   text-align: center;
   background: rgb(244, 244, 245);
-  overflow:hidden;
+  overflow: hidden;
 }
 
 .el-footer {

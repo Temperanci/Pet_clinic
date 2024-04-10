@@ -11,13 +11,16 @@ export interface Result<T> {
 }
 
 // 接口地址，根据你的实际后端地址来修改
-const API_BASE_URL = 'http://123.60.5.195:8084';
-
-export const pageQuery = async (request: BedPageRequest): Promise<Result<BedPageResponse>> => {
+const API_BASE_URL = '/api';
+const bed = {
+    bedId: '床位编号',
+    departmentId: '科室编号',
+    location: '位置',
+    
+}
+export async function pageQuery(){
     try {
-        const response = await axios.get<Result<BedPageResponse>>(`${API_BASE_URL}/bed/pageQuery`, {
-            params: request
-        });
+        const response = await axios.post(`${API_BASE_URL}/bed/pageQuery`, bed);
         return response.data; // 假设后端直接返回 Result<BedPageResponse> 结构
     } catch (error) {
         console.error('page query bed error', error);
@@ -28,7 +31,7 @@ export const pageQuery = async (request: BedPageRequest): Promise<Result<BedPage
 // 假设 BedUpdateRequest 和 BedBO 已经定义好了
 import type { BedUpdateRequest } from "@/apis/bed/bed-interface";
 
-export const update = async (request: BedUpdateRequest): Promise<Result<BedBO>> => {
+export async function update(request: BedUpdateRequest) : Promise<Result<BedBO>> {
     try {
         const response = await axios.post<Result<BedBO>>(`${API_BASE_URL}/bed/update`, request);
         return response.data; // 假设后端直接返回 Result<BedBO> 结构

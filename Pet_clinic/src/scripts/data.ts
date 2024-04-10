@@ -570,3 +570,5 @@ export const frontChargeData=[
     {id: 99, service: '心理咨询', serviceType: '咨询', price: 80, department: '心理科'},
     {id: 100, service: '病理学检查', serviceType: '检查', price: 120, department: '病理科'}
 ]
+
+export const accout= {account:'test',psw:'123456',status:0}

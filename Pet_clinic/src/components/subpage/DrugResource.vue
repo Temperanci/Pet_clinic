@@ -36,7 +36,7 @@
             </el-table>
           </div>
           <div class="pagination-block">
-            <el-pagination style="margin-top: 5%;" @current-change="pagination" layout="prev, pager, next"
+            <el-pagination style="margin-bottom: 3%;" @current-change="pagination" layout="prev, pager, next"
               :total="getPagination(queryData, len)" />
           </div>
         </div>
@@ -53,7 +53,7 @@ import '@/assets/table.css'
 var tableData: Table = new Table([]);
 var queryData = frontDrugData;
 var currentPage = 1;
-const len = 14;//每页展示数
+const len = 10;//每页展示数
 const { ctx } = getCurrentInstance() as any;
 console.log(ctx)
 selectPage(currentPage - 1, tableData, queryData, len)
@@ -154,7 +154,7 @@ const diseases = [{
 .main {
   height: 100%;
   width: 100%;
-  text-align: center;
+  align-content: center;
   background: rgb(244, 244, 245);
   overflow: hidden;
 }

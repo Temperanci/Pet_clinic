@@ -1,10 +1,15 @@
-export interface BedBO {
+export class BO{
+    constructor(){
+        
+    }
+}
+export interface BedBO extends BO{
     bedId: string;
     location: string;
     departmentId: string;
 }
 
-export interface DepartmentBO {
+export interface DepartmentBO extends BO{
     desc: string;
     name: string;
     picture: string;
@@ -12,14 +17,14 @@ export interface DepartmentBO {
     departmentId: string;
 }
 
-export interface DiseaseContentBO {
+export interface DiseaseContentBO extends BO{
     title: string;
     content: string;
     contentId: string;
     diseaseId: string;
 }
 
-export interface DiseaseBO {
+export interface DiseaseBO extends BO{
     desc: string;
     name: string;
     diseaseId: string;
@@ -28,7 +33,7 @@ export interface DiseaseBO {
     pictureUrlList: string[];
 }
 
-export interface DiseaseInstanceBO {
+export interface DiseaseInstanceBO extends BO{
     desc: string;
     time: string;
     diseaseId: string;
@@ -37,7 +42,7 @@ export interface DiseaseInstanceBO {
     pictureUrlList: string[];
 }
 
-export interface DrugBO {
+export interface DrugBO extends BO{
     desc: string;
     name: string;
     type: string;
@@ -46,7 +51,7 @@ export interface DrugBO {
     diseaseIdList: string[];
 }
 
-export interface PersonnelBO {
+export interface PersonnelBO extends BO{
     name: string;
     role: string;
     status: string;
@@ -56,7 +61,7 @@ export interface PersonnelBO {
     departmentId: string;
 }
 
-export interface PriceBO {
+export interface PriceBO extends BO{
     desc: string;
     type: string;
     price: number;
@@ -66,7 +71,7 @@ export interface PriceBO {
     departmentId: string;
 }
 
-export interface ProblemBO {
+export interface ProblemBO extends BO{
     type: string;
     title: string;
     answer: string;
@@ -77,7 +82,7 @@ export interface ProblemBO {
     gradingPoints: string;
 }
 
-export interface ProblemSetBO {
+export interface ProblemSetBO extends BO{
     desc: string;
     title: string;
     endTime: Date;
@@ -89,14 +94,14 @@ export interface ProblemSetBO {
     problemScoreMap: Record<string, number>;
 }
 
-export interface ProcessBO {
+export interface ProcessBO extends BO{
     type: string;
     title: string;
     content: string;
     processId: string;
 }
 
-export interface TestRecordBO {
+export interface TestRecordBO extends BO{
     score: number;
     graded: boolean;
     gradeMap: Record<string, GradeResultBO>;
@@ -111,7 +116,7 @@ export interface TestRecordBO {
 }
 
 // 假设还需要创建 GradeResultBO 接口
-export interface GradeResultBO {
+export interface GradeResultBO extends BO{
     scores: number;
     reason: string;
 }
