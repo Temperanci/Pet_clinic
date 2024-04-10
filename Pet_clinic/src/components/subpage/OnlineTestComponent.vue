@@ -54,7 +54,7 @@ var content = ref(0)
 
 function changeContent(n: number) { //改变测试页面内容
   content.value = n;
-  console.log('changeContent: ', content.value)
+  console.log('测试页面内容: ', content.value)
 }
 function returnUpper() {
   switch (content.value) {

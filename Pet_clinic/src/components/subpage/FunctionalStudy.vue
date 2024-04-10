@@ -1,7 +1,7 @@
 <template>
 
   <div class="container">
-    <el-row :gutter="80">
+    <el-row :gutter="80" justify="end">
       <el-col :span="8">
         <el-card shadow="hover">
           <el-result title="角色扮演" sub-title="可选前台、医助、医师三种角色">
@@ -44,6 +44,13 @@
           </el-result>
         </el-card>
       </el-col>
+
+      <div class="ai-helper">
+        <el-button plain @click="dialogOverflowVisible = true">
+          智能医生
+        </el-button>
+      </div>
+
       <!-- 假设有一个返回按钮的 Slot -->
       <slot name="back-button"></slot>
 
@@ -54,10 +61,11 @@
         <CaseStudyComponent v-if="activeComponent === 'CaseStudyComponent'" @close="showOverlay = false" />
         <OnlineTestComponent v-if="activeComponent === 'OnlineTestComponent'" @close="showOverlay = false" />
       </OverlayComponent>
+
+
+
     </el-row>
-    <el-button plain @click="dialogOverflowVisible = true">
-      智能医生
-    </el-button>
+
 
 
     <el-dialog v-model="dialogOverflowVisible" title="智能医生" width="600" draggable overflow>
@@ -183,5 +191,10 @@ function openOverlayWithComponent(componentName: string) {
   /* 视口高度 */
   z-index: 1000;
   /* 确保它位于其他内容之上 */
+}
+
+.ai-helper {
+  text-align: right;
+  display: inline-flex;
 }
 </style>

@@ -4,14 +4,14 @@ import type { BedBO } from "@/apis/schemas";
 import type { BedPageRequest, BedPageResponse } from "@/apis/bed/bed-interface";
 
 // Result 接口定义，根据你的实际返回结构来定义
-interface Result<T> {
+export interface Result<T> {
     success: boolean; // 假设有这样的一个标志
     data: T;
     // 可能还有其他的字段，如错误代码等
 }
 
 // 接口地址，根据你的实际后端地址来修改
-const API_BASE_URL = 'http://localhost:8084';
+const API_BASE_URL = 'http://123.60.5.195:8084';
 
 export const pageQuery = async (request: BedPageRequest): Promise<Result<BedPageResponse>> => {
     try {

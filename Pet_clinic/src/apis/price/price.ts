@@ -11,7 +11,7 @@ interface Result<T> {
 }
 
 // This is the base URL for your API
-const API_BASE_URL = 'http://localhost:8084';
+const API_BASE_URL = 'http://123.60.5.195:8084';
 
 // Function to query prices with pagination
 export const pageQuery = async (request: PricePageRequest): Promise<Result<PricePageResponse>> => {
