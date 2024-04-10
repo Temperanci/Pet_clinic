@@ -9,12 +9,14 @@
                     <div class="problemContent">
                         <p>{{ currentProblemRef.content }}</p>
                         <el-radio-group v-if="currentProblemRef.type === '单选'" v-model="chosenAnswer">
-                            <el-radio v-for="(choice, index) in currentProblemRef.choices" :key="index" :label="index+1">
+                            <el-radio v-for="(choice, index) in currentProblemRef.choices" :key="index"
+                                :label="index + 1">
                                 {{ choice }}
                             </el-radio>
                         </el-radio-group>
-                        <el-checkbox-group v-else-if="currentProblemRef.type === '多选'"  v-model="chosenAnswers">
-                            <el-checkbox v-for="(choice, index) in currentProblemRef.choices" :key="index" :label="index+1">
+                        <el-checkbox-group v-else-if="currentProblemRef.type === '多选'" v-model="chosenAnswers">
+                            <el-checkbox v-for="(choice, index) in currentProblemRef.choices" :key="index"
+                                :label="index + 1">
                                 {{ choice }}
                             </el-checkbox>
                         </el-checkbox-group>
@@ -77,74 +79,117 @@ function submit() {
 const ProblemList = [{
     problemId: 1,
     type: '单选',
-    subjectId: '无',
-    title: '这是一道单选题',
-    content: '请选择一个选项 Lorem ipsum dolor, sit amet consectetur adipisicing elit. Corrupti magnam nam dolorem quidem earum ipsa perferendis possimus asperiores consequuntur at fuga aliquid neque laudantium libero, itaque ratione, nihil aut a!',
-    choices: ['选项1', '选项2', '选项3', '选项4']
+    subjectId: '',
+    title: '题1',
+    content: '犬细小病毒感染通常通过以下哪种途径传播？',
+    choices: ['A. 空气飞沫传播', 'B. 食物或饮水传播', 'C. 虫媒传播', 'D. 直接接触传播']
 },
 {
     problemId: 2,
     type: '多选',
-    subjectId: '无',
-    title: '这是一道多选题',
-    content: '请选择多个选项 Lorem ipsum dolor, sit amet consectetur adipisicing elit. Corrupti magnam nam dolorem quidem earum ipsa perferendis possimus asperiores consequuntur at fuga aliquid neque laudantium libero, itaque ratione, nihil aut a!',
-    choices: ['选项1', '选项2', '选项3', '选项4']
+    subjectId: '宠物疾病',
+    title: '题2',
+    content: '以下哪些症状可能表明猫患上了猫白血病病毒感染？',
+    choices: ['A. 慢性呕吐', 'B. 鼻血', 'C. 脱毛', 'D. 昏睡不醒']
 },
 {
     problemId: 3,
     type: '简答',
-    subjectId: '无',
-    title: '这是一道简答题',
-    content: '请在以下输入框内答题 Lorem ipsum dolor, sit amet consectetur adipisicing elit. Corrupti magnam nam dolorem quidem earum ipsa perferendis possimus asperiores consequuntur at fuga aliquid neque laudantium libero, itaque ratione, nihil aut a!',
-    choices: []
+    subjectId: '宠物疾病',
+    title: '题3',
+    content: '请简要介绍一种常见的猫传染性疾病。'
 },
 {
     problemId: 4,
     type: '单选',
-    subjectId: '无',
-    title: '题3',
-    content: '请选择一个选项 Lorem ipsum dolor, sit amet consectetur adipisicing elit. Corrupti magnam nam dolorem quidem earum ipsa perferendis possimus asperiores consequuntur at fuga aliquid neque laudantium libero, itaque ratione, nihil aut a!',
-    choices: ['选项1', '选项2', '选项3', '选项4']
+    subjectId: '宠物疾病',
+    title: '题4',
+    content: '犬瘟热是由以下哪种病毒引起的？',
+    choices: ['A. 犬瘟热病毒', 'B. 犬细小病毒', 'C. 猫白血病病毒', 'D. 犬冠状病毒']
 },
 {
     problemId: 5,
-    type: '单选',
-    subjectId: '无',
+    type: '多选',
+    subjectId: '宠物疾病',
     title: '题5',
-    content: '请选择一个选项 Lorem ipsum dolor, sit amet consectetur adipisicing elit. Corrupti magnam nam dolorem quidem earum ipsa perferendis possimus asperiores consequuntur at fuga aliquid neque laudantium libero, itaque ratione, nihil aut a!',
-    choices: ['选项1', '选项2', '选项3', '选项4']
+    content: '以下哪些疾病对猫咪的生命威胁较大？',
+    choices: ['A. 猫白血病', 'B. 猫感冒', 'C. 猫瘟热', 'D. 猫糖尿病']
 },
 {
     problemId: 6,
-    type: '单选',
-    subjectId: '无',
+    type: '简答',
+    subjectId: '宠物疾病',
     title: '题6',
-    content: '请选择一个选项 Lorem ipsum dolor, sit amet consectetur adipisicing elit. Corrupti magnam nam dolorem quidem earum ipsa perferendis possimus asperiores consequuntur at fuga aliquid neque laudantium libero, itaque ratione, nihil aut a!',
-    choices: ['选项1', '选项2', '选项3', '选项4']
+    content: '请简要介绍一种常见的犬传染性疾病。'
 },
 {
     problemId: 7,
     type: '单选',
-    subjectId: '无',
+    subjectId: '宠物疾病',
     title: '题7',
-    content: '请选择一个选项 Lorem ipsum dolor, sit amet consectetur adipisicing elit. Corrupti magnam nam dolorem quidem earum ipsa perferendis possimus asperiores consequuntur at fuga aliquid neque laudantium libero, itaque ratione, nihil aut a!',
-    choices: ['选项1', '选项2', '选项3', '选项4']
+    content: '猫糖尿病是由以下哪种因素引起的？',
+    choices: ['A. 遗传因素', 'B. 高糖饮食', 'C. 肥胖', 'D. 环境因素']
 },
 {
     problemId: 8,
-    type: '单选',
-    subjectId: '无',
+    type: '多选',
+    subjectId: '宠物疾病',
     title: '题8',
-    content: '请选择一个选项 Lorem ipsum dolor, sit amet consectetur adipisicing elit. Corrupti magnam nam dolorem quidem earum ipsa perferendis possimus asperiores consequuntur at fuga aliquid neque laudantium libero, itaque ratione, nihil aut a!',
-    choices: ['选项1', '选项2', '选项3', '选项4']
+    content: '以下哪些症状可能表明犬患上了心丝虫病？',
+    choices: ['A. 呼吸困难', 'B. 咳嗽', 'C. 腹胀', 'D. 无食欲']
 },
 {
     problemId: 9,
-    type: '单选',
-    subjectId: '无',
+    type: '简答',
+    subjectId: '宠物疾病',
     title: '题9',
-    content: '请选择一个选项 Lorem ipsum dolor, sit amet consectetur adipisicing elit. Corrupti magnam nam dolorem quidem earum ipsa perferendis possimus asperiores consequuntur at fuga aliquid neque laudantium libero, itaque ratione, nihil aut a!',
-    choices: ['选项1', '选项2', '选项3', '选项4']
+    content: '请简要介绍一种常见的犬皮肤疾病。'
+},
+{
+    problemId: 10,
+    type: '单选',
+    subjectId: '宠物疾病',
+    title: '题10',
+    content: '以下哪种疾病会导致狗出现间歇性发作的癫痫样抽搐？',
+    choices: ['A. 犬瘟热', 'B. 犬癫痫病', 'C. 犬肺炎', 'D. 犬传染性肝炎']
+},
+{
+    problemId: 11,
+    type: '多选',
+    subjectId: '宠物疾病',
+    title: '题11',
+    content: '以下哪些疾病可以通过犬与犬之间的直接接触传播？',
+    choices: ['A. 犬细小病毒感染', 'B. 犬瘟热', 'C. 犬冠状病毒感染', 'D. 犬传染性肝炎']
+},
+{
+    problemId: 12,
+    type: '简答',
+    subjectId: '宠物疾病',
+    title: '题12',
+    content: '请简要介绍一种常见的猫肠道疾病。'
+},
+{
+    problemId: 13,
+    type: '单选',
+    subjectId: '宠物疾病',
+    title: '题13',
+    content: '以下哪种疾病会导致猫出现呼吸道感染症状？',
+    choices: ['A. 猫白血病病毒感染', 'B. 猫冠状病毒感染', 'C. 猫感冒', 'D. 猫糖尿病']
+},
+{
+    problemId: 14,
+    type: '多选',
+    subjectId: '宠物疾病',
+    title: '题14',
+    content: '以下哪些因素可能引起犬皮肤过敏？',
+    choices: ['A. 食物过敏', 'B. 花粉过敏', 'C. 虫媒传播', 'D. 药物过敏']
+},
+{
+    problemId: 15,
+    type: '简答',
+    subjectId: '宠物疾病',
+    title: '题15',
+    content: '请简要介绍一种常见的犬抱歉，我之前的回答中只提供了题目的信息，没有给出选项和答案。以下是题目、选项和答案的完整信息'
 }
 ]
 
@@ -185,9 +230,10 @@ const url = ''
 }
 
 ;
+
 .testButton {
     display: flex;
     align-items: flex-end;
-    justify-content:center;
+    justify-content: center;
 }
 </style>
