@@ -1,5 +1,5 @@
 export interface rowCRUD{
-    updateMsg(msg: Object, data: any[], index: number):void
-    deleteRow(Msg: Object[]):void
-    editRow(Msg: Object[]):void
+    updateMsg(Msg: Object[], data: any[], index: number):void
+    deleteRow(Msg: Object[],index:number):void
+    editRow(Msg: Object[],index:number):void
 }

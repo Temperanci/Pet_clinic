@@ -3,18 +3,18 @@
         <template #default="scope">
             <span v-if="status[scope.$index] === 0">
                 <el-button link type="primary" size="small"
-                    @click="emit('select', scope.$index); status[scope.$index] = 1">Edit</el-button>
+                    @click="emit('edit', scope.$index); status[scope.$index] = 1">Edit</el-button>
                 <el-button link type="primary" size="small" @click="status[scope.$index] = 2">Delete</el-button>
             </span>
             <span v-if="status[scope.$index] === 1">
                 <el-button link type="primary" size="small"
-                    @click="confirmEdit(scope.$index);">confirm
-                    edit</el-button>
+                    @click="editConfirm(scope.$index);">confirm
+                    </el-button>
                 <el-button link type="primary" size="small"
-                    @click="status[scope.$index] = 0; emit('select', scope.$index);">cancel edit</el-button>
+                    @click="status[scope.$index] = 0; emit('cancel', scope.$index);">cancel</el-button>
             </span>
             <span v-if="status[scope.$index] === 2">
-                <el-button link type="primary" size="small" @click="emit('select', scope.$index);">confirm
+                <el-button link type="primary" size="small" @click="emit('delete', scope.$index);">confirm
                     delete</el-button>
                 <el-button link type="primary" size="small" @click="status[scope.$index] = 0">cancel delete</el-button>
             </span>
@@ -25,39 +25,22 @@
 <script setup lang="ts">
 import * as schemas from '../../apis/schemas.ts'
 import * as Cl from '../../apis/class.ts'
-import { defineComponent, ref, defineEmits } from 'vue';
+import { defineComponent, ref, defineEmits, watch } from 'vue';
 import type { Ref } from 'vue';
 const component = defineComponent({
     name: "tableOption"
 })
-const emit = defineEmits(['select'])
+const emit = defineEmits([
+    'edit',
+    'cancel',
+    'delete',
+    'editConfirm',
+    'deleteConfirm',    
+])
 const props = defineProps({
-    Msg: Array<Object>,
     num: Number,
-    Data: Array<any>,
-    type:String
+    clear:Boolean
 })
-// TODO:
-function confirmEdit(index:number){
-    emit('select', index); 
-    updateMsg((props.Msg||[])[index],props.Data||[],index,props.type||''); 
-    console.log('out func', props.Msg || []);
-}
-function updateMsg(msg: Object, data: any[], index: number,type:string) {
-    switch(type) {
-        case "BedBO":
-        (msg as Cl.Bed).bedId = data[index].bedId;
-        (msg as Cl.Bed).location = data[index].location;
-        (msg as Cl.Bed).departmentId = data[index].departmentId;
-        break;
-    }
-}
-function deleteRow(Msg: schemas.BO[]) {
-
-}
-function editRow(Msg: schemas.BO[]) {
-
-}
 function statusGen(num: number): Ref<number[]> {
     var temp = ref<number[]>([]);
     for (var i = 0; i < num; i++) {
@@ -65,7 +48,21 @@ function statusGen(num: number): Ref<number[]> {
     }
     return temp;
 }
-const status = statusGen(props.num || 0);//0：Edit/delete 1:edit=>confirm/cancel 2:delete=>confirm/cancel 
+var status:Ref<number[]> = statusGen(props.num || 0);//0：Edit/delete 1:edit=>confirm/cancel 2:delete=>confirm/cancel 
+function editConfirm(index:number){
+    emit('editConfirm', index);
+    emit('edit', index);
+    status.value[index] = 0;
+}
+function clearStatus(){
+    status = statusGen(props.num || 0);
+}
+watch(()=>props.clear,(newVal)=>{
+    if(newVal){
+        clearStatus();
+        console.log('clearStatus',status);
+    }
+})
 </script>
 <script lang="ts">
 export function EditedGen(num: number, obj: Object): Object[] {
@@ -83,6 +80,12 @@ export function isSelectGen(num: number): Ref<boolean[]> {
     }
     console.log(temp);
     return temp;
+}
+export function clearIsSelected(isSelected:Ref<boolean[]>){
+    for(var i =0;i<isSelected.value.length;i++){
+        isSelected.value[i] = false;
+    }
+    return isSelected;
 }
 </script>
 <style scoped lang="scss"></style>

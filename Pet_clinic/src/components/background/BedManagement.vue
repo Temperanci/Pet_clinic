@@ -7,24 +7,29 @@
       <el-table :data="tableData.tab">
         <el-table-column prop="bedId" label="床位编号">
           <template #default="scope">
-            <el-input v-if="isSelected[scope.$index] === true" v-model="scope.row.bedId"></el-input>
+            <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].bedId"></el-input>
             <span v-else>{{ scope.row.bedId }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="departmentId" label="科室编号">
           <template #default="scope">
-            <el-input v-if="isSelected[scope.$index] === true" v-model="scope.row.departmentId"></el-input>
+            <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].departmentId"></el-input>
             <span v-else>{{ scope.row.departmentId }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="location" label="位置">
           <template #default="scope">
-            <el-input v-if="isSelected[scope.$index] === true" v-model="scope.row.location"></el-input>
+            <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].location"></el-input>
             <span v-else>{{ scope.row.location }}</span>
           </template>
         </el-table-column>
-        <tableOption :type=cType :num=tabLength :Msg=edited :Data=tableData.tab
-          @select="(index) => { isSelected[index] = !isSelected[index]; }" />
+        <tableOption 
+          :clear=clearPara
+          :num = tabLength
+          @edit-confirm="(index)=>{CRUDhandler.editRow(edited,index);}"
+          @edit="(index) => { CRUDhandler.updateMsg(edited,tableData.tab,index);isSelected[index] = !isSelected[index]; clearPara=false;}" 
+          @cancel="(index) =>{isSelected[index] = !isSelected[index]; clearPara=false;console.log('cancel',edited)}"
+          />
       </el-table>
     </div>
     <div class="pagination-block">
@@ -41,29 +46,42 @@ import { updateTab, selectPage, Table, getPagination, LENGTH } from '../../scrip
 import '@/assets/table.css'
 //request
 import tableOption from "../subComponents/tableOption.vue";
-import { isSelectGen, EditedGen } from "../subComponents/tableOption.vue";
+import { isSelectGen, EditedGen,clearIsSelected } from "../subComponents/tableOption.vue";
 import { onMounted } from "vue";
 import type { Ref } from "vue";
-import { pageQuery } from "../../apis/bed/bed.ts"
-import type { BedPageResponse } from "@/apis/bed/bed-interface.ts"
-import { BO, type BedBO } from "@/apis/schemas";
+import { pageQuery ,update} from "../../apis/bed/bed.ts"
+import type { BedPageResponse,BedUpdateRequest } from "@/apis/bed/bed-interface.ts"
 import { Bed } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt.ts'
 const BedPage = ref<BedPageResponse>({ datas: [], total: 0, limit: 0 });
-const cType: string = "BedBO";
 class bedRowCRUD implements rowCRUD {
-  updateMsg(msg: Object, data: any[], index: number): void {
-    (msg as Bed).bedId = data[index].bedId;
-    (msg as Bed).location = data[index].location;
-    (msg as Bed).departmentId = data[index].departmentId;
+  updateMsg(Msg: Object[], data: any[], index: number): void {
+    (Msg[index] as Bed).bedId = data[index].bedId;
+    (Msg[index] as Bed).location = data[index].location;
+    (Msg[index] as Bed).departmentId = data[index].departmentId;
+    console.log('editedBed',Msg);
   }
-  deleteRow(Msg: Object[]): void {
-
+  deleteRow(Msg: Object[],index:number): void {
+    
   }
-  editRow(Msg: Object[]): void {
+  editRow(Msg: Object[],index:number): void {
+    var request:BedUpdateRequest = {
+      bed:{
+        bedId:(Msg[index] as Bed).bedId,
+        location:(Msg[index] as Bed).location, 
+        departmentId:(Msg[index] as Bed).departmentId,  
+      },
+    delete:false}
+    console.log('update request',request);
+    var response= update(request);
+    fetchBeds();
+    console.log('update response',response);
+  }
+  constructor(){
 
   }
 }
+var CRUDhandler = new bedRowCRUD();
 async function fetchBeds() {
   try {
     const response = await pageQuery();
@@ -83,37 +101,27 @@ onMounted(() => {
   fetchBeds();
 });
 //request
-// import {addSelect,chageSelected} from '../../scripts/table.ts'
+var tabLength = LENGTH;//每页展示的条目数
+const clearPara = ref(false);
+var isSelected = isSelectGen(tabLength);
+var edited: Ref<Bed[]> = ref<Bed[]>([]);
+edited.value = EditedGen(tabLength, new Bed()) as Bed[];
 var tableData: Table = new Table([]);
 var queryData = ref<any[]>([]);
 var currentPage = 1;
-var tabLength = LENGTH;//每页展示的条目数
 const { ctx } = getCurrentInstance() as any;
 selectPage(currentPage - 1, tableData, queryData);
 function pagination(val: number) {
   currentPage = val
   updateTab(currentPage, tableData, queryData, ctx)
+  isSelected=clearIsSelected(isSelected);
+  clearPara.value = true;
   // TODO:clear isSelected
 }
-
 //分页
-const columnMap = new Map([
-  ['bedId', '床位编号'],
-  ['departmentId', '科室编号'],
-  ['location', '位置']
-])
-var isSelected = isSelectGen(tabLength);
-var edited: Ref<Bed[]> = ref<Bed[]>([]);
-edited.value = EditedGen(tabLength, new Bed()) as Bed[];
-// var updateRow:BedBO = new BO() as BedBO;
-// updateRow.bedId=''
-// console.log('update',updateRow);
-// console.log('updateBed',updateRow.bedId);
-// console.log('updateLoc',updateRow.location);
 const component = defineComponent({
   name: "BedManagement"
 })
-
 </script>
 
 <style scoped lang="scss">
