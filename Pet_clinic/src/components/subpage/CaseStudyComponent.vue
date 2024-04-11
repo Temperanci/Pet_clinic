@@ -1,107 +1,61 @@
 <template>
   <div class="study-panel">
     <el-menu
-        :default-openeds="['1']"
         class="el-menu-vertical-demo"
-        @open="handleOpen"
-        @close="handleClose"
     >
-      <el-sub-menu v-for="category in categories" :index="category.id" :key="category.id">
-        <template #title>
-          <span>{{ category.name }}</span>
-        </template>
-        <el-menu-item-group>
-          <el-menu-item
-              v-for="caseType in category.caseTypes"
-              :index="caseType.id"
-              :key="caseType.id"
-              @click="showCaseDetails(caseType)"
-          >
-            {{ caseType.name }}
-          </el-menu-item>
-        </el-menu-item-group>
-      </el-sub-menu>
+      <!-- 遍历疾病列表，为每个疾病创建菜单项 -->
+      <el-menu-item
+          v-for="disease in diseasePage.datas"
+          :key="disease.diseaseId"
+          :index="disease.diseaseId"
+          @click="showCaseDetails(disease)"
+      >
+        {{ disease.name }}
+      </el-menu-item>
     </el-menu>
     <div class="case-details" v-if="selectedCase">
       <h2>{{ selectedCase.name }}</h2>
-      <p>{{ selectedCase.details }}</p>
+      <p>{{ selectedCase.desc }}</p>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-import { ElMenu, ElMenuItem, ElMenuItemGroup } from 'element-plus';
+<script setup lang="ts">
+import {defineComponent, onMounted, ref} from 'vue';
+import { ElMenu, ElMenuItem } from 'element-plus';
+import { DiseasePageQuery } from "@/apis/disease/disease";
+import type { DiseaseBO } from "@/apis/schemas";
+import type { DiseasePageResponse } from "@/apis/disease/disease-interface";
 
-import {defineComponent} from "vue";
-
+// 声明组件名称
 defineComponent({
   name: "CaseStudyComponent"
 })
 
-const categories = ref([
-  {
-    id: '1',
-    name: '大类A',
-    caseTypes: [
-      { id: '1-1', name: '病例A1', details: '病例A1详细信息...' },
-      { id: '1-2', name: '病例A2', details: '病例A2详细信息...' },
-      // ...更多病例
-    ],
-  },
-  {
-    id: '2',
-    name: '大类B',
-    caseTypes: [
-      { id: '2-1', name: '病例B1', details: '病例B1详细信息...' },
-      { id: '2-2', name: '病例B2', details: '病例B2详细信息...' },
-      // ...更多病例
-    ],
-  },
-  {
-    id: '3',
-    name: '大类C',
-    caseTypes: [
-      { id: '3-1', name: '病例C1', details: '病例C1详细信息...' },
-      { id: '3-2', name: '病例C2', details: '病例C2详细信息...' },
-      // ...其他病例C
-    ],
-  },
-  {
-    id: '4',
-    name: '大类C',
-    caseTypes: [
-      { id: '3-1', name: '病例C1', details: '病例C1详细信息...' },
-      { id: '3-2', name: '病例C2', details: '病例C2详细信息...' },
-      // ...其他病例C
-    ],
-  },
-  {
-    id: '5',
-    name: '大类C',
-    caseTypes: [
-      { id: '3-1', name: '病例C1', details: '病例C1详细信息...' },
-      { id: '3-2', name: '病例C2', details: '病例C2详细信息...' },
-      // ...其他病例C
-    ],
+// 定义疾病页面的响应式数据
+const diseasePage = ref<DiseasePageResponse>({ datas: [], total: 0, limit: 0 });
+// 定义选中的疾病详情
+const selectedCase = ref<DiseaseBO | null>(null);
+
+// 定义获取疾病列表的函数
+async function fetchDisease() {
+  try {
+    const response = await DiseasePageQuery();
+    diseasePage.value = response.data;
+  } catch (error) {
+    console.error('Failed to fetch disease:', error);
   }
-  // ...更多大类
-]);
+}
 
-const selectedCase = ref(null);
+// 定义展示疾病详情的函数
+function showCaseDetails(disease: DiseaseBO) {
+  selectedCase.value = disease;
+}
 
-const showCaseDetails = (caseType) => {
-  selectedCase.value = caseType;
-};
-
-const handleOpen = (key, keyPath) => {
-  console.log(key, keyPath);
-};
-
-const handleClose = (key, keyPath) => {
-  console.log(key, keyPath);
-};
+// 组件挂载后获取疾病数据
+onMounted(fetchDisease);
 </script>
+
 
 <style scoped lang="scss">
 .study-panel {

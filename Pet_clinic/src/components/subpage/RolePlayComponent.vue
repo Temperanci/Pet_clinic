@@ -21,11 +21,8 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from 'vue';
+import {ref} from 'vue';
 import RoleDetail from './RoleDetail.vue';
-import {processPageQuery} from "@/apis/process/process";
-import type {ProcessBO} from "@/apis/schemas";
-import type {ProcessPageResponse} from "@/apis/process/process-interface";
 
 
 
