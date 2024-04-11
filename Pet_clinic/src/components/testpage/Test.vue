@@ -3,25 +3,23 @@
         <el-container>
             <el-container width="60%">
                 <el-header>
-                    <h3>{{ currentProblemRef.title }}</h3>
+                    <h3>{{ selectedProblem.title }}</h3>
                 </el-header>
                 <el-main>
                     <div class="problemContent">
-                        <p>{{ currentProblemRef.content }}</p>
-                        <el-radio-group v-if="currentProblemRef.type === '单选'" v-model="chosenAnswer">
-                            <el-radio v-for="(choice, index) in currentProblemRef.choices" :key="index"
-                                :label="index + 1">
+                        <pre style="font-size: larger;">{{ selectedProblem.content }}</pre>
+                        <el-radio-group v-if="selectedProblem.type === '单选题'" v-model="answer[selectedIndex]">
+                            <el-radio v-for="(choice, index) in choices" :key="index" :label="choice">
                                 {{ choice }}
                             </el-radio>
                         </el-radio-group>
-                        <el-checkbox-group v-else-if="currentProblemRef.type === '多选'" v-model="chosenAnswers">
-                            <el-checkbox v-for="(choice, index) in currentProblemRef.choices" :key="index"
-                                :label="index + 1">
+                        <el-checkbox-group v-else-if="selectedProblem.type === '多选题'" v-model="chosenAnswers">
+                            <el-checkbox v-for="(choice, index) in choices" :key="index" :label="choices">
                                 {{ choice }}
                             </el-checkbox>
                         </el-checkbox-group>
-                        <el-input v-else-if="currentProblemRef.type === '简答'" type="textarea" placeholder="在此输入答案"
-                            v-model="inputAnswer" />
+                        <el-input v-else-if="selectedProblem.type === '简答题'" type="textarea" placeholder="在此输入答案"
+                            v-model="answer[selectedIndex]" />
                     </div>
                 </el-main>
                 <el-footer>
@@ -35,9 +33,10 @@
             </el-container>
             <el-aside>
                 <div class="problemTable">
-                    <div class="problemNumber" v-for="(problem, index) in ProblemList">
-                        <el-button @click="jumpProblem(problem.problemId)">{{ index + 1 }}</el-button>
-
+                    <div class="problemNumber" v-for="(pro, index) in problemList">
+                        <el-button style="width: 45px" @click="jumpProblem(index)"
+                            :style="{ background: pro.problemId === selectedProblem.problemId ? 'aquamarine' : '' }">{{
+                        index + 1 }}</el-button>
                     </div>
                 </div>
             </el-aside>
@@ -47,50 +46,125 @@
 
 <script setup lang="ts">
 import { defineComponent } from "vue";
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue';
+import { pageQuery } from '@/apis/problem/problem';
+import type { ProblemPageRequest, ProblemPageResponse, ProblemUpdateRequest } from '@/apis/problem/problem-interface';
+import type { ProblemBO } from '@/apis/schemas';
 
 defineComponent({
     name: "Test",
 })
 
-function jumpProblem(n: number) {
-    var temp = ProblemList.find(pro => pro.problemId === n);
-    if (temp != null) {
-        currentProblemRef.value = temp;
-        console.log('跳转至题', currentProblemRef.value.problemId, currentProblemRef.value.title);
+const ProblemPage = ref<ProblemPageResponse>({ datas: [], total: 0, limit: 0 });
+const selectedProblem = ref<ProblemBO>({
+    type: '',
+    title: '',
+    answer: '',
+    content: '',
+    problemId: '',
+    subjectId: '',
+    background: '',
+    gradingPoints: ''
+})
+var problemList = ref(ProblemPage.value?.datas);
+var selectedIndex = ref(0);
+async function fetchProblems() {
+    try {
+        const response = await pageQuery(1);
+        const pages = Math.ceil(response.data.total / response.data.limit); //总页数
+        console.log("total=", response.data.total, " limit=", response.data.limit);
+        for (var i = 1; i <= pages; i++) {
+            const response = await pageQuery(i);
+            if (response && response.data && response.data.datas) {
+                ProblemPage.value = response.data;
+                for (var j in ProblemPage.value.datas) { //单选题内容换行
+                    ProblemPage.value.datas[j].content = ProblemPage.value.datas[j].content.replace(/(A\.|B\.|C\.|D\.)/g, '\n$1');
+                }
+                problemList.value = problemList.value.concat(ProblemPage.value.datas);
+                console.log("获取problemList:", problemList.value);
+                selectedProblem.value = problemList.value[selectedIndex.value];
+            } else {
+                console.error('No data returned from the API');
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching problems:', error);
+    }
+}
+onMounted(async () => {
+    await fetchProblems();
+
+});
+
+
+
+const props = defineProps({
+    testId: String
+})
+const choices = ref(['A', 'B', 'C', 'D']);
+const answer = ref<string[]>([]);
+const answerMap = new Map();
+
+const chosenAnswer = ref('');
+const chosenAnswers = ref([]);
+const inputAnswer = ref('');
+
+
+function jumpProblem(i: number) {
+    var pro = problemList.value[i];
+    if (pro != null) {
+        saveAnswer();
+        selectedProblem.value = pro;
+        selectedIndex.value = i;
+        console.log('跳转至题目:', selectedProblem.value.title);
     } else {
         console.log('跳转失败');
     }
 }
 function nextProblem() {
-    jumpProblem(currentProblemRef.value.problemId + 1)
-    console.log('下一题');
+    saveAnswer();
+    jumpProblem(selectedIndex.value + 1);
 }
 function priorProblem() {
-    jumpProblem(currentProblemRef.value.problemId - 1)
-    console.log('上一题');
+    saveAnswer();
+    jumpProblem(selectedIndex.value - 1);
 }
 function submit() {
-    console.log('提交测试');
+    saveAnswer();
+    console.log('提交测试:', props.testId);
+    console.log(answerMap);
 }
-
+function saveAnswer() { //切换题目时自动保存答案
+    var pro = selectedProblem.value;
+    var temp = answer.value[selectedIndex.value];
+    if (temp != null) {
+        if (pro.type == '单选题') {
+            console.log("单选:", temp);
+            answerMap.set(pro.problemId, temp);
+        } else if (pro.type == '多选题') {
+            console.log("多选:", temp);
+            answerMap.set(pro.problemId, temp);
+        } else if (pro.type == '简答题') {
+            console.log("简答:", temp);
+            answerMap.set(pro.problemId, temp);
+        }
+    }
+}
 
 
 const ProblemList = [{
     problemId: 1,
     type: '单选',
     subjectId: '',
-    title: '题1',
-    content: '犬细小病毒感染通常通过以下哪种途径传播？',
-    choices: ['A. 空气飞沫传播', 'B. 食物或饮水传播', 'C. 虫媒传播', 'D. 直接接触传播']
+    title: '犬细小病毒',
+    content: '犬细小病毒感染通常通过以下哪种途径传播？\nA. 空气飞沫传播\nB. 食物或饮水传播\nC. 虫媒传播\nD. 直接接触传播',
 },
 {
     problemId: 2,
     type: '多选',
     subjectId: '宠物疾病',
     title: '题2',
-    content: '以下哪些症状可能表明猫患上了猫白血病病毒感染？',
-    choices: ['A. 慢性呕吐', 'B. 鼻血', 'C. 脱毛', 'D. 昏睡不醒']
+    content: '以下哪些症状可能表明猫患上了猫白血病病毒感染？以下哪些症状可能表明猫患上了猫白血病病毒感染？\nA. 慢性呕吐\nB. 鼻血\nC. 脱毛\nD. 昏睡不醒'
 },
 {
     problemId: 3,
@@ -189,17 +263,55 @@ const ProblemList = [{
     type: '简答',
     subjectId: '宠物疾病',
     title: '题15',
-    content: '请简要介绍一种常见的犬抱歉，我之前的回答中只提供了题目的信息，没有给出选项和答案。以下是题目、选项和答案的完整信息'
+    content: '请简要介绍一种常见的犬皮肤疾病。'
+},
+{
+    problemId: 10,
+    type: '单选',
+    subjectId: '宠物疾病',
+    title: '题10',
+    content: '以下哪种疾病会导致狗出现间歇性发作的癫痫样抽搐？',
+    choices: ['A. 犬瘟热', 'B. 犬癫痫病', 'C. 犬肺炎', 'D. 犬传染性肝炎']
+},
+{
+    problemId: 11,
+    type: '多选',
+    subjectId: '宠物疾病',
+    title: '题11',
+    content: '以下哪些疾病可以通过犬与犬之间的直接接触传播？',
+    choices: ['A. 犬细小病毒感染', 'B. 犬瘟热', 'C. 犬冠状病毒感染', 'D. 犬传染性肝炎']
+},
+{
+    problemId: 12,
+    type: '简答',
+    subjectId: '宠物疾病',
+    title: '题12',
+    content: '请简要介绍一种常见的猫肠道疾病。'
+},
+{
+    problemId: 13,
+    type: '单选',
+    subjectId: '宠物疾病',
+    title: '题13',
+    content: '以下哪种疾病会导致猫出现呼吸道感染症状？',
+    choices: ['A. 猫白血病病毒感染', 'B. 猫冠状病毒感染', 'C. 猫感冒', 'D. 猫糖尿病']
+},
+{
+    problemId: 14,
+    type: '多选',
+    subjectId: '宠物疾病',
+    title: '题14',
+    content: '以下哪些因素可能引起犬皮肤过敏？',
+    choices: ['A. 食物过敏', 'B. 花粉过敏', 'C. 虫媒传播', 'D. 药物过敏']
+},
+{
+    problemId: 15,
+    type: '简答',
+    subjectId: '宠物疾病',
+    title: '题15',
+    content: '请简要介绍一种常见的犬抱歉'
 }
 ]
-
-var currentProblem = ProblemList[0];
-var currentProblemRef = ref(currentProblem);
-var inputAnswer = ref('');
-var chosenAnswer = ref(0);
-var chosenAnswers = ref([0]);
-
-const url = ''
 </script>
 
 <style scoped lang="scss">
@@ -219,7 +331,7 @@ const url = ''
 .problemTable {
     display: flex;
     flex-wrap: wrap;
-    padding: 2vw;
+    padding: 3vw;
 }
 
 ;
@@ -231,9 +343,11 @@ const url = ''
 
 ;
 
+
 .testButton {
     display: flex;
     align-items: flex-end;
+    justify-content: center;
     justify-content: center;
 }
 </style>

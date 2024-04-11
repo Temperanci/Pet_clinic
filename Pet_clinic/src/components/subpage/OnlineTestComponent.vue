@@ -30,10 +30,10 @@
         </div>
       </template>
       <SingleProblem v-if="content === 1" @page="(n: number) => content = n" />
-      <ProblemSet v-if="content === 2" @page="(n: number) => content = n" />
-      <Test v-if="content === 3" @page="(n: number) => content = n" />
+      <ProblemSet v-if="content === 2" @page="(n: number) => content = n" @id="(id: string) => testId = id" />
+      <Test v-if="content === 3" @page="(n: number) => content = n" :testId="testId" />
     </div>
-  </div> 
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -50,8 +50,9 @@ defineComponent({
     Test
   }
 })
-var content = ref(0)
 
+const testId = ref('')
+const content = ref(0)
 function changeContent(n: number) { //改变测试页面内容
   content.value = n;
   console.log('测试页面内容: ', content.value)
@@ -86,8 +87,9 @@ const close = defineEmits(['close'])
   top: 10px;
   left: 10px;
 }
-.test-content{
+
+.test-content {
   position: relative;
-  top:50px;
+  top: 50px;
 }
 </style>
