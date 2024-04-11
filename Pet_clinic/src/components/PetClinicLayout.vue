@@ -8,12 +8,17 @@
         <div class="card-container">
           <div class="card-left">
             <el-avatar :size="40" />
-            <el-text>用户名用户名</el-text>
+            <el-text>用户名</el-text>
           </div>
           <div class="card-right">
-            <el-button v-if="userStatus === 0" @click="Switch(0)">后台页面</el-button>
-            <el-divider />
-            <el-text>注销</el-text>
+            <div style="height: 50%;">
+              <el-text style="margin:auto" v-if="userStatus === 0" @click="Switch(0)">后台页面</el-text>
+            </div>
+            <!-- <el-divider /> -->
+            <div style="height: 50%;">
+              <el-text @click="Logout">注销</el-text>
+            </div>
+            
           </div>
         </div>
       </el-card>
@@ -87,7 +92,9 @@
     </el-footer>
   </el-container>
 </template>
-
+<script lang="ts">
+const ifLogined = ref(false)//false:未登录
+</script>
 <script setup lang="ts">
 import { defineComponent } from 'vue'
 import type { DefineComponent } from 'vue';
@@ -98,6 +105,7 @@ import DepartmentDetails from './subpage/DepartmentDetails.vue'
 import DrugResource from './subpage/DrugResource.vue'
 import BedInquiry from './subpage/BedInquiry.vue'
 import FunctionalStudy from './subpage/FunctionalStudy.vue'
+import {accout} from  '../scripts/data.ts'
 
 defineComponent({
   name: "PetClinicLayout"
@@ -123,21 +131,31 @@ const activeIndex = ref('1')
 const currentComponent = ref(componentsMap[activeIndex.value])
 const selectedDepartmentName = ref("");
 const userStatus = ref(0)//0:管理 1:路人
-const ifLogined = ref(true)//false:未登录
 const loginVisible = ref(false)
 const registerVisible = ref(false)
 const handleSelect = (index: string) => {
   activeIndex.value = index
   currentComponent.value = componentsMap[index]
 }
+// TODO:登录注册的详细逻辑
 const userName = ref('')
 const userPwd = ref('')
 const userPwdConfirm = ref('')
-function Login(){
 
+function Login(){
+  if(userName.value===accout.account && userPwd.value===accout.psw){
+    ifLogined.value = true;
+    userStatus.value = accout.status;
+  }
 }
 function Register(){
 
+}
+function Logout(){
+  userName.value='';
+  userPwd.value='';
+  userStatus.value=1;
+  ifLogined.value=false;  
 }
 // 当 marker 被点击时调用
 const markerClicked = (name: string) => {
@@ -189,15 +207,16 @@ const markerClicked = (name: string) => {
           margin-right: 0.5vw;
           margin-left: -0.5vw;
         }
-      }
-      .card-right{
+        .card-right{
         display: flex;
         flex-direction: column;
-        line-height: 0;
       }
+      }
+      
     }
   }
 }
+
 .el-main{
   height: 87vh;
   width: 100%;

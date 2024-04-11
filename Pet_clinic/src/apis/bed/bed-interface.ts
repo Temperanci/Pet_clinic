@@ -4,6 +4,8 @@ export interface BedPageRequest {
     bedId?: string;
     location?: string;
     departmentId?: string;
+    currPageNo?:number;
+    limit?:number;
 }
 
 export interface BedPageResponse {

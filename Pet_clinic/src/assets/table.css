@@ -1,12 +1,15 @@
 .pagination-block{
     margin: auto;
   }
-  .table {
-    width: 98%;
-    height:auto;
-    margin-top:1%;
-    margin-left:1%;
-    margin-right:1;
-    margin-bottom:1%;
-    overflow:hidden;
-  }
+.table {
+  width: 98%;
+  height:auto;
+  margin-top:1%;
+  margin-left:1%;
+  margin-right:1;
+  margin-bottom:1%;
+  overflow:hidden;
+}
+.el-pagination{
+  margin-bottom: 5%;
+}
