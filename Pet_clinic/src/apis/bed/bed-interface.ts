@@ -1,11 +1,9 @@
 import type { BedBO } from "@/apis/schemas";
-
-export interface BedPageRequest {
+import type {BasePageRequest} from "@/apis/page";
+export interface BedPageRequest extends BasePageRequest{
     bedId?: string;
     location?: string;
     departmentId?: string;
-    currPageNo?:number;
-    limit?:number;
 }
 
 export interface BedPageResponse {

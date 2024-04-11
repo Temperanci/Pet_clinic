@@ -47,13 +47,13 @@ export interface DrugBO{
 }
 
 export interface PersonnelBO{
-    name: string;
-    role: string;
-    status: string;
-    password: string;
-    personnelId: string;
-    phoneNumber: string;
-    departmentId: string;
+    name?: string;
+    role?: string;
+    status?: string;
+    password?: string;
+    personnelId?: string;
+    phoneNumber?: string;
+    departmentId?: string;
 }
 
 export interface PriceBO{

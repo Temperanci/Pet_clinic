@@ -1,12 +1,10 @@
 import type { DiseaseContentBO } from "@/apis/schemas";
-
-export interface DiseaseContentPageRequest {
+import type {BasePageRequest} from "@/apis/page";
+export interface DiseaseContentPageRequest extends BasePageRequest{
     title?: string;
     content?: string;
     contentId?: string;
     diseaseId?: string;
-    currPageNo?:number;
-    limit?:number;
 }
 
 export interface DiseaseContentPageResponse {

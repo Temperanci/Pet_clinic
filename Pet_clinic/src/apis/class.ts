@@ -83,3 +83,22 @@ export class Department implements schemas.DepartmentBO{
         this.name='';
     }
 }
+
+export class Personnel implements schemas.PersonnelBO{
+    name: string;
+    role: string;
+    status: string;
+    password: string;
+    personnelId: string;
+    phoneNumber: string;
+    departmentId: string;
+    constructor(){
+        this.name='';
+        this.role='';
+        this.status='';
+        this.password='';
+        this.personnelId='';
+        this.phoneNumber='';
+        this.departmentId='';
+    }
+}

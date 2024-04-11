@@ -1,13 +1,11 @@
 import type { DepartmentBO } from "@/apis/schemas";
-
-export interface DepartmentPageRequest {
+import type {BasePageRequest} from "@/apis/page";
+export interface DepartmentPageRequest extends BasePageRequest{
     desc?: string;
     name?: string;
     picture?: string;
     location?: string;
     departmentId?: string;
-    currPageNo?:number;
-    limit?:number;
 }
 
 export interface DepartmentPageResponse {
