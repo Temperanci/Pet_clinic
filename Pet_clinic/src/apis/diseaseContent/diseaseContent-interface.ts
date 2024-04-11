@@ -5,6 +5,8 @@ export interface DiseaseContentPageRequest {
     content?: string;
     contentId?: string;
     diseaseId?: string;
+    currPageNo?:number;
+    limit?:number;
 }
 
 export interface DiseaseContentPageResponse {

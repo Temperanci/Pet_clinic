@@ -7,6 +7,8 @@ export interface DiseasePageRequest {
     fileUrlList?: string[];
     departmentId?: string;
     pictureUrlList?: string[];
+    currPageNo?:number;
+    limit?:number;
 }
 
 export interface DiseasePageResponse {

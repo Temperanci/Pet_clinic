@@ -5,11 +5,11 @@ export interface BedBO{
 }
 
 export interface DepartmentBO{
-    desc: string;
-    name: string;
-    picture: string;
-    location: string;
-    departmentId: string;
+    desc?: string;
+    name?: string;
+    picture?: string;
+    location?: string;
+    departmentId?: string;
 }
 
 export interface DiseaseContentBO{

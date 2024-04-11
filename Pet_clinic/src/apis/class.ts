@@ -68,3 +68,18 @@ export class DiseaseInstance implements schemas.DiseaseInstanceBO{
         this.pictureUrlList=[];
     }
 }
+
+export class Department implements schemas.DepartmentBO{
+    departmentId: string;
+    desc: string ;
+    picture: string;
+    location?: string;
+    name?: string;
+    constructor(){
+        this.departmentId='';
+        this.desc='';
+        this.picture='';
+        this.picture='';
+        this.name='';
+    }
+}

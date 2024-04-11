@@ -6,6 +6,8 @@ export interface DepartmentPageRequest {
     picture?: string;
     location?: string;
     departmentId?: string;
+    currPageNo?:number;
+    limit?:number;
 }
 
 export interface DepartmentPageResponse {
@@ -15,6 +17,6 @@ export interface DepartmentPageResponse {
 }
 
 export interface DepartmentUpdateRequest {
-    DepartmentBO: DepartmentBO;
+    department: DepartmentBO;
     delete?: boolean;
 }
