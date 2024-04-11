@@ -13,11 +13,13 @@ export interface Result<T> {
 
 // API 基础路径
 const API_BASE_URL = '/api';
-const personnel = {}
+const personnel = {
+    
+}
 // 分页查询人事信息
-export async function PersonnelPageQuery(){
+export async function pageQuery(request?:PersonnelPageRequest){
     try {
-        const response = await axios.post(`${API_BASE_URL}/personnel/pageQuery`, personnel);
+        const response = await axios.post(`${API_BASE_URL}/personnel/pageQuery`,request|| personnel);
         return response.data;
     } catch (error) {
         // 处理错误

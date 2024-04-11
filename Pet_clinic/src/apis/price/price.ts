@@ -13,13 +13,7 @@ interface Result<T> {
 // This is the base URL for your API
 const API_BASE_URL = '/api';
 const price = {
-    desc:'描述',
-    type:'服务类型',
-    price:'价格',
-    title:'服务名称',
-    priceId:'价格编号',
-    serviceId:'服务编号',
-    departmentId:'科室编号'
+    
 }
 // Function to query prices with pagination
 export async function pageQuery(request?:PricePageRequest){

@@ -5,11 +5,11 @@ export interface BedBO{
 }
 
 export interface DepartmentBO{
-    desc: string;
-    name: string;
-    picture: string;
-    location: string;
-    departmentId: string;
+    desc?: string;
+    name?: string;
+    picture?: string;
+    location?: string;
+    departmentId?: string;
 }
 
 export interface DiseaseContentBO{
@@ -29,41 +29,41 @@ export interface DiseaseBO{
 }
 
 export interface DiseaseInstanceBO{
-    desc: string;
-    time: string;
-    diseaseId: string;
-    instanceId: string;
-    fileUrlList: string[];
-    pictureUrlList: string[];
+    desc?: string;
+    time?: number;
+    diseaseId?: string;
+    instanceId?: string;
+    fileUrlList?: string[];
+    pictureUrlList?: string[];
 }
 
 export interface DrugBO{
-    desc: string;
-    name: string;
-    type: string;
-    drugId: string;
-    departmentId: string;
-    diseaseIdList: string[];
+    desc?: string;
+    name?: string;
+    type?: string;
+    drugId?: string;
+    departmentId?: string;
+    diseaseIdList?: string[];
 }
 
 export interface PersonnelBO{
-    name: string;
-    role: string;
-    status: string;
-    password: string;
-    personnelId: string;
-    phoneNumber: string;
-    departmentId: string;
+    name?: string;
+    role?: string;
+    status?: string;
+    password?: string;
+    personnelId?: string;
+    phoneNumber?: string;
+    departmentId?: string;
 }
 
 export interface PriceBO{
-    desc: string;
-    type: string;
-    price: number;
-    title: string;
-    priceId: string;
-    serviceId: string;
-    departmentId: string;
+    desc?: string;
+    type?: string;
+    price?: number;
+    title?: string;
+    priceId?: string;
+    serviceId?: string;
+    departmentId?: string;
 }
 
 export interface ProblemBO{

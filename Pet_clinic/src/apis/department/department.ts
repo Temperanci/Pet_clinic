@@ -1,7 +1,7 @@
 // department.ts
 import axios from 'axios';
 import type { DepartmentBO } from '@/apis/schemas';
-import type { DepartmentUpdateRequest } from '@/apis/department/department-interface';
+import type { DepartmentUpdateRequest ,DepartmentPageRequest} from '@/apis/department/department-interface';
 
 // Result 接口定义，根据后端返回的实际结构定义
 export interface Result<T> {
@@ -14,11 +14,14 @@ export interface Result<T> {
 // API 基础路径
 const API_BASE_URL = '/api';
 
-const department = {}
+const department = {
+    
+}
+
 // 分页查询部门信息
-export async function pageQuery(){
+export async function pageQuery(request?:DepartmentPageRequest){
     try {
-        const response = await axios.post(`${API_BASE_URL}/department/pageQuery`, department);
+        const response = await axios.post(`${API_BASE_URL}/department/pageQuery`, request||department);
         return response.data;
     } catch (error) {
         // If there's an error, handle it here
