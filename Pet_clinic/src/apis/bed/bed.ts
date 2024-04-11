@@ -13,14 +13,11 @@ export interface Result<T> {
 // 接口地址，根据你的实际后端地址来修改
 const API_BASE_URL = '/api';
 const bed = {
-    bedId: '床位编号',
-    departmentId: '科室编号',
-    location: '位置',
-    
+       
 }
-export async function pageQuery(){
+export async function pageQuery(request?:BedPageRequest){
     try {
-        const response = await axios.post(`${API_BASE_URL}/bed/pageQuery`, bed);
+        const response = await axios.post(`${API_BASE_URL}/bed/pageQuery`, request||bed);
         return response.data; // 假设后端直接返回 Result<BedPageResponse> 结构
     } catch (error) {
         console.error('page query bed error', error);

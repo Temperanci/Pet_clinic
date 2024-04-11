@@ -31,9 +31,7 @@ export function updateTab(currentPage: number, table: Table, data: Ref<any[]>, c
     selectPage(currentPage - 1, table, data,len)
     ctx.$forceUpdate();
 }
-export function getPagination(data: any[],length?:number): number {
-    var len=0;
-    if(length){len=length;}
-    else{len=LENGTH}
-    return Math.ceil(data.length / len) * 10
-}//获取分页数
+
+export function getPagination(num:number,length:number): number {
+    return Math.ceil(num / length) * 10
+}

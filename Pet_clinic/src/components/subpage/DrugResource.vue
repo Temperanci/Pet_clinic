@@ -1,153 +1,236 @@
 <template>
   <div class="mainPage">
-      <el-aside>
-        <div>
-          <el-container>
-            <el-input class="searchBar" v-model="input" placeholder="请输入内容"></el-input>
-            <el-button class="searchBar">搜索</el-button>
-          </el-container>
+    <el-aside>
+      <div>
+        <el-container>
+          <el-input class="searchBar" v-model="input" placeholder="请输入内容"></el-input>
+          <el-button class="searchBar">搜索</el-button>
+        </el-container>
+      </div>
+      <div class="filter">
+        <el-input class="option" v-model="DrugId" placeholder="请输入药品编号"></el-input>
+        <el-input class="option" v-model="Name" placeholder="请输入药品名称"></el-input>
+        <el-input class="option" v-model="Type" placeholder="请输入药品类型"></el-input>
+        <el-input class="option" v-model="DepartmentId" placeholder="请输入科室"></el-input>
+        <el-input class="option" v-model="DiseaseId" placeholder="请输入适用疾病"></el-input>
+        <!-- <el-select class="option" v-model="drug" clearable placeholder="请选择药品名称">
+          <el-option v-for="item in drugs" :key="item.value" :label="item.label" :value="item.value">
+          </el-option>
+        </el-select>
+        <el-select class="option" v-model="drugType" clearable placeholder="请选择药品类型">
+          <el-option v-for="item in drugTypes" :key="item.value" :label="item.label" :value="item.value">
+          </el-option>
+        </el-select>
+        <el-select class="option" v-model="department" clearable placeholder="请选择科室">
+          <el-option v-for="item in departments" :key="item.value" :label="item.label" :value="item.value">
+          </el-option>
+        </el-select>
+        <el-select class="option" v-model="disease" clearable placeholder="请选择适用疾病">
+          <el-option v-for="item in diseases" :key="item.value" :label="item.label" :value="item.value">
+          </el-option>
+        </el-select> -->
+        <el-button class="optionButton" @click="fetchDrugs();console.log('筛选')">筛选</el-button>
+      </div>
+    </el-aside>
+    <div class="main">
+      <div style="height: 100%;display: flex;flex-flow: column;">
+        <div style="height: 90%;" class="table">
+          <el-table :data="queryData" height="100%">
+            <el-table-column prop="drugId" label="药品编号">
+              <template #default="scope">
+                <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].drugId"></el-input>
+                <span v-else>{{ scope.row.drugId }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="name" label="药品名称">
+              <template #default="scope">
+                <el-input v-if="isSelected[scope.$index] === true"
+                  v-model="edited[scope.$index].name"></el-input>
+                <span v-else>{{ scope.row.name }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="type" label="药品类型">
+              <template #default="scope">
+                <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].type"></el-input>
+                <span v-else>{{ scope.row.type }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="desc" label="描述">
+              <template #default="scope">
+                <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].desc"></el-input>
+                <span v-else>{{ scope.row.desc }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="diseaseIdList" label="适用疾病">
+              <template #default="scope">
+                <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].diseaseIdList"></el-input>
+                <span v-else>{{ scope.row.diseaseIdList }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="departmentId" label="科室">
+              <template #default="scope">
+                <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].departmentId"></el-input>
+                <span v-else>{{ scope.row.departmentId }}</span>
+              </template>
+            </el-table-column>
+          </el-table>
         </div>
-        <div class="filter">
-          <el-input class="option" v-model="input" placeholder="请输入药品编号"></el-input>
-          <el-select class="option" v-model="drug" clearable placeholder="请选择药品名称">
-            <el-option v-for="item in drugs" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
-          </el-select>
-          <el-select class="option" v-model="drugType" clearable placeholder="请选择药品类型">
-            <el-option v-for="item in drugTypes" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
-          </el-select>
-          <el-select class="option" v-model="department" clearable placeholder="请选择科室">
-            <el-option v-for="item in departments" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
-          </el-select>
-          <el-select class="option" v-model="disease" clearable placeholder="请选择适用疾病">
-            <el-option v-for="item in diseases" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
-          </el-select>
-          <el-button class="optionButton">筛选</el-button>
-        </div>
-      </el-aside>
-      <div class="main">
-        <div style="height: 100%;display: flex;flex-flow: column;">
-          <div style="height: 90%;">
-            <el-table class="table" :data="tableData.tab">
-              <el-table-column v-for="column in columnMap" :prop="column[0]" :label="column[1]" />
-            </el-table>
-          </div>
-          <div class="pagination-block">
-            <el-pagination style="margin-bottom: 3%;" @current-change="pagination" layout="prev, pager, next"
-              :total="getPagination(queryData, len)" />
-          </div>
+        <div class="pagination-block">
+          <el-pagination @current-change="pagination" layout="prev, pager, next"
+            :total="getPagination(entryNum, tabLength)" />
         </div>
       </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { defineComponent } from "vue";
-import { ref, getCurrentInstance } from 'vue'
-import { updateTab, selectPage, Table, getPagination } from '../../scripts/paginate.ts'
-import { frontDrugData } from '../../scripts/data.ts'
+import { ref} from 'vue'
+import { getPagination } from '../../scripts/paginate.ts'
 import '@/assets/table.css'
-var tableData: Table = new Table([]);
-var queryData = frontDrugData;
+//request
+import { isSelectGen, EditedGen,clearIsSelected } from "../subComponents/tableOption.vue";
+import { onMounted } from "vue";
+import type { Ref } from "vue";
+import { pageQuery ,update} from "../../apis/drug/drug.ts"
+import type { DrugPageResponse,DrugPageRequest } from "@/apis/drug/drug-interface.ts"
+import { Drug } from "@/apis/class";
+import { type rowCRUD } from '../../scripts/tableOpt.ts'
 var currentPage = 1;
-const len = 10;//每页展示数
-const { ctx } = getCurrentInstance() as any;
-console.log(ctx)
-selectPage(currentPage - 1, tableData, queryData, len)
+var entryNum = ref(0);
+const input = ref('');
+const DrugId = ref('');
+const Type = ref('');
+const Name = ref('');
+const DepartmentId = ref('');
+const DiseaseId = ref('');
+const DrugPage = ref<DrugPageResponse>({ datas: [], total: 0, limit: 0 });
+class drugRowCRUD implements rowCRUD {
+  updateMsg(Msg: Object[], data: any[], index: number): void {
+  }//更新buffer
+  deleteRow(Msg: Object[],index:number): void {
+  }//删除
+  editRow(Msg: Object[],index:number): void {
+  }//修改
+  constructor(){
+
+  }
+}
+var CRUDhandler = new drugRowCRUD();
+async function fetchDrugs() {
+  try {
+    var request:DrugPageRequest={
+      drugId:DrugId.value,
+      type:Type.value,
+      name:Name.value,
+      departmentId:DepartmentId.value,
+      diseaseId:DiseaseId.value
+    }
+    console.log('request',request);
+    const response = await pageQuery(request);
+    if (response && response.data && response.data.datas) {
+      DrugPage.value = response.data; // 假设响应中有data属性，且包含datas数组
+      queryData.value = DrugPage.value.datas;
+      tabLength.value = DrugPage.value.limit;
+      entryNum.value = DrugPage.value.total;
+      isSelected=isSelectGen(tabLength.value);
+      edited.value = EditedGen(tabLength.value, new Drug()) as Drug[];
+      // selectPage(currentPage - 1, tableData, queryData);
+      console.log('Fetched drugs:', DrugPage.value.datas);
+    } else {
+      console.error('No data returned from the API');
+    }
+  } catch (error) {
+    console.error('Error fetching drugs:', error);
+  }
+}
+onMounted(() => {
+  fetchDrugs();
+});
+var tabLength = ref(0);//每页展示的条目数
+const clearPara = ref(false);
+var isSelected:Ref<boolean[]> = ref<boolean[]>([]);
+var edited: Ref<Drug[]> = ref<Drug[]>([]);
+var queryData = ref<any[]>([]);
+var currentPage = 1;
 function pagination(val: number) {
   currentPage = val
-  updateTab(currentPage, tableData, queryData, ctx, len)
-  console.log(tableData.tab)
+  isSelected=clearIsSelected(isSelected);
+  clearPara.value = true;
 }
-//分页
-const columnMap = new Map([
-  ['drugId', '药品编号'],
-  ['drug', '药品名称'],
-  ['drugType', '药品类型'],
-  ['disease', '适用疾病'],
-  ['department', '科室']
-])
+//request
 defineComponent({
   name: "DrugResource"
 })
-const fits = ['fill', 'contain']
-const url =
-  'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
-const chargeData = ref(0);
-const searchKey = ref(0);
-const filterKey = ref(0);
-const input = ref('');
-const drug = ref('');
-const drugs = [{
-  value: '选项1',
-  label: '黄金糕'
-}, {
-  value: '选项2',
-  label: '双皮奶'
-}, {
-  value: '选项3',
-  label: '蚵仔煎'
-}, {
-  value: '选项4',
-  label: '龙须面'
-}, {
-  value: '选项5',
-  label: '北京烤鸭'
-}];
-const drugType = ref('');
-const drugTypes = [{
-  value: '选项1',
-  label: '黄金糕'
-}, {
-  value: '选项2',
-  label: '双皮奶'
-}, {
-  value: '选项3',
-  label: '蚵仔煎'
-}, {
-  value: '选项4',
-  label: '龙须面'
-}, {
-  value: '选项5',
-  label: '北京烤鸭'
-}];
-const department = ref('');
-const departments = [{
-  value: '选项1',
-  label: '黄金糕'
-}, {
-  value: '选项2',
-  label: '双皮奶'
-}, {
-  value: '选项3',
-  label: '蚵仔煎'
-}, {
-  value: '选项4',
-  label: '龙须面'
-}, {
-  value: '选项5',
-  label: '北京烤鸭'
-}];
-const disease = ref('');
-const diseases = [{
-  value: '选项1',
-  label: '黄金糕'
-}, {
-  value: '选项2',
-  label: '双皮奶'
-}, {
-  value: '选项3',
-  label: '蚵仔煎'
-}, {
-  value: '选项4',
-  label: '龙须面'
-}, {
-  value: '选项5',
-  label: '北京烤鸭'
-}];
+
+// const drugs = [{
+//   value: '选项1',
+//   label: '黄金糕'
+// }, {
+//   value: '选项2',
+//   label: '双皮奶'
+// }, {
+//   value: '选项3',
+//   label: '蚵仔煎'
+// }, {
+//   value: '选项4',
+//   label: '龙须面'
+// }, {
+//   value: '选项5',
+//   label: '北京烤鸭'
+// }];
+
+// const drugTypes = [{
+//   value: '选项1',
+//   label: '黄金糕'
+// }, {
+//   value: '选项2',
+//   label: '双皮奶'
+// }, {
+//   value: '选项3',
+//   label: '蚵仔煎'
+// }, {
+//   value: '选项4',
+//   label: '龙须面'
+// }, {
+//   value: '选项5',
+//   label: '北京烤鸭'
+// }];
+
+// const departments = [{
+//   value: '选项1',
+//   label: '黄金糕'
+// }, {
+//   value: '选项2',
+//   label: '双皮奶'
+// }, {
+//   value: '选项3',
+//   label: '蚵仔煎'
+// }, {
+//   value: '选项4',
+//   label: '龙须面'
+// }, {
+//   value: '选项5',
+//   label: '北京烤鸭'
+// }];
+
+// const diseases = [{
+//   value: '选项1',
+//   label: '黄金糕'
+// }, {
+//   value: '选项2',
+//   label: '双皮奶'
+// }, {
+//   value: '选项3',
+//   label: '蚵仔煎'
+// }, {
+//   value: '选项4',
+//   label: '龙须面'
+// }, {
+//   value: '选项5',
+//   label: '北京烤鸭'
+// }];
 </script>
 
 <style scoped lang="scss">
