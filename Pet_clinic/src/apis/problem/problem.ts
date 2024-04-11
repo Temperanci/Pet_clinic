@@ -11,18 +11,35 @@ interface Result<T> {
 }
 
 // Base URL for your API
-const API_BASE_URL = 'http://123.60.5.195:8084';
+const API_BASE_URL = '/api';
+
+const problem = {
+    type: '题目类型',
+    title: '题目标题',
+    answer: '题目答案',
+    content: '题目内容',
+    problemId: '题目ID',
+    subjectId: '病种ID',
+    background: '背景',
+    gradingPoints: '分数',
+    currPageNo: 1
+}
 
 // Function to query problems with pagination
-export const pageQuery = async (request: ProblemPageRequest): Promise<Result<ProblemPageResponse>> => {
-    const response = await axios.get<Result<ProblemPageResponse>>(`${API_BASE_URL}/problem/pageQuery`, {
-        params: request,
-    });
-    return response.data; // Assuming the backend directly returns the Result type
-};
+export async function pageQuery(pageNo:number){
+    try {
+        problem.currPageNo=pageNo;
+        const response = await axios.post(`${API_BASE_URL}/problem/pageQuery`, problem);
+        return response.data;
+    } catch (error) {
+        // If there's an error, handle it here
+        console.error('Error occurred during the page query:', error);
+        throw error; // Re-throw the error after logging or handling it
+    }
+}
 
 // Function to update problem information
-export const update = async (request: ProblemUpdateRequest): Promise<Result<ProblemBO>> => {
+export async function update(request: ProblemUpdateRequest): Promise<Result<ProblemBO>> {
     const response = await axios.post<Result<ProblemBO>>(`${API_BASE_URL}/problem/update`, request);
-    return response.data; // Assuming the backend directly returns the Result type
-};
+    return response.data;
+}

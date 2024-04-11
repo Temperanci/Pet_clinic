@@ -63,7 +63,7 @@
           </div>
         </el-popover>
       </div>
-      
+
     </el-header>
     <el-main>
       <el-menu mode="horizontal"
@@ -80,7 +80,7 @@
       <div class="content-area">
         <!-- 动态组件会在这里渲染 -->
         <ClinicGuidance v-if="activeIndex === '1'" @marker-clicked="markerClicked" />
-        <DepartmentDetails v-if="activeIndex === '2'" :selected-id="selectedDepartmentId" />
+        <DepartmentDetails v-if="activeIndex === '2'" :name="selectedDepartmentName" />
         <DrugResource v-if="activeIndex === '3'" />
         <ServiceCharge v-if="activeIndex === '4'" />
         <BedInquiry v-if="activeIndex === '5'" />
@@ -129,7 +129,7 @@ const componentsMap: ComponentsMap = {
 
 const activeIndex = ref('1')
 const currentComponent = ref(componentsMap[activeIndex.value])
-const selectedDepartmentId = ref(1);
+const selectedDepartmentName = ref("");
 const userStatus = ref(0)//0:管理 1:路人
 const loginVisible = ref(false)
 const registerVisible = ref(false)
@@ -158,11 +158,11 @@ function Logout(){
   ifLogined.value=false;  
 }
 // 当 marker 被点击时调用
-const markerClicked = (id: number) => {
+const markerClicked = (name: string) => {
   // 切换到科室详情页面
   activeIndex.value = '2';
   // 设置选中的科室 ID
-  selectedDepartmentId.value = id;
+  selectedDepartmentName.value = name;
 };
 
 </script>
@@ -252,17 +252,17 @@ const markerClicked = (id: number) => {
   width: 10%;
   display: flex;
   .loginBtn{
-    margin: 0%;
-    border-radius: 0%;
+    margin: 0;
+    border-radius: 0;
   }
   .registerBtn{
-    margin: 0%;
-    border-radius: 0%;
+    margin: 0;
+    border-radius: 0;
   }
 }
 .input {
       margin-bottom: 10px;
-      width:300;
+      width: 300px;
       }
 .Btn{
   margin-left: 60px;

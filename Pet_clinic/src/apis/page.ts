@@ -10,3 +10,9 @@ export interface Permission {
      */
     role: string[];
 }
+
+export interface BasePageRequest {
+    limit: number;
+    currPageNo: number;
+    // ...其他属性
+}

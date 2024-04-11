@@ -1,6 +1,7 @@
 import type { PersonnelBO } from "@/apis/schemas";
+import type {BasePageRequest} from "@/apis/page";
 
-export interface PersonnelPageRequest {
+export interface PersonnelPageRequest extends BasePageRequest {
     name?: string;
     role?: string;
     status?: string;
