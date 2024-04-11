@@ -14,11 +14,7 @@
     <el-main style="margin-left: 5vw;">
       <h3 style="color:grey; text-align:center; font-size:20px">{{ currentDepartmentRef.name }} 床位图</h3>
       <div class="bed-image" style="display: flex; justify-content:center;">
-<<<<<<< HEAD
           <el-image style="width: 60%; height: 60%;" :src="loadBedMap()"/>
-=======
-          <el-image style="width: 60%; height: 60%;" :src="'./01.png'"/>
->>>>>>> main
       </div>
     </el-main>
   </div>
@@ -53,21 +49,12 @@ function loadBedList(){
 
 // 返回所选科室的床位图
 function loadBedMap(){
-<<<<<<< HEAD
   const bedMapURL = '/image/bedMap/'+currentDepartmentRef.value.departmentId+'.png';
   console.log('床位图地址: ',bedMapURL);
   return bedMapURL;
 }
 
 const departments = [
-=======
-  var bedMapURL = '../../assets/img/bedMap/'+currentDepartmentRef.value.departmentId+'.png';
-  console.log('床位图地址: ',bedMapURL);
-  currentBedMap.value = bedMapURL;
-}
-
-var departments = [
->>>>>>> main
 {
     departmentId: '',
     name: '',
@@ -99,13 +86,6 @@ var departments = [
     desc: '略'
   }
 ]
-<<<<<<< HEAD
-=======
-
-var currentDepartment = departments[0];
-var currentDepartmentRef = ref(currentDepartment);
-var currentBedMap = ref('');
->>>>>>> main
 
 const currentDepartment = departments[0];
 const currentDepartmentRef = ref(currentDepartment);

@@ -3,22 +3,22 @@
         <el-container>
             <el-container width="60%">
                 <el-header>
-                    <h3>{{ currentProblem.title }}</h3>
+                    <h3>{{ selectedProblem.title }}</h3>
                 </el-header>
                 <el-main>
                     <div class="problemContent">
-                        <pre style="font-size: larger;">{{ currentProblem.content }}</pre>
-                        <el-radio-group v-if="currentProblem.type === '单选'" v-model="chosenAnswer">
+                        <pre style="font-size: larger;">{{ selectedProblem.content }}</pre>
+                        <el-radio-group v-if="selectedProblem.type === '单选题'" v-model="chosenAnswer">
                             <el-radio v-for="(choice, index) in choices" :key="index" :label="choice">
                                 {{ choice }}
                             </el-radio>
                         </el-radio-group>
-                        <el-checkbox-group v-else-if="currentProblem.type === '多选'" v-model="chosenAnswers">
+                        <el-checkbox-group v-else-if="selectedProblem.type === '多选题'" v-model="chosenAnswers">
                             <el-checkbox v-for="(choice, index) in choices" :key="index" :label="choices">
                                 {{ choice }}
                             </el-checkbox>
                         </el-checkbox-group>
-                        <el-input v-else-if="currentProblem.type === '简答'" type="textarea" placeholder="在此输入答案"
+                        <el-input v-else-if="selectedProblem.type === '简答题'" type="textarea" placeholder="在此输入答案"
                             v-model="inputAnswer" />
                     </div>
                 </el-main>
@@ -33,9 +33,9 @@
             </el-container>
             <el-aside>
                 <div class="problemTable">
-                    <div class="problemNumber" v-for="(pro, index) in ProblemList">
-                        <el-button style="width: 45px" @click="jumpProblem(pro.problemId)"
-                            :style="{ background: pro.problemId === currentProblem.problemId ? 'aquamarine' : '' }">{{
+                    <div class="problemNumber" v-for="(pro, index) in problemList">
+                        <el-button style="width: 45px" @click="jumpProblem(index)"
+                            :style="{ background: pro.problemId === selectedProblem.problemId ? 'aquamarine' : '' }">{{
                         index + 1 }}</el-button>
                     </div>
                 </div>
@@ -46,7 +46,7 @@
 
 <script setup lang="ts">
 import { defineComponent } from "vue";
-import { ref,onMounted } from 'vue';
+import { ref, onMounted, nextTick, watch } from 'vue';
 import { pageQuery } from '@/apis/problem/problem';
 import type { ProblemPageRequest, ProblemPageResponse, ProblemUpdateRequest } from '@/apis/problem/problem-interface';
 import type { ProblemBO } from '@/apis/schemas';
@@ -55,19 +55,44 @@ defineComponent({
     name: "Test",
 })
 
+const ProblemPage = ref<ProblemPageResponse>({ datas: [], total: 50, limit: 100 });
+const selectedProblem = ref<ProblemBO>({
+    type: '',
+    title: '',
+    answer: '',
+    content: '',
+    problemId: '',
+    subjectId: '',
+    background: '',
+    gradingPoints: ''
+})
+var problemList = ref(ProblemPage.value?.datas);
+var selectedIndex = ref(0);
 
-const problemList = ref<ProblemPageResponse>();
-const fetchData = async () => {
+async function fetchProblems() {
     try {
-        const response = await pageQuery({});
-        problemList.value = response.data;
+        const response = await pageQuery();
+        if (response && response.data && response.data.datas) {
+            ProblemPage.value = response.data;
+            problemList.value = ProblemPage.value.datas;
+            console.log("数据量: ", problemList.value.length);
+            console.log("获取数据: ", problemList);
+            selectedProblem.value = problemList.value[selectedIndex.value];
+            // if (ProblemPage.value.datas.length > 0) {
+            //     selectedProblem.value = ProblemPage.value.datas[0];
+            // }
+        } else {
+            console.error('No data returned from the API');
+        }
     } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching problems:', error);
     }
-};
-onMounted(fetchData);
-console.log("数据量: ",problemList.value?.datas.length);
-console.log("获取数据: ",problemList.value?.datas); 
+}
+onMounted(async () => {
+    await fetchProblems();
+    await nextTick();
+
+});
 
 
 
@@ -75,35 +100,37 @@ const props = defineProps({
     testId: String
 })
 
-function jumpProblem(n: number) {
+function jumpProblem(i: number) {
     saveAnswer();
-    var temp = ProblemList.find(pro => pro.problemId === n);
+    // var temp = ProblemList.find(pro => pro.problemId === n);
+    var temp = problemList.value[i];
     if (temp != null) {
-        currentProblem.value = temp;
-        console.log('跳转至题', currentProblem.value.problemId);
+        selectedProblem.value = temp;
+        selectedIndex.value = i;
+        console.log('跳转至题', selectedProblem.value.title);
     } else {
         console.log('跳转失败');
     }
 }
 function nextProblem() {
     saveAnswer();
-    jumpProblem(currentProblem.value.problemId + 1)
+    jumpProblem(selectedIndex.value + 1)
     console.log('下一题');
 }
 function priorProblem() {
     saveAnswer();
-    jumpProblem(currentProblem.value.problemId - 1)
+    jumpProblem(selectedIndex.value - 1)
     console.log('上一题');
 }
 function saveAnswer() { //切换题目时自动保存答案
-    var temp = currentProblem.value;
-    if (temp.type == '单选') {
+    var temp = selectedProblem.value;
+    if (temp.type == '单选题') {
         console.log("单选:", chosenAnswer.value);
         answerMap.set(temp.problemId, chosenAnswer.value);
-    } else if (temp.type == '多选') {
+    } else if (temp.type == '多选题') {
         console.log("多选:", chosenAnswers.value);
         answerMap.set(temp.problemId, chosenAnswers.value[0]);
-    } else if (temp.type == '简答') {
+    } else if (temp.type == '简答题') {
         console.log("简答:", inputAnswer.value);
         answerMap.set(temp.problemId, inputAnswer.value);
     }
@@ -111,6 +138,7 @@ function saveAnswer() { //切换题目时自动保存答案
 
 
 function submit() {
+
     console.log('提交测试');
     console.log(answerMap);
 }
@@ -277,7 +305,7 @@ const ProblemList = [{
 }
 ]
 
-const currentProblem = ref(ProblemList[0]);
+// const currentProblem = ref(ProblemList[0]);
 
 const choices = ref(['A', 'B', 'C', 'D']);
 const chosenAnswer = ref('');
