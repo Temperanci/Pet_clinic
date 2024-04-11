@@ -96,18 +96,18 @@ export interface ProcessBO{
     processId: string;
 }
 
-export interface TestRecordBO{
-    score: number;
-    graded: boolean;
-    gradeMap: Record<string, GradeResultBO>;
+export interface TestRecordBO {
+    score?: number;
+    graded?: boolean;
+    gradeMap?: Record<string, GradeResultBO>;
     answerMap: Record<string, string>;
     startTime: Date;
-    submitted: boolean;
-    answerList: string[];
-    submitTime: Date;
+    submitted?: boolean;
+    answerList?: string[];
+    submitTime?: Date;
     candidateId: string;
     problemSetId: string;
-    testRecordId: string;
+    testRecordId?: string;
 }
 
 // 假设还需要创建 GradeResultBO 接口

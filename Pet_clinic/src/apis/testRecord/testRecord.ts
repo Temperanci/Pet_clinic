@@ -11,18 +11,46 @@ interface Result<T> {
 }
 
 // Base URL for your API, adjust it to match your actual environment
-const API_BASE_URL = 'http://localhost:8084';
+const API_BASE_URL = '/api';
 
-// Function to query test records with pagination
-export const pageQuery = async (request: TestRecordPageRequest): Promise<Result<TestRecordPageResponse>> => {
-    const response = await axios.get<Result<TestRecordPageResponse>>(`${API_BASE_URL}/testRecord/pageQuery`, {
-        params: request,
-    });
-    return response.data; // Assuming the backend directly returns the Result type
-};
+const testRecord = {
+    // score: '',
+    // graded: '',
+    // gradeMap: '',
+    // answerMap: '',
+    // startTime: '',
+    // submitted: '',
+    // answerList: '',
+    // submitTime: '',
+    // candidateId: '',
+    // problemSetId:'',
+    // testRecordId:'',
+    currPageNo: 1
+}
 
-// Function to update test record information
+export async function pageQuery(pageNo:number){
+    try {
+        testRecord.currPageNo=pageNo;
+        const response = await axios.post(`${API_BASE_URL}/testRecord/pageQuery`, testRecord);
+        return response.data;
+    } catch (error) {
+        console.error('Error occurred during the page query:', error);
+        throw error; 
+    }
+}
+
+// export async function update(request: TestRecordUpdateRequest){
+
+// }
+
 export const update = async (request: TestRecordUpdateRequest): Promise<Result<TestRecordBO>> => {
-    const response = await axios.post<Result<TestRecordBO>>(`${API_BASE_URL}/testRecord/update`, request);
-    return response.data; // Assuming the backend directly returns the Result type
+    try {
+        const response = await axios.post<Result<TestRecordBO>>(`${API_BASE_URL}/testRecord/update`, request);
+        console.log("提交测试记录:",request);
+        // console.log("提交测试记录:",request.testRecord.answerMap);
+        return response.data;
+    } catch (error) {
+        console.error('Error occurred during the updation:', error);
+        throw error; 
+    }
 };
