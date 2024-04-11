@@ -227,7 +227,53 @@ const ProblemList = [{
     type: '简答',
     subjectId: '宠物疾病',
     title: '题15',
-    content: '请简要介绍一种常见的犬抱歉，我之前的回答中只提供了题目的信息，没有给出选项和答案。以下是题目、选项和答案的完整信息'
+    content: '请简要介绍一种常见的犬皮肤疾病。'
+},
+{
+    problemId: 10,
+    type: '单选',
+    subjectId: '宠物疾病',
+    title: '题10',
+    content: '以下哪种疾病会导致狗出现间歇性发作的癫痫样抽搐？',
+    choices: ['A. 犬瘟热', 'B. 犬癫痫病', 'C. 犬肺炎', 'D. 犬传染性肝炎']
+},
+{
+    problemId: 11,
+    type: '多选',
+    subjectId: '宠物疾病',
+    title: '题11',
+    content: '以下哪些疾病可以通过犬与犬之间的直接接触传播？',
+    choices: ['A. 犬细小病毒感染', 'B. 犬瘟热', 'C. 犬冠状病毒感染', 'D. 犬传染性肝炎']
+},
+{
+    problemId: 12,
+    type: '简答',
+    subjectId: '宠物疾病',
+    title: '题12',
+    content: '请简要介绍一种常见的猫肠道疾病。'
+},
+{
+    problemId: 13,
+    type: '单选',
+    subjectId: '宠物疾病',
+    title: '题13',
+    content: '以下哪种疾病会导致猫出现呼吸道感染症状？',
+    choices: ['A. 猫白血病病毒感染', 'B. 猫冠状病毒感染', 'C. 猫感冒', 'D. 猫糖尿病']
+},
+{
+    problemId: 14,
+    type: '多选',
+    subjectId: '宠物疾病',
+    title: '题14',
+    content: '以下哪些因素可能引起犬皮肤过敏？',
+    choices: ['A. 食物过敏', 'B. 花粉过敏', 'C. 虫媒传播', 'D. 药物过敏']
+},
+{
+    problemId: 15,
+    type: '简答',
+    subjectId: '宠物疾病',
+    title: '题15',
+    content: '请简要介绍一种常见的犬抱歉'
 }
 ]
 
@@ -271,9 +317,11 @@ const answerMap = new Map();
 
 ;
 
+
 .testButton {
     display: flex;
     align-items: flex-end;
+    justify-content: center;
     justify-content: center;
 }
 </style>

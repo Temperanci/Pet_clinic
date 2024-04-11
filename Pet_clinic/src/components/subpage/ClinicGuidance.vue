@@ -9,7 +9,7 @@
                 :key="marker.id"
                 :id="marker.id.toString()"
                 :lat-lng="marker.position"
-                @click="onMarkerClicked(marker.id)">
+                @click="onMarkerClicked(marker.name)">
         <l-icon
             :icon-url="markerUrl"
             :shadow-url="shadowMarkerUrl"
@@ -63,9 +63,9 @@ const imageBounds: [LatLngTuple, LatLngTuple] = [[39.5, 38.5], [40.5, 40.5]];
 
 const emit = defineEmits(['marker-clicked']);
 
-function onMarkerClicked(id: number) {
+function onMarkerClicked(name: string) {
   // 直接调用 emit 发送事件
-  emit('marker-clicked', id);
+  emit('marker-clicked', name);
 }
 
 </script>
