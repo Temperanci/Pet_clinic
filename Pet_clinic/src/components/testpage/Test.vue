@@ -26,7 +26,7 @@
                     <div class="testButton">
                         <el-button @click="priorProblem()">上一题</el-button>
                         <el-button @click="nextProblem()">下一题</el-button>
-                        <el-button @click="submit()">提交</el-button>
+                        <el-button @click="dialogVisible = true">提交</el-button>
                     </div>
 
                 </el-footer>
@@ -42,6 +42,18 @@
             </el-aside>
         </el-container>
     </div>
+
+    <el-dialog v-model="dialogVisible" title="确认提交" width="400">
+        <span>是否提交试卷？</span>
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="dialogVisible = false">Cancel</el-button>
+                <el-button type="primary" @click="dialogVisible = false;submit()">
+                    Confirm
+                </el-button>
+            </div>
+        </template>
+    </el-dialog>
 </template>
 
 <script setup lang="ts">
@@ -99,7 +111,7 @@ onMounted(async () => {
 });
 
 
-
+const emit = defineEmits(['page']);
 const props = defineProps({
     testId: String
 })
@@ -156,7 +168,8 @@ function submit() {
         // delete: false,
         submitted: true
     };
-    const temp=update(submitContent);
+    update(submitContent);
+    emit('page',2);
 }
 function saveAnswer() { //切换题目时自动保存答案
     var pro = selectedProblem.value;
@@ -174,6 +187,9 @@ function saveAnswer() { //切换题目时自动保存答案
         }
     }
 }
+
+const dialogVisible = ref(false)
+
 
 
 </script>
