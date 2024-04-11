@@ -1,12 +1,12 @@
 <template>
   <div class="mainPage">
     <el-aside>
-      <div>
+      <!-- <div>
         <el-container>
           <el-input class="searchBar" v-model="input" placeholder="请输入内容"></el-input>
           <el-button class="searchBar">搜索</el-button>
         </el-container>
-      </div>
+      </div> -->
       <div class="filter">
         <el-input class="option" v-model="ServiceId" placeholder="请输入服务编号"></el-input>
         <el-input class="option" v-model="Title" placeholder="请输入服务名称"></el-input>
@@ -25,7 +25,17 @@
           <el-option v-for="item in departments" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select> -->
-        <el-button class="optionButton">筛选</el-button>
+        <el-button v-if="back" class="optionButton" 
+        @click="fetchPrice();back=false;clearFilter();">返回</el-button>
+        <el-button v-else class="optionButton" 
+        @click="CRUDhandler.search({
+            priceId: PriceId,
+            type: Type,
+            title: Title,
+            departmentId: DepartmentId,
+            serviceId: ServiceId
+          });
+          back=true;">筛选</el-button>
       </div>
     </el-aside>
     <div class="main">
@@ -96,12 +106,20 @@ import { type rowCRUD } from '../../scripts/tableOpt.ts'
 
 var currentPage = 1;
 var entryNum = ref(0);
+var back = ref(false);
 const ServiceId = ref('');
 const input = ref('');
 const Type = ref('');
 const Title = ref('');
 const DepartmentId = ref('');
 const PriceId = ref('');
+function clearFilter(){
+  ServiceId.value='';
+  Type.value='';
+  Title.value='';
+  DepartmentId.value='';
+  PriceId.value='';
+}
 const PricePage = ref<PricePageResponse>({ datas: [], total: 0, limit: 0 });
 class priceRowCRUD implements rowCRUD {
   updateMsg(Msg: Object[], data: any[], index: number): void {
@@ -110,36 +128,53 @@ class priceRowCRUD implements rowCRUD {
   }//删除
   editRow(Msg: Object[], index: number): void {
   }//修改
+  createRow(msg: Object): void {
+  }
+  search(msg: Object): void {
+    fetchPrice(undefined, 999, msg, true);
+  }
   constructor() {
 
   }
 }
 var CRUDhandler = new priceRowCRUD();
-async function fetchPrice() {
+async function fetchPrice(pageNum?: number, pageLimit?: number, msg?: Object, search?: boolean) {
+  var temp = msg || {
+    priceId: '',
+    type: '',
+    departmentId: '',
+    title: '',
+    serviceId:'',
+  }
+  var request: PricePageRequest = {
+    priceId: ((temp as Price).priceId === '') ? undefined : (temp as Price).priceId,
+    type: ((temp as Price).type === '') ? undefined : (temp as Price).type,
+    departmentId: ((temp as Price).departmentId === '') ? undefined : (temp as Price).departmentId,
+    serviceId: ((temp as Price).serviceId === '') ? undefined : (temp as Price).serviceId,
+    title: ((temp as Price).title === '') ? undefined : (temp as Price).title,
+    currPageNo: pageNum || 1,
+    limit: pageLimit || 20
+  }
+  console.log('request', request);
   try {
-    var request: PricePageRequest = {
-      priceId: PriceId.value,
-      type: Type.value,
-      title: Title.value,
-      departmentId: DepartmentId.value,
-      serviceId: ServiceId.value
-    }
-    console.log('request', request);
-    const response = await pageQuery(request);
+    const response = await pageQuery(request || undefined);
     if (response && response.data && response.data.datas) {
       PricePage.value = response.data; // 假设响应中有data属性，且包含datas数组
       queryData.value = PricePage.value.datas;
-      tabLength.value = PricePage.value.limit;
+      if (search || false) {
+        tabLength.value = PricePage.value.total;
+      }
+      else { tabLength.value = PricePage.value.limit; }//保证搜索只有一页
       entryNum.value = PricePage.value.total;
       isSelected = isSelectGen(tabLength.value);
       edited.value = EditedGen(tabLength.value, new Price()) as Price[];
       // selectPage(currentPage - 1, tableData, queryData);
-      console.log('Fetched price:', PricePage.value.datas);
+      console.log('Fetched Price:', PricePage.value.datas);
     } else {
       console.error('No data returned from the API');
     }
   } catch (error) {
-    console.error('Error fetching price:', error);
+    console.error('Error fetching Price:', error);
   }
 }
 onMounted(() => {

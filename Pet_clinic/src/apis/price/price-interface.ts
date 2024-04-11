@@ -8,6 +8,8 @@ export interface PricePageRequest {
     priceId?: string;
     serviceId?: string;
     departmentId?: string;
+    currPageNo?:number;
+    limit?:number;
 }
 
 export interface PricePageResponse {

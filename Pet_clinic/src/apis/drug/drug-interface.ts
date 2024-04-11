@@ -7,6 +7,8 @@ export interface DrugPageRequest {
     drugId?: string;
     departmentId?: string;
     diseaseId?: string;
+    currPageNo?:number;
+    limit?:number;
 }
 
 export interface DrugPageResponse {

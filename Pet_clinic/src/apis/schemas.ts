@@ -38,12 +38,12 @@ export interface DiseaseInstanceBO{
 }
 
 export interface DrugBO{
-    desc: string;
-    name: string;
-    type: string;
-    drugId: string;
-    departmentId: string;
-    diseaseIdList: string[];
+    desc?: string;
+    name?: string;
+    type?: string;
+    drugId?: string;
+    departmentId?: string;
+    diseaseIdList?: string[];
 }
 
 export interface PersonnelBO{
@@ -57,13 +57,13 @@ export interface PersonnelBO{
 }
 
 export interface PriceBO{
-    desc: string;
-    type: string;
-    price: number;
-    title: string;
-    priceId: string;
-    serviceId: string;
-    departmentId: string;
+    desc?: string;
+    type?: string;
+    price?: number;
+    title?: string;
+    priceId?: string;
+    serviceId?: string;
+    departmentId?: string;
 }
 
 export interface ProblemBO{
