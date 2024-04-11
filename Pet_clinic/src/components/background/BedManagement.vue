@@ -5,25 +5,26 @@
   <div style="height: 100%;display: flex;flex-flow: column;">
     <div style="height: 90%;" class="table">
       <el-table :data="tableData.tab">
-        <el-table-column  prop="bedId" label="床位编号" width="350">
+        <el-table-column prop="bedId" label="床位编号">
           <template #default="scope">
-            <el-input v-if="isSelected[scope.$index]===true" v-model="scope.row.bedId"></el-input>
+            <el-input v-if="isSelected[scope.$index] === true" v-model="scope.row.bedId"></el-input>
             <span v-else>{{ scope.row.bedId }}</span>
           </template>
         </el-table-column>
-        <el-table-column  prop="departmentId" label="科室编号" width="350">
+        <el-table-column prop="departmentId" label="科室编号">
           <template #default="scope">
-            <el-input v-if="isSelected[scope.$index]===true" v-model="scope.row.departmentId"></el-input>
+            <el-input v-if="isSelected[scope.$index] === true" v-model="scope.row.departmentId"></el-input>
             <span v-else>{{ scope.row.departmentId }}</span>
           </template>
         </el-table-column>
-        <el-table-column  prop="location" label="位置" width="350">
+        <el-table-column prop="location" label="位置">
           <template #default="scope">
-            <el-input v-if="isSelected[scope.$index]===true" v-model="scope.row.location"></el-input>
+            <el-input v-if="isSelected[scope.$index] === true" v-model="scope.row.location"></el-input>
             <span v-else>{{ scope.row.location }}</span>
           </template>
         </el-table-column>
-        <tableOption :num=tabLength @select="(index)=>{isSelected[index]=!isSelected[index];}"/>
+        <tableOption :type=cType :num=tabLength :Msg=edited :Data=tableData.tab
+          @select="(index) => { isSelected[index] = !isSelected[index]; }" />
       </el-table>
     </div>
     <div class="pagination-block">
@@ -36,17 +37,33 @@
 import { defineComponent } from "vue";
 //分页
 import { ref, getCurrentInstance } from 'vue'
-import { updateTab, selectPage, Table, getPagination,LENGTH } from '../../scripts/paginate.ts'
-import { bedData } from '../../scripts/data.ts'
+import { updateTab, selectPage, Table, getPagination, LENGTH } from '../../scripts/paginate.ts'
 import '@/assets/table.css'
-import tableOption from "../subComponents/tableOption.vue";
-import {isSelectGen} from "../subComponents/tableOption.vue";
 //request
+import tableOption from "../subComponents/tableOption.vue";
+import { isSelectGen, EditedGen } from "../subComponents/tableOption.vue";
 import { onMounted } from "vue";
-import {pageQuery} from "../../apis/bed/bed.ts"
+import type { Ref } from "vue";
+import { pageQuery } from "../../apis/bed/bed.ts"
 import type { BedPageResponse } from "@/apis/bed/bed-interface.ts"
-import type {BedBO} from "@/apis/schemas";
+import { BO, type BedBO } from "@/apis/schemas";
+import { Bed } from "@/apis/class";
+import { type rowCRUD } from '../../scripts/tableOpt.ts'
 const BedPage = ref<BedPageResponse>({ datas: [], total: 0, limit: 0 });
+const cType: string = "BedBO";
+class bedRowCRUD implements rowCRUD {
+  updateMsg(msg: Object, data: any[], index: number): void {
+    (msg as Bed).bedId = data[index].bedId;
+    (msg as Bed).location = data[index].location;
+    (msg as Bed).departmentId = data[index].departmentId;
+  }
+  deleteRow(Msg: Object[]): void {
+
+  }
+  editRow(Msg: Object[]): void {
+
+  }
+}
 async function fetchBeds() {
   try {
     const response = await pageQuery();
@@ -63,7 +80,7 @@ async function fetchBeds() {
   }
 }
 onMounted(() => {
-  fetchBeds();  
+  fetchBeds();
 });
 //request
 // import {addSelect,chageSelected} from '../../scripts/table.ts'
@@ -85,7 +102,14 @@ const columnMap = new Map([
   ['departmentId', '科室编号'],
   ['location', '位置']
 ])
-var isSelected = isSelectGen(length);
+var isSelected = isSelectGen(tabLength);
+var edited: Ref<Bed[]> = ref<Bed[]>([]);
+edited.value = EditedGen(tabLength, new Bed()) as Bed[];
+// var updateRow:BedBO = new BO() as BedBO;
+// updateRow.bedId=''
+// console.log('update',updateRow);
+// console.log('updateBed',updateRow.bedId);
+// console.log('updateLoc',updateRow.location);
 const component = defineComponent({
   name: "BedManagement"
 })
