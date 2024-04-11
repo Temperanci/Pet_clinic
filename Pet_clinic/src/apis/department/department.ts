@@ -14,13 +14,7 @@ export interface Result<T> {
 // API 基础路径
 const API_BASE_URL = '/api';
 
-const department = {
-    desc: '部门描述',
-    name: '部门名称',
-    picture: '部门图片',
-    location: '部门位置',
-    departmentId: '部门ID',
-}
+const department = {}
 // 分页查询部门信息
 export async function pageQuery(){
     try {
