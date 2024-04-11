@@ -14,14 +14,14 @@ interface Result<T> {
 const API_BASE_URL = '/api';
 
 const problem = {
-    type: '题目类型',
-    title: '题目标题',
-    answer: '题目答案',
-    content: '题目内容',
-    problemId: '题目ID',
-    subjectId: '病种ID',
-    background: '背景',
-    gradingPoints: '分数',
+    // type: '',
+    // title: '',
+    // answer: '',
+    // content: '',
+    // problemId: '',
+    // subjectId: '',
+    // background: '',
+    // gradingPoints: '',
     currPageNo: 1
 }
 

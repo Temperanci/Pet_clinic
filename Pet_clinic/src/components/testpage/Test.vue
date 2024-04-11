@@ -8,7 +8,7 @@
                 <el-main>
                     <div class="problemContent">
                         <pre style="font-size: larger;">{{ selectedProblem.content }}</pre>
-                        <el-radio-group v-if="selectedProblem.type === '单选题'" v-model="answer[selectedIndex]">
+                        <el-radio-group v-if="selectedProblem.type === 'objective'" v-model="answer[selectedIndex]">
                             <el-radio v-for="(choice, index) in choices" :key="index" :label="choice">
                                 {{ choice }}
                             </el-radio>
@@ -18,7 +18,7 @@
                                 {{ choice }}
                             </el-checkbox>
                         </el-checkbox-group>
-                        <el-input v-else-if="selectedProblem.type === '简答题'" type="textarea" placeholder="在此输入答案"
+                        <el-input v-else-if="selectedProblem.type === 'subjective'" type="textarea" placeholder="在此输入答案"
                             v-model="answer[selectedIndex]" />
                     </div>
                 </el-main>
@@ -48,8 +48,10 @@
 import { defineComponent } from "vue";
 import { ref, onMounted } from 'vue';
 import { pageQuery } from '@/apis/problem/problem';
+import { update } from '@/apis/testRecord/testRecord';
 import type { ProblemPageRequest, ProblemPageResponse, ProblemUpdateRequest } from '@/apis/problem/problem-interface';
-import type { ProblemBO } from '@/apis/schemas';
+import type { TestRecordPageRequest, TestRecordPageResponse, TestRecordUpdateRequest } from '@/apis/testRecord/testRecord-interface';
+import type { ProblemBO, TestRecordBO } from '@/apis/schemas';
 
 defineComponent({
     name: "Test",
@@ -81,12 +83,12 @@ async function fetchProblems() {
                     ProblemPage.value.datas[j].content = ProblemPage.value.datas[j].content.replace(/(A\.|B\.|C\.|D\.)/g, '\n$1');
                 }
                 problemList.value = problemList.value.concat(ProblemPage.value.datas);
-                console.log("获取problemList:", problemList.value);
                 selectedProblem.value = problemList.value[selectedIndex.value];
             } else {
                 console.error('No data returned from the API');
             }
         }
+        console.log("获取problemList:", problemList.value);
     } catch (error) {
         console.error('Error fetching problems:', error);
     }
@@ -103,7 +105,8 @@ const props = defineProps({
 })
 const choices = ref(['A', 'B', 'C', 'D']);
 const answer = ref<string[]>([]);
-const answerMap = new Map();
+const answerMap = new Map<string, string>();
+
 
 const chosenAnswer = ref('');
 const chosenAnswers = ref([]);
@@ -131,20 +134,41 @@ function priorProblem() {
 }
 function submit() {
     saveAnswer();
-    console.log('提交测试:', props.testId);
-    console.log(answerMap);
+    const testRecord: TestRecordBO = {
+        // score: 0,
+        // graded: false,
+        // gradeMap: {},
+        answerMap: {}, //题目id-->考生答案
+        startTime: new Date(),
+        // submitted: true,
+        // answerList: [],
+        submitTime: new Date(),
+        candidateId: '114514',
+        problemSetId: '',
+
+    };
+    testRecord.problemSetId = props.testId ?? '';
+    testRecord.answerMap = Object.fromEntries(answerMap);
+    console.log("提交测试:", testRecord.problemSetId);
+    // console.log("测试记录:", testRecord.answerMap);
+    const submitContent: TestRecordUpdateRequest = {
+        testRecord: testRecord,
+        // delete: false,
+        submitted: true
+    };
+    const temp=update(submitContent);
 }
 function saveAnswer() { //切换题目时自动保存答案
     var pro = selectedProblem.value;
     var temp = answer.value[selectedIndex.value];
     if (temp != null) {
-        if (pro.type == '单选题') {
+        if (pro.type == 'objective') {
             console.log("单选:", temp);
             answerMap.set(pro.problemId, temp);
         } else if (pro.type == '多选题') {
             console.log("多选:", temp);
             answerMap.set(pro.problemId, temp);
-        } else if (pro.type == '简答题') {
+        } else if (pro.type == 'subjective') {
             console.log("简答:", temp);
             answerMap.set(pro.problemId, temp);
         }

@@ -14,15 +14,15 @@ interface Result<T> {
 const API_BASE_URL = '/api';
 
 const problemSet = {
-    desc: '描述',
-    title: '试卷题目',
-    endTime: '0',
-    duration: '0',
-    startTime: '0',
-    whiteList: '列表',
-    problemSetId: '试卷ID',
-    problemIdList: '试卷题目列表',
-    problemScoreMap: '试卷题目分数',
+    // desc: '',
+    // title: '',
+    // endTime: '',
+    // duration: '',
+    // startTime: '',
+    // whiteList: '',
+    // problemSetId: '',
+    // problemIdList: '',
+    // problemScoreMap: '',
     currPageNo: 1
 }
 

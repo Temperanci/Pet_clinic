@@ -5,6 +5,7 @@
                 <!-- <el-table v-for="item in loadCurrentList().slice((current-1)*size,current*size)" :key="item.problemSetId">
                 </el-table> -->
                 <el-table :data="loadCurrentList()" border width="">
+                    <!-- <el-table-column prop="problemSetId" label="id" width="" /> -->
                     <el-table-column prop="title" label="名称" width="" />
                     <el-table-column prop="desc" label="描述" width="" />
                     <el-table-column prop="startTime" label="开始时间" width="" />
@@ -49,12 +50,12 @@ async function fetchProblemSets() {
             if (response && response.data && response.data.datas) {
                 ProblemSetPage.value = response.data;
                 problemSetList.value = problemSetList.value.concat(ProblemSetPage.value.datas);
-                console.log("获取problemSetList:", problemSetList.value);
             }
             else {
                 console.error('No data returned from the API');
             }
         }
+        console.log("获取problemSetList:", problemSetList.value);
     } catch (error) {
         console.error('Error fetching problemSets:', error);
     }
@@ -72,6 +73,47 @@ const enterTest = (id: string) => {
     console.log('进入测试: ', id)
 }
 
+function loadCurrentList() {
+    const currentList: { problemSetId: string, title: string, desc: string, startTime: string, endTime: string, duration: string }[] = [];
+    for (var i in problemSetList.value) {
+        var index = problemSetList.value.indexOf(problemSetList.value[i])
+        if (index >= current.value * 10 - 10 && index < current.value * 10) {
+            const temp: { problemSetId: string, title: string, desc: string, startTime: string, endTime: string, duration: string } = {
+                problemSetId: "",
+                title: "",
+                desc: "",
+                startTime: "",
+                endTime: "",
+                duration: ""
+            };
+            temp.problemSetId = problemSetList.value[i].problemSetId;
+            temp.title = problemSetList.value[i].title;
+            temp.desc = problemSetList.value[i].desc;
+            if (problemSetList.value[i].startTime != null) {
+                temp.startTime = problemSetList.value[i].startTime?.toString()?.slice(0, 10) + ' ' + problemSetList.value[i].startTime?.toString()?.slice(11, 16);
+            }
+            if (problemSetList.value[i].endTime != null) {
+                temp.endTime = problemSetList.value[i].endTime?.toString()?.slice(0, 10) + ' ' + problemSetList.value[i].endTime?.toString()?.slice(11, 16);;
+            }
+            if (problemSetList.value[i].duration != null) {
+                temp.duration = problemSetList.value[i].duration?.toString();
+            }
+            currentList.push(temp);
+        }
+    }
+    console.log("当前分页数据:", currentList);
+    return currentList;
+}
+
+var current = ref(1);
+var size = ref(10);
+function handleCurrentChange(n: number) {
+    current.value = n;
+    console.log('当前页号:', n);
+}
+function handleSizeChange(n: number) {
+    size.value = n;
+}
 
 const ProblemSetList = [{
     problemSetId: '001',
@@ -253,48 +295,6 @@ const ProblemSetList = [{
 }
 
 ]
-
-function loadCurrentList() {
-    const currentList: { title: string, desc: string, startTime: string, endTime: string, duration: string }[] = [];
-
-    for (var i in problemSetList.value) {
-        var index = problemSetList.value.indexOf(problemSetList.value[i])
-        if (index >= current.value * 10 - 10 && index < current.value * 10) {
-            const temp: { title: string, desc: string, startTime: string, endTime: string, duration: string } = {
-                title: "",
-                desc: "",
-                startTime: "",
-                endTime: "",
-                duration: ""
-            };
-            temp.title = problemSetList.value[i].title;
-            temp.desc = problemSetList.value[i].desc;
-            if (problemSetList.value[i].startTime != null) {
-                temp.startTime = problemSetList.value[i].startTime?.toString()?.slice(0, 10) + ' ' + problemSetList.value[i].startTime?.toString()?.slice(11, 16);
-            }
-            if (problemSetList.value[i].endTime != null) {
-                temp.endTime = problemSetList.value[i].endTime?.toString()?.slice(0, 10) + ' ' + problemSetList.value[i].startTime?.toString()?.slice(11, 16);;
-            }
-            if (problemSetList.value[i].duration != null) {
-                temp.duration = problemSetList.value[i].duration?.toString();
-            }
-            currentList.push(temp);
-        }
-    }
-    console.log("当前分页数据:", currentList);
-    return currentList;
-}
-
-var current = ref(1);
-var size = ref(10);
-function handleCurrentChange(n: number) {
-    current.value = n;
-    console.log('当前页号:', n);
-}
-function handleSizeChange(n: number) {
-    size.value = n;
-}
-
 </script>
 
 <style scoped lang="scss">
