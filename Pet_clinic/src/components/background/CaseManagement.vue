@@ -66,6 +66,7 @@
 </template>
 
 <script setup lang="ts">
+// TODO:正确展示list字段
 import { defineComponent } from "vue";
 import { ref } from 'vue'
 import { getPagination,} from '../../scripts/paginate.ts'
@@ -104,13 +105,18 @@ class bedRowCRUD implements rowCRUD {
     console.log('delete response',response); 
   }//删除
   editRow(Msg: Object[],index:number): void {
+    console.log('msg!!!',Msg)
     var request:DiseaseInstanceUpdateRequest = {
       diseaseInstance:{
         instanceId:(Msg[index] as DiseaseInstance).instanceId, 
         diseaseId:(Msg[index] as DiseaseInstance).diseaseId,
         desc: (Msg[index] as DiseaseInstance).desc,
-        fileUrlList: (Msg[index] as DiseaseInstance).fileUrlList,
-        pictureUrlList: (Msg[index] as DiseaseInstance).pictureUrlList,
+        fileUrlList: ((Msg[index] as DiseaseInstance).fileUrlList as unknown) as string===''
+        ?undefined
+        :(((Msg[index] as DiseaseInstance).fileUrlList as unknown) as string).split(','),
+        pictureUrlList: (((Msg[index] as DiseaseInstance).pictureUrlList as unknown) as string)===''
+        ?undefined
+        :(((Msg[index] as DiseaseInstance).pictureUrlList as unknown) as string).split(','),
         time:Date.now()
       },
     delete:false}
@@ -132,8 +138,12 @@ class bedRowCRUD implements rowCRUD {
       diseaseInstance:{
         desc:(msg as DiseaseInstance).desc, 
         diseaseId:(msg as DiseaseInstance).diseaseId,
-        fileUrlList:(msg as DiseaseInstance).fileUrlList.length>0?(msg as DiseaseInstance).fileUrlList:undefined,
-        pictureUrlList:(msg as DiseaseInstance).pictureUrlList.length>0?(msg as DiseaseInstance).pictureUrlList:undefined,
+        fileUrlList:(msg as DiseaseInstance).fileUrlList.length>0
+        ?(msg as DiseaseInstance).fileUrlList
+        :undefined,
+        pictureUrlList:(msg as DiseaseInstance).pictureUrlList.length>0
+        ?(msg as DiseaseInstance).pictureUrlList
+        :undefined,
         time:Date.now() 
       },
     delete:false}
@@ -157,16 +167,16 @@ async function fetchDiseaseInstances(pageNum?:number,pageLimit?:number,msg?:Obje
     time:0,
     diseaseId:'',
     instanceId:'',
-    fileUrlList:[],
-    pictureUrlList:[],
+    fileUrlList:[''],
+    pictureUrlList:[''],
   }
   var request:DiseaseInstancePageRequest= {
     instanceId:((temp as DiseaseInstance).instanceId==='')?undefined:(temp as DiseaseInstance).instanceId,
     time:((temp as DiseaseInstance).time===0)?undefined:(temp as DiseaseInstance).time, 
     diseaseId:((temp as DiseaseInstance).diseaseId==='')?undefined:(temp as DiseaseInstance).diseaseId,
     desc:((temp as DiseaseInstance).desc==='')?undefined:(temp as DiseaseInstance).desc,
-    fileUrlList:((temp as DiseaseInstance).fileUrlList.length<=0)?undefined:(temp as DiseaseInstance).fileUrlList,
-    pictureUrlList:((temp as DiseaseInstance).pictureUrlList.length<=0)?undefined:(temp as DiseaseInstance).pictureUrlList,
+    fileUrlList:((temp as DiseaseInstance).fileUrlList.length>0&&(temp as DiseaseInstance).fileUrlList[0]!=='')?(temp as DiseaseInstance).fileUrlList:undefined,
+    pictureUrlList:((temp as DiseaseInstance).pictureUrlList.length>0&&(temp as DiseaseInstance).pictureUrlList[0]!=='')?(temp as DiseaseInstance).pictureUrlList:undefined,
     currPageNo:pageNum||1,
     limit:pageLimit||20
   }
