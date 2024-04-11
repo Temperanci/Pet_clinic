@@ -82,7 +82,7 @@ import { Viewer } from "photo-sphere-viewer";
 import "photo-sphere-viewer/dist/photo-sphere-viewer.css";
 import { ArrowDown } from '@element-plus/icons-vue'
 import { pageQuery } from "@/apis/department/department";
-import { PersonnelPageQuery } from "@/apis/personnel/personnel";
+import { pageQuery as PersonnelPageQuery} from "@/apis/personnel/personnel";
 import type { DepartmentPageResponse } from "@/apis/department/department-interface"
 import type { DepartmentBO, PersonnelBO } from "@/apis/schemas";
 
