@@ -29,12 +29,12 @@ export interface DiseaseBO{
 }
 
 export interface DiseaseInstanceBO{
-    desc: string;
-    time: string;
-    diseaseId: string;
-    instanceId: string;
-    fileUrlList: string[];
-    pictureUrlList: string[];
+    desc?: string;
+    time?: number;
+    diseaseId?: string;
+    instanceId?: string;
+    fileUrlList?: string[];
+    pictureUrlList?: string[];
 }
 
 export interface DrugBO{

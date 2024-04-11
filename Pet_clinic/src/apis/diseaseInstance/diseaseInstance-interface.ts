@@ -2,11 +2,13 @@ import type { DiseaseInstanceBO } from "@/apis/schemas";
 
 export interface DiseaseInstancePageRequest {
     desc?: string;
-    time?: string;
+    time?: number;
     diseaseId?: string;
     instanceId?: string;
     fileUrlList?: string[];
     pictureUrlList?: string[];
+    currPageNo?:number;
+    limit?:number;
 }
 
 export interface DiseaseInstancePageResponse {
@@ -16,6 +18,6 @@ export interface DiseaseInstancePageResponse {
 }
 
 export interface DiseaseInstanceUpdateRequest {
-    DiseaseInstanceBO: DiseaseInstanceBO;
+    diseaseInstance: DiseaseInstanceBO;
     delete?: boolean;
 }

@@ -51,3 +51,20 @@ export class Price implements schemas.PriceBO{
         this.serviceId='';
     }
 }
+
+export class DiseaseInstance implements schemas.DiseaseInstanceBO{
+    desc: string;
+    time: number;
+    diseaseId: string;
+    instanceId: string;
+    fileUrlList: string[];
+    pictureUrlList: string[];
+    constructor(){
+        this.desc='';
+        this.time=0;
+        this.diseaseId='';
+        this.instanceId='';
+        this.fileUrlList=[];
+        this.pictureUrlList=[];
+    }
+}

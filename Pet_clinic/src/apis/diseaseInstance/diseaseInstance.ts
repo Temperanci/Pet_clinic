@@ -12,17 +12,27 @@ interface Result<T> {
 
 // Assume this is the base URL for your API
 const API_BASE_URL = '/api';
+const diseaseInstance={
 
+}
 // Function to query disease instances with pagination
-export const pageQuery = async (request: DiseaseInstancePageRequest): Promise<Result<DiseaseInstancePageResponse>> => {
-    const response = await axios.get<Result<DiseaseInstancePageResponse>>(`${API_BASE_URL}/diseaseInstance/pageQuery`, {
-        params: request,
-    });
-    return response.data; // Assuming the backend directly returns the Result type
+export async function pageQuery(request?:DiseaseInstancePageRequest){
+    try {
+        const response = await axios.post(`${API_BASE_URL}/diseaseInstance/pageQuery`, request||diseaseInstance);
+        return response.data; // 假设后端直接返回 Result<DiseaseInstancePageResponse> 结构
+    } catch (error) {
+        console.error('page query diseaseInstance error', error);
+        throw error;
+    }
 };
 
 // Function to update disease instance information
-export const update = async (request: DiseaseInstanceUpdateRequest): Promise<Result<DiseaseInstanceBO>> => {
-    const response = await axios.post<Result<DiseaseInstanceBO>>(`${API_BASE_URL}/diseaseInstance/update`, request);
-    return response.data; // Assuming the backend directly returns the Result type
+export async function update(request: DiseaseInstanceUpdateRequest) : Promise<Result<DiseaseInstanceBO>> {
+    try {
+        const response = await axios.post<Result<DiseaseInstanceBO>>(`${API_BASE_URL}/diseaseInstance/update`, request);
+        return response.data; // 假设后端直接返回 Result<DiseaseInstanceBO> 结构
+    } catch (error) {
+        console.error('update diseaseInstance error', error);
+        throw error;
+    }
 };
