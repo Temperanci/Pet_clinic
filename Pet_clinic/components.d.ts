@@ -67,6 +67,7 @@ declare module 'vue' {
     SingleProblem: typeof import('./src/components/testpage/SingleProblem.vue')['default']
     StaffManagement: typeof import('./src/components/background/StaffManagement.vue')['default']
     StudyManagement: typeof import('./src/components/background/StudyManagement.vue')['default']
+    TableOption: typeof import('./src/components/subComponents/tableOption.vue')['default']
     Test: typeof import('./src/components/testpage/Test.vue')['default']
     VaccineManagement: typeof import('./src/components/background/VaccineManagement.vue')['default']
   }

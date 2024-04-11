@@ -13,15 +13,7 @@ export interface Result<T> {
 
 // API 基础路径
 const API_BASE_URL = '/api';
-const personnel = {
-    name: '人事名称',
-    role: '人事角色',
-    status: '人事状态',
-    password: '人事密码',
-    personnelId: '人事ID',
-    phoneNumber: '人事电话号码',
-    departmentId: '部门ID',
-}
+const personnel = {}
 // 分页查询人事信息
 export async function PersonnelPageQuery(){
     try {

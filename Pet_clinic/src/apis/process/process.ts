@@ -10,12 +10,7 @@ export interface Result<T> {
 }
 // API 基础路径，确保这是后端服务的正确地址
 const API_BASE_URL = '/api';
-const process = {
-    type: '流程类型',
-    title: '流程标题',
-    content: '流程内容',
-    processId: '流程ID',
-}
+const process = {}
 
 // 分页查询流程信息的函数
 export async function processPageQuery(){
