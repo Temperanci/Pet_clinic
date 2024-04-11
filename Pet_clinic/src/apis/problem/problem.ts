@@ -21,12 +21,14 @@ const problem = {
     problemId: '题目ID',
     subjectId: '病种ID',
     background: '背景',
-    gradingPoints: '分数'
+    gradingPoints: '分数',
+    currPageNo: 1
 }
 
 // Function to query problems with pagination
-export async function pageQuery(){
+export async function pageQuery(pageNo:number){
     try {
+        problem.currPageNo=pageNo;
         const response = await axios.post(`${API_BASE_URL}/problem/pageQuery`, problem);
         return response.data;
     } catch (error) {

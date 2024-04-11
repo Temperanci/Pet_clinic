@@ -8,7 +8,7 @@
                 <el-main>
                     <div class="problemContent">
                         <pre style="font-size: larger;">{{ selectedProblem.content }}</pre>
-                        <el-radio-group v-if="selectedProblem.type === '单选题'" v-model="chosenAnswer">
+                        <el-radio-group v-if="selectedProblem.type === '单选题'" v-model="answer[selectedIndex]">
                             <el-radio v-for="(choice, index) in choices" :key="index" :label="choice">
                                 {{ choice }}
                             </el-radio>
@@ -19,7 +19,7 @@
                             </el-checkbox>
                         </el-checkbox-group>
                         <el-input v-else-if="selectedProblem.type === '简答题'" type="textarea" placeholder="在此输入答案"
-                            v-model="inputAnswer" />
+                            v-model="answer[selectedIndex]" />
                     </div>
                 </el-main>
                 <el-footer>
@@ -46,7 +46,7 @@
 
 <script setup lang="ts">
 import { defineComponent } from "vue";
-import { ref, onMounted, nextTick, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import { pageQuery } from '@/apis/problem/problem';
 import type { ProblemPageRequest, ProblemPageResponse, ProblemUpdateRequest } from '@/apis/problem/problem-interface';
 import type { ProblemBO } from '@/apis/schemas';
@@ -55,7 +55,7 @@ defineComponent({
     name: "Test",
 })
 
-const ProblemPage = ref<ProblemPageResponse>({ datas: [], total: 50, limit: 100 });
+const ProblemPage = ref<ProblemPageResponse>({ datas: [], total: 0, limit: 0 });
 const selectedProblem = ref<ProblemBO>({
     type: '',
     title: '',
@@ -68,21 +68,24 @@ const selectedProblem = ref<ProblemBO>({
 })
 var problemList = ref(ProblemPage.value?.datas);
 var selectedIndex = ref(0);
-
 async function fetchProblems() {
     try {
-        const response = await pageQuery();
-        if (response && response.data && response.data.datas) {
-            ProblemPage.value = response.data;
-            problemList.value = ProblemPage.value.datas;
-            console.log("数据量: ", problemList.value.length);
-            console.log("获取数据: ", problemList);
-            selectedProblem.value = problemList.value[selectedIndex.value];
-            // if (ProblemPage.value.datas.length > 0) {
-            //     selectedProblem.value = ProblemPage.value.datas[0];
-            // }
-        } else {
-            console.error('No data returned from the API');
+        const response = await pageQuery(1);
+        const pages = Math.ceil(response.data.total / response.data.limit); //总页数
+        console.log("total=", response.data.total, " limit=", response.data.limit);
+        for (var i = 1; i <= pages; i++) {
+            const response = await pageQuery(i);
+            if (response && response.data && response.data.datas) {
+                ProblemPage.value = response.data;
+                for (var j in ProblemPage.value.datas) { //单选题内容换行
+                    ProblemPage.value.datas[j].content = ProblemPage.value.datas[j].content.replace(/(A\.|B\.|C\.|D\.)/g, '\n$1');
+                }
+                problemList.value = problemList.value.concat(ProblemPage.value.datas);
+                console.log("获取problemList:", problemList.value);
+                selectedProblem.value = problemList.value[selectedIndex.value];
+            } else {
+                console.error('No data returned from the API');
+            }
         }
     } catch (error) {
         console.error('Error fetching problems:', error);
@@ -90,7 +93,6 @@ async function fetchProblems() {
 }
 onMounted(async () => {
     await fetchProblems();
-    await nextTick();
 
 });
 
@@ -99,48 +101,54 @@ onMounted(async () => {
 const props = defineProps({
     testId: String
 })
+const choices = ref(['A', 'B', 'C', 'D']);
+const answer = ref<string[]>([]);
+const answerMap = new Map();
+
+const chosenAnswer = ref('');
+const chosenAnswers = ref([]);
+const inputAnswer = ref('');
+
 
 function jumpProblem(i: number) {
-    saveAnswer();
-    // var temp = ProblemList.find(pro => pro.problemId === n);
-    var temp = problemList.value[i];
-    if (temp != null) {
-        selectedProblem.value = temp;
+    var pro = problemList.value[i];
+    if (pro != null) {
+        saveAnswer();
+        selectedProblem.value = pro;
         selectedIndex.value = i;
-        console.log('跳转至题', selectedProblem.value.title);
+        console.log('跳转至题目:', selectedProblem.value.title);
     } else {
         console.log('跳转失败');
     }
 }
 function nextProblem() {
     saveAnswer();
-    jumpProblem(selectedIndex.value + 1)
-    console.log('下一题');
+    jumpProblem(selectedIndex.value + 1);
 }
 function priorProblem() {
     saveAnswer();
-    jumpProblem(selectedIndex.value - 1)
-    console.log('上一题');
+    jumpProblem(selectedIndex.value - 1);
+}
+function submit() {
+    saveAnswer();
+    console.log('提交测试:', props.testId);
+    console.log(answerMap);
 }
 function saveAnswer() { //切换题目时自动保存答案
-    var temp = selectedProblem.value;
-    if (temp.type == '单选题') {
-        console.log("单选:", chosenAnswer.value);
-        answerMap.set(temp.problemId, chosenAnswer.value);
-    } else if (temp.type == '多选题') {
-        console.log("多选:", chosenAnswers.value);
-        answerMap.set(temp.problemId, chosenAnswers.value[0]);
-    } else if (temp.type == '简答题') {
-        console.log("简答:", inputAnswer.value);
-        answerMap.set(temp.problemId, inputAnswer.value);
+    var pro = selectedProblem.value;
+    var temp = answer.value[selectedIndex.value];
+    if (temp != null) {
+        if (pro.type == '单选题') {
+            console.log("单选:", temp);
+            answerMap.set(pro.problemId, temp);
+        } else if (pro.type == '多选题') {
+            console.log("多选:", temp);
+            answerMap.set(pro.problemId, temp);
+        } else if (pro.type == '简答题') {
+            console.log("简答:", temp);
+            answerMap.set(pro.problemId, temp);
+        }
     }
-}
-
-
-function submit() {
-
-    console.log('提交测试');
-    console.log(answerMap);
 }
 
 
@@ -304,16 +312,6 @@ const ProblemList = [{
     content: '请简要介绍一种常见的犬抱歉'
 }
 ]
-
-// const currentProblem = ref(ProblemList[0]);
-
-const choices = ref(['A', 'B', 'C', 'D']);
-const chosenAnswer = ref('');
-const chosenAnswers = ref([]);
-const inputAnswer = ref('');
-
-const answerMap = new Map();
-
 </script>
 
 <style scoped lang="scss">
