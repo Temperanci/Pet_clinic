@@ -17,6 +17,7 @@ const API_BASE_URL = '/api';
 const department = {
     
 }
+
 // 分页查询部门信息
 export async function pageQuery(request?:DepartmentPageRequest){
     try {

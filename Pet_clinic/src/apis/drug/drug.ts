@@ -13,7 +13,6 @@ interface Result<T> {
 // This is the base URL for your API
 const API_BASE_URL = '/api';
 const drug ={
-    
 }
 // Function to query drugs with pagination
 export async function pageQuery(request?:DrugPageRequest){

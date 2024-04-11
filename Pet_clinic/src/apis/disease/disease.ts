@@ -12,14 +12,7 @@ interface Result<T> {
 
 // 假设这是你的API的基础URL
 const API_BASE_URL = '/api';
-const disease = {
-    desc: '疾病描述',
-    name: '疾病名称',
-    diseaseId: '疾病ID',
-    fileUrlList: null,
-    departmentId: '部门ID',
-    pictureUrlList: null,
-}
+const disease = {}
 
 // 分页查询疾病信息
 export async function DiseasePageQuery(){

@@ -120,7 +120,7 @@ const personnelList = ref<PersonnelBO[]>([]);
 async function fetchDepartments() {
   try {
     const response = await pageQuery();
-    // console.log('response:', response)
+    console.log('response:', response)
     if (response && response.data && response.data.datas) {
       DepartmentPage.value = response.data; // 假设响应中有data属性，且包含datas数组
       // 如果需要，可以在这里设置默认选中的部门

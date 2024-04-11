@@ -174,7 +174,7 @@ async function fetchPrice(pageNum?: number, pageLimit?: number, msg?: Object, se
       console.error('No data returned from the API');
     }
   } catch (error) {
-    console.error('Error fetching Price:', error);
+  console.error('Error fetching Price:', error);
   }
 }
 onMounted(() => {
