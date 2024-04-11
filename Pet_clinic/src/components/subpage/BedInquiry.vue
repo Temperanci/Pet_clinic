@@ -55,11 +55,6 @@ function loadBedMap(){
 }
 
 const departments = [
-{
-    departmentId: '',
-    name: '',
-    desc: ''
-  },
   {
     departmentId: '01',
     name: '门诊室',

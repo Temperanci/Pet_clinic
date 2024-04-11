@@ -2,7 +2,9 @@
 import axios from 'axios';
 import type { ProblemSetPageRequest, ProblemSetPageResponse, ProblemSetUpdateRequest } from '@/apis/problemSet/problemSet-interface';
 import type { ProblemSetBO } from '@/apis/schemas';
+import type { ProblemSetBO } from '@/apis/schemas';
 
+// General result structure
 // General result structure
 interface Result<T> {
     success: boolean;
@@ -40,5 +42,6 @@ export async function pageQuery(pageNo:number){
 
 export const update = async (request: ProblemSetUpdateRequest): Promise<Result<ProblemSetBO>> => {
     const response = await axios.post<Result<ProblemSetBO>>(`${API_BASE_URL}/problemSet/update`, request);
+    return response.data; 
     return response.data; 
 };

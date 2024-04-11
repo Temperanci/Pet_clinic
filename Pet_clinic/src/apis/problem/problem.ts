@@ -25,21 +25,20 @@ const problem = {
     currPageNo: 1
 }
 
-// Function to query problems with pagination
+
 export async function pageQuery(pageNo:number){
     try {
         problem.currPageNo=pageNo;
         const response = await axios.post(`${API_BASE_URL}/problem/pageQuery`, problem);
         return response.data;
     } catch (error) {
-        // If there's an error, handle it here
         console.error('Error occurred during the page query:', error);
-        throw error; // Re-throw the error after logging or handling it
+        throw error; 
     }
 }
 
-// Function to update problem information
 export async function update(request: ProblemUpdateRequest): Promise<Result<ProblemBO>> {
     const response = await axios.post<Result<ProblemBO>>(`${API_BASE_URL}/problem/update`, request);
     return response.data;
 }
+
