@@ -51,3 +51,54 @@ export class Price implements schemas.PriceBO{
         this.serviceId='';
     }
 }
+
+export class DiseaseInstance implements schemas.DiseaseInstanceBO{
+    desc: string;
+    time: number;
+    diseaseId: string;
+    instanceId: string;
+    fileUrlList: string[];
+    pictureUrlList: string[];
+    constructor(){
+        this.desc='';
+        this.time=0;
+        this.diseaseId='';
+        this.instanceId='';
+        this.fileUrlList=[];
+        this.pictureUrlList=[];
+    }
+}
+
+export class Department implements schemas.DepartmentBO{
+    departmentId: string;
+    desc: string ;
+    picture: string;
+    location?: string;
+    name?: string;
+    constructor(){
+        this.departmentId='';
+        this.desc='';
+        this.picture='';
+        this.picture='';
+        this.name='';
+    }
+}
+
+export class Personnel implements schemas.PersonnelBO{
+    name: string;
+    role: string;
+    status: string;
+    password: string;
+    personnelId: string;
+    phoneNumber: string;
+    departmentId: string;
+    constructor(){
+        this.name='';
+        this.role='';
+        this.status='';
+        this.password='';
+        this.personnelId='';
+        this.phoneNumber='';
+        this.departmentId='';
+    }
+}

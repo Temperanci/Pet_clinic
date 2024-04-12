@@ -26,14 +26,15 @@
         <el-popover
           :visible="loginVisible"
           placement="left"
-          :width="300">
+          :width="300"
+          style="display: flex;flex-direction: column;">
           <template #reference>
             <el-button class="loginBtn" @click="()=>{loginVisible=!loginVisible;registerVisible=false;}">登录</el-button>
           </template>
-          <div >
+          <div style="width: 100%;">
             <el-input v-model="userName" class="input" placeholder="用户名" />
           </div>
-          <div>
+          <div style="width: 100%;">
             <el-input v-model="userPwd" class="input" placeholder="密码" />
           </div>
           <div style="width: 100%;">
@@ -251,6 +252,7 @@ const markerClicked = (name: string) => {
 .login {
   width: 10%;
   display: flex;
+  flex-direction: column;
   .loginBtn{
     margin: 0;
     border-radius: 0;
@@ -261,8 +263,9 @@ const markerClicked = (name: string) => {
   }
 }
 .input {
+      margin-left: auto;
       margin-bottom: 10px;
-      width: 300px;
+      width: 280px;
       }
 .Btn{
   margin-left: 60px;

@@ -1,12 +1,12 @@
 <template>
   <div class="mainPage">
     <el-aside>
-      <div>
+      <!-- <div>
         <el-container>
           <el-input class="searchBar" v-model="input" placeholder="请输入内容"></el-input>
           <el-button class="searchBar">搜索</el-button>
         </el-container>
-      </div>
+      </div> -->
       <div class="filter">
         <el-input class="option" v-model="DrugId" placeholder="请输入药品编号"></el-input>
         <el-input class="option" v-model="Name" placeholder="请输入药品名称"></el-input>
@@ -29,7 +29,17 @@
           <el-option v-for="item in diseases" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select> -->
-        <el-button class="optionButton" @click="fetchDrugs();console.log('筛选')">筛选</el-button>
+        <el-button v-if="back" class="optionButton" 
+        @click="fetchDrugs();back=false;clearFilter();">返回</el-button>
+        <el-button v-else class="optionButton" 
+        @click="CRUDhandler.search({
+            drugId: DrugId,
+            type: Type,
+            name: Name,
+            departmentId: DepartmentId,
+            diseaseIdList: [DiseaseId]
+          });
+          back=true;">筛选</el-button>
       </div>
     </el-aside>
     <div class="main">
@@ -44,8 +54,7 @@
             </el-table-column>
             <el-table-column prop="name" label="药品名称">
               <template #default="scope">
-                <el-input v-if="isSelected[scope.$index] === true"
-                  v-model="edited[scope.$index].name"></el-input>
+                <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].name"></el-input>
                 <span v-else>{{ scope.row.name }}</span>
               </template>
             </el-table-column>
@@ -63,13 +72,15 @@
             </el-table-column>
             <el-table-column prop="diseaseIdList" label="适用疾病">
               <template #default="scope">
-                <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].diseaseIdList"></el-input>
+                <el-input v-if="isSelected[scope.$index] === true"
+                  v-model="edited[scope.$index].diseaseIdList"></el-input>
                 <span v-else>{{ scope.row.diseaseIdList }}</span>
               </template>
             </el-table-column>
             <el-table-column prop="departmentId" label="科室">
               <template #default="scope">
-                <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].departmentId"></el-input>
+                <el-input v-if="isSelected[scope.$index] === true"
+                  v-model="edited[scope.$index].departmentId"></el-input>
                 <span v-else>{{ scope.row.departmentId }}</span>
               </template>
             </el-table-column>
@@ -86,63 +97,89 @@
 
 <script setup lang="ts">
 import { defineComponent } from "vue";
-import { ref} from 'vue'
+import { ref } from 'vue'
 import { getPagination } from '../../scripts/paginate.ts'
 import '@/assets/table.css'
 //request
-import { isSelectGen, EditedGen,clearIsSelected } from "../subComponents/tableOption.vue";
+import { isSelectGen, EditedGen, clearIsSelected } from "../subComponents/tableOption.vue";
 import { onMounted } from "vue";
 import type { Ref } from "vue";
-import { pageQuery ,update} from "../../apis/drug/drug.ts"
-import type { DrugPageResponse,DrugPageRequest } from "@/apis/drug/drug-interface.ts"
+import { pageQuery, update } from "../../apis/drug/drug.ts"
+import type { DrugPageResponse, DrugPageRequest } from "@/apis/drug/drug-interface.ts"
 import { Drug } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt.ts'
 var currentPage = 1;
 var entryNum = ref(0);
+var back = ref(false);
 const input = ref('');
 const DrugId = ref('');
 const Type = ref('');
 const Name = ref('');
 const DepartmentId = ref('');
 const DiseaseId = ref('');
+function clearFilter(){
+  DrugId.value='';
+  Type.value='';
+  Name.value='';
+  DepartmentId.value='';
+  DiseaseId.value='';
+}
 const DrugPage = ref<DrugPageResponse>({ datas: [], total: 0, limit: 0 });
 class drugRowCRUD implements rowCRUD {
   updateMsg(Msg: Object[], data: any[], index: number): void {
   }//更新buffer
-  deleteRow(Msg: Object[],index:number): void {
+  deleteRow(Msg: Object[], index: number): void {
   }//删除
-  editRow(Msg: Object[],index:number): void {
+  editRow(Msg: Object[], index: number): void {
   }//修改
-  constructor(){
+  createRow(msg: Object): void {
+  }
+  search(msg: Object): void {
+    console.log('drug111',(msg as Drug).diseaseIdList);
+    fetchDrugs(undefined, 999, msg, true);
+  }
+  constructor() {
 
   }
 }
 var CRUDhandler = new drugRowCRUD();
-async function fetchDrugs() {
+async function fetchDrugs(pageNum?: number, pageLimit?: number, msg?: Object, search?: boolean) {
+  var temp = msg || {
+    drugId: '',
+    type: '',
+    name: '',
+    departmentId: '',
+    diseaseIdList: []
+  }
+  var request: DrugPageRequest = {
+    drugId: ((temp as Drug).drugId === '') ? undefined : (temp as Drug).drugId,
+    type: ((temp as Drug).type === '') ? undefined : (temp as Drug).type,
+    departmentId: ((temp as Drug).departmentId === '') ? undefined : (temp as Drug).departmentId,
+    diseaseId: ((temp as Drug).diseaseIdList.length > 0 && (temp as Drug).diseaseIdList[0] !== '') ? (temp as Drug).diseaseIdList[0] : undefined,
+    name: ((temp as Drug).name === '') ? undefined : (temp as Drug).name,
+    currPageNo: pageNum || 1,
+    limit: pageLimit || 20
+  }
+  console.log('request', request);
   try {
-    var request:DrugPageRequest={
-      drugId:DrugId.value,
-      type:Type.value,
-      name:Name.value,
-      departmentId:DepartmentId.value,
-      diseaseId:DiseaseId.value
-    }
-    console.log('request',request);
-    const response = await pageQuery(request);
+    const response = await pageQuery(request || undefined);
     if (response && response.data && response.data.datas) {
       DrugPage.value = response.data; // 假设响应中有data属性，且包含datas数组
       queryData.value = DrugPage.value.datas;
-      tabLength.value = DrugPage.value.limit;
+      if (search || false) {
+        tabLength.value = DrugPage.value.total;
+      }
+      else { tabLength.value = DrugPage.value.limit; }//保证搜索只有一页
       entryNum.value = DrugPage.value.total;
-      isSelected=isSelectGen(tabLength.value);
+      isSelected = isSelectGen(tabLength.value);
       edited.value = EditedGen(tabLength.value, new Drug()) as Drug[];
       // selectPage(currentPage - 1, tableData, queryData);
-      console.log('Fetched drugs:', DrugPage.value.datas);
+      console.log('Fetched Drugs:', DrugPage.value.datas);
     } else {
       console.error('No data returned from the API');
     }
   } catch (error) {
-    console.error('Error fetching drugs:', error);
+    console.error('Error fetching Drugs:', error);
   }
 }
 onMounted(() => {
@@ -150,13 +187,13 @@ onMounted(() => {
 });
 var tabLength = ref(0);//每页展示的条目数
 const clearPara = ref(false);
-var isSelected:Ref<boolean[]> = ref<boolean[]>([]);
+var isSelected: Ref<boolean[]> = ref<boolean[]>([]);
 var edited: Ref<Drug[]> = ref<Drug[]>([]);
 var queryData = ref<any[]>([]);
 var currentPage = 1;
 function pagination(val: number) {
   currentPage = val
-  isSelected=clearIsSelected(isSelected);
+  isSelected = clearIsSelected(isSelected);
   clearPara.value = true;
 }
 //request

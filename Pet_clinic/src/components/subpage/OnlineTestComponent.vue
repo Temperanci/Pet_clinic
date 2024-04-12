@@ -5,26 +5,35 @@
     <div class="test-content">
       <template v-if="content === 0">
         <div class="testType">
-          <el-row :gutter="80">
+          <el-row :gutter="40">
             <el-col :span="12">
-              <el-result title="套题" sub-title="选择试卷参加测试">
-                <template #icon>
-                  <el-image src="url" />
-                </template>
-                <template #extra>
-                  <el-button type="primary" @click="changeContent(2)">进入</el-button>
-                </template>
-              </el-result>
+              <el-card shadow="hover">
+                <el-result title="套题" sub-title="选择试卷参加测试">
+                  <template #icon>
+                    <el-icon size="50">
+                      <Checked />
+                    </el-icon>
+                  </template>
+                  <template #extra>
+                    <el-button type="primary" size="large" @click="changeContent(2)">进入</el-button>
+                  </template>
+                </el-result>
+              </el-card>
             </el-col>
             <el-col :span="12">
-              <el-result title="单题" sub-title="按知识点筛选相关题目">
-                <template #icon>
-                  <el-image src="url" />
-                </template>
-                <template #extra>
-                  <el-button type="primary" @click="changeContent(1)">进入</el-button>
-                </template>
-              </el-result>
+              <el-card shadow="hover">
+                <el-result title="单题" sub-title="按知识点筛选相关题目">
+                  <template #icon>
+                    <el-icon size="50">
+                      <Checked />
+                    </el-icon>
+                  </template>
+                  <template #extra>
+                    <el-button type="primary" size="large" @click="changeContent(1)">进入</el-button>
+                  </template>
+                </el-result>
+              </el-card>
+
             </el-col>
           </el-row>
         </div>
@@ -81,7 +90,11 @@ const close = defineEmits(['close'])
   position: relative;
   /* 这里添加您自己的样式 */
 }
-
+.testType{
+  margin-top: 100px;
+  margin-left: 200px;
+  margin-right: 200px;
+}
 .back-button {
   position: absolute;
   top: 10px;

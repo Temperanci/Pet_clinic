@@ -13,11 +13,6 @@ interface Result<T> {
 // This is the base URL for your API
 const API_BASE_URL = '/api';
 const drug ={
-    drugId: '药品编号',
-    name: '药品名称',
-    type: '药品类型',
-    diseaseId:'适用疾病',
-    departmentId:'科室'
 }
 // Function to query drugs with pagination
 export async function pageQuery(request?:DrugPageRequest){
