@@ -8,7 +8,7 @@
                 <el-main>
                     <div class="problemContent">
                         <pre style="font-size: larger;">{{ selectedProblem.content }}</pre>
-                        <el-radio-group v-if="selectedProblem.type === '单选题'" v-model="answer[selectedIndex]">
+                        <el-radio-group v-if="selectedProblem.type === 'objective'" v-model="answer[selectedIndex]">
                             <el-radio v-for="(choice, index) in choices" :key="index" :label="choice">
                                 {{ choice }}
                             </el-radio>
@@ -18,7 +18,7 @@
                                 {{ choice }}
                             </el-checkbox>
                         </el-checkbox-group>
-                        <el-input v-else-if="selectedProblem.type === '简答题'" type="textarea" placeholder="在此输入答案"
+                        <el-input v-else-if="selectedProblem.type === 'subjective'" type="textarea" placeholder="在此输入答案"
                             v-model="answer[selectedIndex]" />
                     </div>
                 </el-main>
@@ -26,7 +26,7 @@
                     <div class="testButton">
                         <el-button @click="priorProblem()">上一题</el-button>
                         <el-button @click="nextProblem()">下一题</el-button>
-                        <el-button @click="submit()">提交</el-button>
+                        <el-button @click="dialogVisible = true">提交</el-button>
                     </div>
 
                 </el-footer>
@@ -42,14 +42,28 @@
             </el-aside>
         </el-container>
     </div>
+
+    <el-dialog v-model="dialogVisible" title="确认提交" width="400">
+        <span>是否提交试卷？</span>
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="dialogVisible = false">Cancel</el-button>
+                <el-button type="primary" @click="dialogVisible = false;submit()">
+                    Confirm
+                </el-button>
+            </div>
+        </template>
+    </el-dialog>
 </template>
 
 <script setup lang="ts">
 import { defineComponent } from "vue";
 import { ref, onMounted } from 'vue';
 import { pageQuery } from '@/apis/problem/problem';
+import { update } from '@/apis/testRecord/testRecord';
 import type { ProblemPageRequest, ProblemPageResponse, ProblemUpdateRequest } from '@/apis/problem/problem-interface';
-import type { ProblemBO } from '@/apis/schemas';
+import type { TestRecordPageRequest, TestRecordPageResponse, TestRecordUpdateRequest } from '@/apis/testRecord/testRecord-interface';
+import type { ProblemBO, TestRecordBO } from '@/apis/schemas';
 
 defineComponent({
     name: "Test",
@@ -81,12 +95,12 @@ async function fetchProblems() {
                     ProblemPage.value.datas[j].content = ProblemPage.value.datas[j].content.replace(/(A\.|B\.|C\.|D\.)/g, '\n$1');
                 }
                 problemList.value = problemList.value.concat(ProblemPage.value.datas);
-                console.log("获取problemList:", problemList.value);
                 selectedProblem.value = problemList.value[selectedIndex.value];
             } else {
                 console.error('No data returned from the API');
             }
         }
+        console.log("获取problemList:", problemList.value);
     } catch (error) {
         console.error('Error fetching problems:', error);
     }
@@ -97,13 +111,14 @@ onMounted(async () => {
 });
 
 
-
+const emit = defineEmits(['page']);
 const props = defineProps({
     testId: String
 })
 const choices = ref(['A', 'B', 'C', 'D']);
 const answer = ref<string[]>([]);
-const answerMap = new Map();
+const answerMap = new Map<string, string>();
+
 
 const chosenAnswer = ref('');
 const chosenAnswers = ref([]);
@@ -131,187 +146,52 @@ function priorProblem() {
 }
 function submit() {
     saveAnswer();
-    console.log('提交测试:', props.testId);
-    console.log(answerMap);
+    const testRecord: TestRecordBO = {
+        // score: 0,
+        // graded: false,
+        // gradeMap: {},
+        answerMap: {}, //题目id-->考生答案
+        startTime: new Date(),
+        // submitted: true,
+        // answerList: [],
+        // submitTime: new Date(),
+        candidateId: 'user',
+        problemSetId: ''
+    };
+    testRecord.problemSetId = props.testId ?? '';
+    testRecord.answerMap = Object.fromEntries(answerMap);
+    console.log("提交测试:", testRecord.problemSetId);
+    // console.log("测试记录:", testRecord.answerMap);
+    const submitContent: TestRecordUpdateRequest = {
+        testRecord: testRecord,
+        // delete: false,
+        submitted: false
+    };
+    var temp = update(submitContent);
+    console.log("测试记录:", temp);
+    emit('page',2);
 }
 function saveAnswer() { //切换题目时自动保存答案
     var pro = selectedProblem.value;
     var temp = answer.value[selectedIndex.value];
     if (temp != null) {
-        if (pro.type == '单选题') {
+        if (pro.type == 'objective') {
             console.log("单选:", temp);
             answerMap.set(pro.problemId, temp);
         } else if (pro.type == '多选题') {
             console.log("多选:", temp);
             answerMap.set(pro.problemId, temp);
-        } else if (pro.type == '简答题') {
+        } else if (pro.type == 'subjective') {
             console.log("简答:", temp);
             answerMap.set(pro.problemId, temp);
         }
     }
 }
 
+const dialogVisible = ref(false)
 
-const ProblemList = [{
-    problemId: 1,
-    type: '单选',
-    subjectId: '',
-    title: '犬细小病毒',
-    content: '犬细小病毒感染通常通过以下哪种途径传播？\nA. 空气飞沫传播\nB. 食物或饮水传播\nC. 虫媒传播\nD. 直接接触传播',
-},
-{
-    problemId: 2,
-    type: '多选',
-    subjectId: '宠物疾病',
-    title: '题2',
-    content: '以下哪些症状可能表明猫患上了猫白血病病毒感染？以下哪些症状可能表明猫患上了猫白血病病毒感染？\nA. 慢性呕吐\nB. 鼻血\nC. 脱毛\nD. 昏睡不醒'
-},
-{
-    problemId: 3,
-    type: '简答',
-    subjectId: '宠物疾病',
-    title: '题3',
-    content: '请简要介绍一种常见的猫传染性疾病。'
-},
-{
-    problemId: 4,
-    type: '单选',
-    subjectId: '宠物疾病',
-    title: '题4',
-    content: '犬瘟热是由以下哪种病毒引起的？',
-    choices: ['A. 犬瘟热病毒', 'B. 犬细小病毒', 'C. 猫白血病病毒', 'D. 犬冠状病毒']
-},
-{
-    problemId: 5,
-    type: '多选',
-    subjectId: '宠物疾病',
-    title: '题5',
-    content: '以下哪些疾病对猫咪的生命威胁较大？',
-    choices: ['A. 猫白血病', 'B. 猫感冒', 'C. 猫瘟热', 'D. 猫糖尿病']
-},
-{
-    problemId: 6,
-    type: '简答',
-    subjectId: '宠物疾病',
-    title: '题6',
-    content: '请简要介绍一种常见的犬传染性疾病。'
-},
-{
-    problemId: 7,
-    type: '单选',
-    subjectId: '宠物疾病',
-    title: '题7',
-    content: '猫糖尿病是由以下哪种因素引起的？',
-    choices: ['A. 遗传因素', 'B. 高糖饮食', 'C. 肥胖', 'D. 环境因素']
-},
-{
-    problemId: 8,
-    type: '多选',
-    subjectId: '宠物疾病',
-    title: '题8',
-    content: '以下哪些症状可能表明犬患上了心丝虫病？',
-    choices: ['A. 呼吸困难', 'B. 咳嗽', 'C. 腹胀', 'D. 无食欲']
-},
-{
-    problemId: 9,
-    type: '简答',
-    subjectId: '宠物疾病',
-    title: '题9',
-    content: '请简要介绍一种常见的犬皮肤疾病。'
-},
-{
-    problemId: 10,
-    type: '单选',
-    subjectId: '宠物疾病',
-    title: '题10',
-    content: '以下哪种疾病会导致狗出现间歇性发作的癫痫样抽搐？',
-    choices: ['A. 犬瘟热', 'B. 犬癫痫病', 'C. 犬肺炎', 'D. 犬传染性肝炎']
-},
-{
-    problemId: 11,
-    type: '多选',
-    subjectId: '宠物疾病',
-    title: '题11',
-    content: '以下哪些疾病可以通过犬与犬之间的直接接触传播？',
-    choices: ['A. 犬细小病毒感染', 'B. 犬瘟热', 'C. 犬冠状病毒感染', 'D. 犬传染性肝炎']
-},
-{
-    problemId: 12,
-    type: '简答',
-    subjectId: '宠物疾病',
-    title: '题12',
-    content: '请简要介绍一种常见的猫肠道疾病。'
-},
-{
-    problemId: 13,
-    type: '单选',
-    subjectId: '宠物疾病',
-    title: '题13',
-    content: '以下哪种疾病会导致猫出现呼吸道感染症状？',
-    choices: ['A. 猫白血病病毒感染', 'B. 猫冠状病毒感染', 'C. 猫感冒', 'D. 猫糖尿病']
-},
-{
-    problemId: 14,
-    type: '多选',
-    subjectId: '宠物疾病',
-    title: '题14',
-    content: '以下哪些因素可能引起犬皮肤过敏？',
-    choices: ['A. 食物过敏', 'B. 花粉过敏', 'C. 虫媒传播', 'D. 药物过敏']
-},
-{
-    problemId: 15,
-    type: '简答',
-    subjectId: '宠物疾病',
-    title: '题15',
-    content: '请简要介绍一种常见的犬皮肤疾病。'
-},
-{
-    problemId: 10,
-    type: '单选',
-    subjectId: '宠物疾病',
-    title: '题10',
-    content: '以下哪种疾病会导致狗出现间歇性发作的癫痫样抽搐？',
-    choices: ['A. 犬瘟热', 'B. 犬癫痫病', 'C. 犬肺炎', 'D. 犬传染性肝炎']
-},
-{
-    problemId: 11,
-    type: '多选',
-    subjectId: '宠物疾病',
-    title: '题11',
-    content: '以下哪些疾病可以通过犬与犬之间的直接接触传播？',
-    choices: ['A. 犬细小病毒感染', 'B. 犬瘟热', 'C. 犬冠状病毒感染', 'D. 犬传染性肝炎']
-},
-{
-    problemId: 12,
-    type: '简答',
-    subjectId: '宠物疾病',
-    title: '题12',
-    content: '请简要介绍一种常见的猫肠道疾病。'
-},
-{
-    problemId: 13,
-    type: '单选',
-    subjectId: '宠物疾病',
-    title: '题13',
-    content: '以下哪种疾病会导致猫出现呼吸道感染症状？',
-    choices: ['A. 猫白血病病毒感染', 'B. 猫冠状病毒感染', 'C. 猫感冒', 'D. 猫糖尿病']
-},
-{
-    problemId: 14,
-    type: '多选',
-    subjectId: '宠物疾病',
-    title: '题14',
-    content: '以下哪些因素可能引起犬皮肤过敏？',
-    choices: ['A. 食物过敏', 'B. 花粉过敏', 'C. 虫媒传播', 'D. 药物过敏']
-},
-{
-    problemId: 15,
-    type: '简答',
-    subjectId: '宠物疾病',
-    title: '题15',
-    content: '请简要介绍一种常见的犬抱歉'
-}
-]
+
+
 </script>
 
 <style scoped lang="scss">
@@ -344,10 +224,10 @@ const ProblemList = [{
 ;
 
 
+
 .testButton {
     display: flex;
     align-items: flex-end;
-    justify-content: center;
     justify-content: center;
 }
 </style>

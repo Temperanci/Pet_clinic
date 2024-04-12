@@ -67,26 +67,26 @@ export interface PriceBO{
 }
 
 export interface ProblemBO{
-    type: string;
-    title: string;
-    answer: string;
-    content: string;
-    problemId: string;
-    subjectId: string;
-    background: string;
-    gradingPoints: string;
+    type?: string;
+    title?: string;
+    answer?: string;
+    content?: string;
+    problemId?: string;
+    subjectId?: string;
+    background?: string;
+    gradingPoints?: string;
 }
 
 export interface ProblemSetBO{
-    desc: string;
-    title: string;
-    endTime: Date;
-    duration: number;
-    startTime: Date;
-    whiteList: string[];
-    problemSetId: string;
-    problemIdList: string[];
-    problemScoreMap: Record<string, number>;
+    desc?: string;
+    title?: string;
+    endTime?: Date;
+    duration?: number;
+    startTime?: Date;
+    whiteList?: string[];
+    problemSetId?: string;
+    problemIdList?: string[];
+    problemScoreMap?: Record<string, number>;
 }
 
 export interface ProcessBO{
@@ -96,18 +96,18 @@ export interface ProcessBO{
     processId: string;
 }
 
-export interface TestRecordBO{
-    score: number;
-    graded: boolean;
-    gradeMap: Record<string, GradeResultBO>;
-    answerMap: Record<string, string>;
-    startTime: Date;
-    submitted: boolean;
-    answerList: string[];
-    submitTime: Date;
-    candidateId: string;
+export interface TestRecordBO {
+    score?: number;
+    graded?: boolean;
+    gradeMap?: Record<string, GradeResultBO>;
+    answerMap?: Record<string, string>;
+    startTime?: Date;
+    submitted?: boolean;
+    answerList?: string[];
+    submitTime?: Date;
+    candidateId?: string;
     problemSetId: string;
-    testRecordId: string;
+    testRecordId?: string;
 }
 
 // 假设还需要创建 GradeResultBO 接口
