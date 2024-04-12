@@ -70,7 +70,7 @@ const emit = defineEmits(['page', 'id'])
 const enterTest = (id: string) => {
     emit('page', 3);
     emit('id', id);
-    console.log('进入测试: ', id)
+    console.log('进入测试:', id)
 }
 
 function loadCurrentList() {
