@@ -1,8 +1,9 @@
 import type { DiseaseInstanceBO } from "@/apis/schemas";
+import type { BasePageRequest } from "../page";
 
-export interface DiseaseInstancePageRequest {
+export interface DiseaseInstancePageRequest extends BasePageRequest{
     desc?: string;
-    time?: string;
+    time?: number;
     diseaseId?: string;
     instanceId?: string;
     fileUrlList?: string[];
@@ -16,6 +17,6 @@ export interface DiseaseInstancePageResponse {
 }
 
 export interface DiseaseInstanceUpdateRequest {
-    DiseaseInstanceBO: DiseaseInstanceBO;
+    diseaseInstance: DiseaseInstanceBO;
     delete?: boolean;
 }

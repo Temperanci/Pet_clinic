@@ -1,6 +1,6 @@
 import type { PriceBO } from "@/apis/schemas";
-
-export interface PricePageRequest {
+import type {BasePageRequest} from "@/apis/page";
+export interface PricePageRequest extends BasePageRequest{
     desc?: string;
     type?: string;
     price?: number;

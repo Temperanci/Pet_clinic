@@ -9,13 +9,13 @@
           <div class="card-container">
             <div class="card-left">
               <el-avatar :size="40" />
-              <el-text>用户名用户名</el-text>
+              <el-text>用户名</el-text>
             </div>
             <div class="card-right">
               <el-button @click="Switch(1)">前台页面</el-button>
               <el-text>后台管理</el-text>
               <el-divider />
-              <el-text>注销</el-text>
+              <!-- <el-text>注销</el-text> -->
             </div>
           </div>
         </el-card>

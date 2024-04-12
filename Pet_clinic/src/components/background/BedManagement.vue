@@ -9,7 +9,7 @@
           <template #default="scope">
             <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].bedId"></el-input> -->
             <el-input v-if="searchBar[scope.$index]" v-model="edited[0].bedId"></el-input>
-            <el-input v-else-if="unwritableBar[scope.$index]" disabled v-model="edited[0].bedId"></el-input>
+            <el-input v-else-if="unwritableBar[scope.$index]" disabled v-model="edited[scope.$index].bedId"></el-input>
             <span v-else>{{ scope.row.bedId }}</span>
           </template>
         </el-table-column>
