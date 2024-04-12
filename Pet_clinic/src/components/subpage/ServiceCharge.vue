@@ -188,6 +188,7 @@ var queryData = ref<any[]>([]);
 var currentPage = 1;
 function pagination(val: number) {
   currentPage = val
+  fetchPrice(currentPage);
   isSelected = clearIsSelected(isSelected);
   clearPara.value = true;
 }

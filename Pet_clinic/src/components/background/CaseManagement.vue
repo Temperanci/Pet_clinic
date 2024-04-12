@@ -111,12 +111,14 @@ class bedRowCRUD implements rowCRUD {
         instanceId:(Msg[index] as DiseaseInstance).instanceId, 
         diseaseId:(Msg[index] as DiseaseInstance).diseaseId,
         desc: (Msg[index] as DiseaseInstance).desc,
-        fileUrlList: ((Msg[index] as DiseaseInstance).fileUrlList as unknown) as string===''
-        ?undefined
-        :(((Msg[index] as DiseaseInstance).fileUrlList as unknown) as string).split(','),
-        pictureUrlList: (((Msg[index] as DiseaseInstance).pictureUrlList as unknown) as string)===''
-        ?undefined
-        :(((Msg[index] as DiseaseInstance).pictureUrlList as unknown) as string).split(','),
+        fileUrlList: undefined,
+        // ((Msg[index] as DiseaseInstance).fileUrlList as unknown) as string===''
+        // ?undefined
+        // :(((Msg[index] as DiseaseInstance).fileUrlList as unknown) as string).split(','),
+        pictureUrlList: undefined,
+        // (((Msg[index] as DiseaseInstance).pictureUrlList as unknown) as string)===''
+        // ?undefined
+        // :(((Msg[index] as DiseaseInstance).pictureUrlList as unknown) as string).split(','),
         time:Date.now()
       },
     delete:false}

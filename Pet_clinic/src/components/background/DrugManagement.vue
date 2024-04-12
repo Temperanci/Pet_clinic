@@ -2,7 +2,7 @@
 <div style="height: 100%;display: flex;flex-flow: column;">
     <div style="height: 90%;" class="table">
       <el-table :data="queryData" height="100%">
-        <el-table-column prop="drugId" label="床位编号">
+        <el-table-column prop="drugId" label="药品编号">
           <template #default="scope">
             <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].drugId"></el-input> -->
             <el-input v-if="searchBar[scope.$index]" v-model="edited[0].drugId"></el-input>
