@@ -23,7 +23,7 @@
 <script setup lang="ts">
 import {defineComponent, onMounted, ref} from 'vue';
 import { ElMenu, ElMenuItem } from 'element-plus';
-import { DiseasePageQuery } from "@/apis/disease/disease";
+import { pageQuery as DiseasePageQuery } from "@/apis/disease/disease";
 import type { DiseaseBO } from "@/apis/schemas";
 import type { DiseasePageResponse } from "@/apis/disease/disease-interface";
 

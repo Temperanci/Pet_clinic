@@ -12,7 +12,16 @@
         </el-table-column>
         <el-table-column prop="diseaseId" label="病种编号">
           <template #default="scope">
-            <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].diseaseId"></el-input>
+            <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].diseaseId"></el-input> -->
+            <el-select v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].diseaseId" placeholder="Select" style="width: 100%">
+    <el-option
+      v-for="item in options"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value"
+      :disabled="item.disabled"
+    />
+  </el-select>
             <span v-else>{{ scope.row.diseaseId }}</span>
           </template>
         </el-table-column>
@@ -77,7 +86,9 @@ import { isSelectGen, EditedGen,clearIsSelected } from "../subComponents/tableOp
 import { onMounted } from "vue";
 import type { Ref } from "vue";
 import { pageQuery ,update} from "../../apis/diseaseInstance/diseaseInstance.ts"
+import {pageQuery as DiseasePageQuery} from "../../apis/disease/disease.ts"
 import type { DiseaseInstancePageRequest, DiseaseInstancePageResponse,DiseaseInstanceUpdateRequest } from "@/apis/diseaseInstance/diseaseInstance-interface.ts"
+import {type DiseasePageResponse} from '@/apis/disease/disease-interface'
 import { DiseaseInstance } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt.ts'
 const DiseaseInstancePage = ref<DiseaseInstancePageResponse>({ datas: [], total: 0, limit: 0 });
@@ -206,6 +217,7 @@ async function fetchDiseaseInstances(pageNum?:number,pageLimit?:number,msg?:Obje
 }
 onMounted(() => {
   fetchDiseaseInstances();
+  getSelection();
 });
 //request
 var entryNum = ref(0);
@@ -229,9 +241,29 @@ function pagination(val: number) {
 const component = defineComponent({
   name: "CaseManagement"
 })
+async function getSelection(){
+  try {
+    const response =  await DiseasePageQuery();
+    if (response && response.data && response.data.datas) {
+      DiseasePage.value = response.data; // 假设响应中有data属性，且包含datas数组
+      console.log('Fetched beds:', DiseasePage.value.datas);
+      for(var i =0;i<DiseasePage.value.datas.length;i++){
+        options.push({value:DiseasePage.value.datas[i].diseaseId,
+          label:DiseasePage.value.datas[i].name});
+      }
+    } else {
+      console.error('No data returned from the API');
+    }
+  } catch (error) {
+    console.error('Error fetching beds:', error);
+  }
+}
 
 </script>
-
+<script lang="ts">
+var options:any[] = [];
+const DiseasePage = ref<DiseasePageResponse>({ datas: [], total: 0, limit: 0 });
+</script>
 <style scoped lang="scss">
 // .el-table__body, .el-table__header{
 //     width: 100%;

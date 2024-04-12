@@ -106,7 +106,7 @@ import { onMounted } from "vue";
 import type { Ref } from "vue";
 import { pageQuery, update } from "../../apis/drug/drug.ts"
 import { pageQuery as deptQuery} from "../../apis/department/department.ts"
-import { pageQuery as disQuery} from "../../apis/disease/disease.ts"
+// import { pageQuery as disQuery} from "../../apis/disease/disease.ts"
 import type { DrugPageResponse, DrugPageRequest } from "@/apis/drug/drug-interface.ts"
 import { Drug } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt.ts'
