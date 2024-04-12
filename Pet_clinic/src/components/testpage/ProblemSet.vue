@@ -96,7 +96,10 @@ function loadCurrentList() {
                 temp.endTime = problemSetList.value[i].endTime?.toString()?.slice(0, 10) + ' ' + problemSetList.value[i].endTime?.toString()?.slice(11, 16);;
             }
             if (problemSetList.value[i].duration != null) {
-                temp.duration = problemSetList.value[i].duration?.toString();
+                var hour = Math.floor(problemSetList.value[i].duration/(1000*60*60));
+                var min = Math.floor(problemSetList.value[i].duration/(1000*60) - hour*60);
+                // temp.duration = problemSetList.value[i].duration?.toString();
+                temp.duration = hour+"h"+min+"min";
             }
             currentList.push(temp);
         }

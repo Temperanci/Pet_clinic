@@ -1,6 +1,7 @@
 import type { ProblemSetBO } from "@/apis/schemas";
+import type { BasePageRequest } from "../page";
 
-export interface ProblemSetPageRequest {
+export interface ProblemSetPageRequest extends BasePageRequest{
     desc?: string;
     title?: string;
     endTime?: Date;

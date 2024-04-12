@@ -1,6 +1,7 @@
 import type { TestRecordBO } from "@/apis/schemas";
+import type { BasePageRequest } from "../page";
 
-export interface TestRecordPageRequest {
+export interface TestRecordPageRequest extends BasePageRequest{
     graded?: boolean;
     gradeMap?: string;
     answerMap?: string;
