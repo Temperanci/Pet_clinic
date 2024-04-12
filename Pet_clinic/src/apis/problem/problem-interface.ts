@@ -1,6 +1,7 @@
 import type { ProblemBO } from "@/apis/schemas";
+import type { BasePageRequest } from "../page";
 
-export interface ProblemPageRequest {
+export interface ProblemPageRequest extends BasePageRequest{
     type?: string;
     title?: string;
     answer?: string;

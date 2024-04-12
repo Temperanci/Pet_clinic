@@ -47,7 +47,6 @@ export const update = async (request: TestRecordUpdateRequest): Promise<Result<T
     try {
         const response = await axios.post<Result<TestRecordBO>>(`${API_BASE_URL}/testRecord/update`, request);
         console.log("提交测试记录:",request);
-        // console.log("提交测试记录:",request.testRecord.answerMap);
         return response.data;
     } catch (error) {
         console.error('Error occurred during the updation:', error);
