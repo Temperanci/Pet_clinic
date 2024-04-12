@@ -14,8 +14,21 @@
       </el-menu-item>
     </el-menu>
     <div class="case-details" v-if="selectedCase">
-      <h2>{{ selectedCase.name }}</h2>
+      <h1>{{ selectedCase.name }}</h1>
       <p>{{ selectedCase.desc }}</p>
+      <el-divider />
+      <p>病例列表：</p>
+      <el-menu>
+        <el-menu-item
+            v-for="instance in selectedCaseInstance"
+            :key="instance.instanceId"
+            :index="instance.instanceId"
+            class="instance-item"
+        >
+          <h2>{{ instance.desc }}</h2>
+          <p>{{ instance.instanceId }}</p>
+        </el-menu-item>
+      </el-menu>
     </div>
   </div>
 </template>
@@ -24,8 +37,10 @@
 import {defineComponent, onMounted, ref} from 'vue';
 import { ElMenu, ElMenuItem } from 'element-plus';
 import { DiseasePageQuery } from "@/apis/disease/disease";
-import type { DiseaseBO } from "@/apis/schemas";
+import type {DiseaseBO, DiseaseInstanceBO} from "@/apis/schemas";
 import type { DiseasePageResponse } from "@/apis/disease/disease-interface";
+import type {DiseaseInstancePageResponse} from "@/apis/diseaseInstance/diseaseInstance-interface";
+import { pageQuery } from "@/apis/diseaseInstance/diseaseInstance";
 
 // 声明组件名称
 defineComponent({
@@ -46,14 +61,31 @@ async function fetchDisease() {
     console.error('Failed to fetch disease:', error);
   }
 }
+const diseaseInstance = ref<DiseaseInstancePageResponse>({ datas: [], total: 0, limit: 0 });
+const selectedCaseInstance = ref<DiseaseInstanceBO[] | null>(null);
+async function fetchDiseaseInstance() {
+  try {
+    const response = await pageQuery();
+    console.log('response:', response)
+    diseaseInstance.value = response.data;
+  } catch (error) {
+    console.error('Failed to fetch diseaseInstance:', error);
+  }
+}
 
 // 定义展示疾病详情的函数
 function showCaseDetails(disease: DiseaseBO) {
   selectedCase.value = disease;
+  selectedCaseInstance.value = diseaseInstance.value.datas.filter(item => item.diseaseId === disease.diseaseId);
+  console.log('selectedCaseInstance:', selectedCaseInstance.value)
 }
 
 // 组件挂载后获取疾病数据
-onMounted(fetchDisease);
+
+onMounted(() => {
+  fetchDisease();
+  fetchDiseaseInstance();
+});
 </script>
 
 
@@ -81,6 +113,14 @@ onMounted(fetchDisease);
   width: 60%; // 根据需要调整宽度
   max-height: 80vh; // 最大高度占视口的80%
   border-radius: 20px;
+  border: #2a1f1f 1px solid;
+}
+.instance-item{
+  justify-content: space-around;
+  background-color: #f4eded;
+  border-radius: 10px;
+  margin: 10px;
+  padding: 10px;
   border: #2a1f1f 1px solid;
 }
 </style>
