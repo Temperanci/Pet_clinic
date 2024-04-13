@@ -3,7 +3,7 @@
         <el-container>
             <el-container width="60%">
                 <el-header>
-                    <h3>{{ selectedProblem.title }}</h3>
+                    <h3>题{{ selectedIndex+1 }}:{{ selectedProblem.title }}</h3>
                 </el-header>
                 <el-main>
                     <div class="problemContent">
@@ -59,7 +59,7 @@
 <script setup lang="ts">
 import { defineComponent } from "vue";
 import { ref, onMounted } from 'vue';
-import { pageQuery } from '@/apis/problem/problem';
+import { pageNoQuery } from '@/apis/problem/problem';
 import { update } from '@/apis/testRecord/testRecord';
 import type { ProblemPageRequest, ProblemPageResponse, ProblemUpdateRequest } from '@/apis/problem/problem-interface';
 import type { TestRecordPageRequest, TestRecordPageResponse, TestRecordUpdateRequest } from '@/apis/testRecord/testRecord-interface';
@@ -84,11 +84,11 @@ var problemList = ref(ProblemPage.value?.datas);
 var selectedIndex = ref(0);
 async function fetchProblems() {
     try {
-        const response = await pageQuery(1);
+        const response = await pageNoQuery(1);
         const pages = Math.ceil(response.data.total / response.data.limit); //总页数
         console.log("total=", response.data.total, " limit=", response.data.limit);
         for (var i = 1; i <= pages; i++) {
-            const response = await pageQuery(i);
+            const response = await pageNoQuery(i);
             if (response && response.data && response.data.datas) {
                 ProblemPage.value = response.data;
                 for (var j in ProblemPage.value.datas) { //单选题内容换行
@@ -155,7 +155,7 @@ function submit() {
         // submitted: true,
         // answerList: [],
         // submitTime: new Date(),
-        candidateId: 'user',
+        candidateId: 'test',
         problemSetId: ''
     };
     testRecord.problemSetId = props.testId ?? '';

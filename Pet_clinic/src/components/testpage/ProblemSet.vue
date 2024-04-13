@@ -30,7 +30,7 @@
 <script setup lang="ts">
 import { defineComponent } from "vue";
 import { ref, onMounted } from 'vue'
-import { pageQuery } from '@/apis/problemSet/problemSet';
+import { pageNoQuery } from '@/apis/problemSet/problemSet';
 import type { ProblemSetPageRequest, ProblemSetPageResponse, ProblemSetUpdateRequest } from '@/apis/problemSet/problemSet-interface';
 import type { ProblemSetBO } from '@/apis/schemas';
 
@@ -42,11 +42,11 @@ const ProblemSetPage = ref<ProblemSetPageResponse>({ datas: [], total: 0, limit:
 var problemSetList = ref(ProblemSetPage.value?.datas);
 async function fetchProblemSets() {
     try {
-        const response = await pageQuery(1);
+        const response = await pageNoQuery(1);
         const pages = Math.ceil(response.data.total / response.data.limit); //总页数
         console.log("total=", response.data.total, " limit=", response.data.limit);
         for (var i = 1; i <= pages; i++) {
-            const response = await pageQuery(i);
+            const response = await pageNoQuery(i);
             if (response && response.data && response.data.datas) {
                 ProblemSetPage.value = response.data;
                 problemSetList.value = problemSetList.value.concat(ProblemSetPage.value.datas);
@@ -98,7 +98,6 @@ function loadCurrentList() {
             if (problemSetList.value[i].duration != null) {
                 var hour = Math.floor(problemSetList.value[i].duration/(1000*60*60));
                 var min = Math.floor(problemSetList.value[i].duration/(1000*60) - hour*60);
-                // temp.duration = problemSetList.value[i].duration?.toString();
                 temp.duration = hour+"h"+min+"min";
             }
             currentList.push(temp);

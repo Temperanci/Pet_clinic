@@ -57,7 +57,9 @@ declare module 'vue' {
     OnlineTestComponent: typeof import('./src/components/subpage/OnlineTestComponent.vue')['default']
     OverlayComponent: typeof import('./src/components/subpage/OverlayComponent.vue')['default']
     PetClinicLayout: typeof import('./src/components/PetClinicLayout.vue')['default']
+    ProblemManagement: typeof import('./src/components/background/ProblemManagement.vue')['default']
     ProblemSet: typeof import('./src/components/testpage/ProblemSet.vue')['default']
+    ProblemSetManagement: typeof import('./src/components/background/ProblemSetManagement.vue')['default']
     QuestionBank: typeof import('./src/components/background/QuestionBank.vue')['default']
     RoleDetail: typeof import('./src/components/subpage/RoleDetail.vue')['default']
     RolePlayComponent: typeof import('./src/components/subpage/RolePlayComponent.vue')['default']
@@ -69,6 +71,7 @@ declare module 'vue' {
     StudyManagement: typeof import('./src/components/background/StudyManagement.vue')['default']
     TableOption: typeof import('./src/components/subComponents/tableOption.vue')['default']
     Test: typeof import('./src/components/testpage/Test.vue')['default']
+    TestRecordManagement: typeof import('./src/components/background/TestRecordManagement.vue')['default']
     VaccineManagement: typeof import('./src/components/background/VaccineManagement.vue')['default']
   }
 }

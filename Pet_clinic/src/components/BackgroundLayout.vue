@@ -81,7 +81,8 @@ import DrugManagement from './background/DrugManagement.vue'
 import StaffManagement from './background/StaffManagement.vue'
 import StudyManagement from './background/StudyManagement.vue'
 import CreateTest from './background/CreateTest.vue'
-import QuestionBank from './background/QuestionBank.vue'
+// import QuestionBank from './background/QuestionBank.vue'
+import ProblemManagement from './background/ProblemManagement.vue'
 import FinishedTest from './background/FinishedTest.vue'
 defineComponent({
   name: "BackgroundLayout"
@@ -104,7 +105,8 @@ const componentsMap: ComponentsMap = {
   '5': DrugManagement,
   '6': StaffManagement,
   '7': StudyManagement,
-  '8': QuestionBank,
+  // '8': QuestionBank,
+  '8': ProblemManagement,
   '9': CreateTest,
   '10': FinishedTest
 };
