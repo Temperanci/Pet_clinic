@@ -8,11 +8,15 @@
         </el-container>
       </div> -->
       <div class="filter">
-        <el-input class="option" v-model="DrugId" placeholder="请输入药品编号"></el-input>
+        <!-- <el-input class="option" v-model="DrugId" placeholder="请输入药品编号"></el-input> -->
         <el-input class="option" v-model="Name" placeholder="请输入药品名称"></el-input>
         <el-input class="option" v-model="Type" placeholder="请输入药品类型"></el-input>
-        <el-input class="option" v-model="DepartmentId" placeholder="请输入科室"></el-input>
-        <el-input class="option" v-model="DiseaseId" placeholder="请输入适用疾病"></el-input>
+        <el-select class="option" placeholder="请选择科室" v-model="DepartmentId" style="width: 100%">
+          <el-option v-for="item in deptOptions" :key="item.value" :label="item.label" :value="item.value"
+            :disabled="item.disabled" />
+        </el-select>
+        <!-- <el-input class="option" v-model="DepartmentId" placeholder="请输入科室"></el-input> -->
+        <!-- <el-input class="option" v-model="DiseaseId" placeholder="请输入适用疾病"></el-input> -->
         <!-- <el-select class="option" v-model="drug" clearable placeholder="请选择药品名称">
           <el-option v-for="item in drugs" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
@@ -29,59 +33,53 @@
           <el-option v-for="item in diseases" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select> -->
-        <el-button v-if="back" class="optionButton" 
-        @click="fetchDrugs();back=false;clearFilter();">返回</el-button>
-        <el-button v-else class="optionButton" 
-        @click="CRUDhandler.search({
-            drugId: DrugId,
-            type: Type,
-            name: Name,
-            departmentId: DepartmentId,
-            diseaseIdList: [DiseaseId]
-          });
-          back=true;">筛选</el-button>
+        <div class="optionButton">
+          <el-button class="button" @click="CRUDhandler.search({
+          drugId: DrugId,
+          type: Type,
+          name: Name,
+          departmentId: DepartmentId,
+          diseaseIdList: [DiseaseId]
+        });
+        back = true;">筛选</el-button>
+          <el-button v-if="back" class="button" @click="fetchDrugs(undefined,defaultNum); back = false; clearFilter();">返回</el-button>
+        </div>
+
       </div>
     </el-aside>
     <div class="main">
       <div style="height: 100%;display: flex;flex-flow: column;">
         <div style="height: 90%;" class="table">
-          <el-table :data="queryData" height="100%">
-            <el-table-column prop="drugId" label="药品编号">
+          <el-table :data="queryData" height="100%" empty-text="来到了没有数据的荒原...">
+            <!-- <el-table-column prop="drugId" label="药品编号">
               <template #default="scope">
                 <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].drugId"></el-input>
                 <span v-else>{{ scope.row.drugId }}</span>
               </template>
-            </el-table-column>
+            </el-table-column> -->
             <el-table-column prop="name" label="药品名称">
               <template #default="scope">
-                <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].name"></el-input>
-                <span v-else>{{ scope.row.name }}</span>
+                <span>{{ scope.row.name }}</span>
               </template>
             </el-table-column>
             <el-table-column prop="type" label="药品类型">
               <template #default="scope">
-                <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].type"></el-input>
-                <span v-else>{{ scope.row.type }}</span>
+                <span>{{ scope.row.type }}</span>
               </template>
             </el-table-column>
             <el-table-column prop="desc" label="描述">
-              <template #default="scope">
-                <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].desc"></el-input>
-                <span v-else>{{ scope.row.desc }}</span>
+              <template #default="scope">      
+                <span>{{ scope.row.desc }}</span>
               </template>
             </el-table-column>
             <el-table-column prop="diseaseIdList" label="适用疾病">
               <template #default="scope">
-                <el-input v-if="isSelected[scope.$index] === true"
-                  v-model="edited[scope.$index].diseaseIdList"></el-input>
-                <span v-else>{{ scope.row.diseaseIdList }}</span>
+                <span>{{ tool.listToString(tool.batchMap(diseaseMap, scope.row.diseaseIdList)) }}</span>
               </template>
             </el-table-column>
             <el-table-column prop="departmentId" label="科室">
-              <template #default="scope">
-                <el-input v-if="isSelected[scope.$index] === true"
-                  v-model="edited[scope.$index].departmentId"></el-input>
-                <span v-else>{{ scope.row.departmentId }}</span>
+              <template #default="scope">               
+                <span>{{ deptMap.get(scope.row.departmentId) }}</span>
               </template>
             </el-table-column>
           </el-table>
@@ -105,27 +103,15 @@ import { isSelectGen, EditedGen, clearIsSelected } from "../subComponents/tableO
 import { onMounted } from "vue";
 import type { Ref } from "vue";
 import { pageQuery, update } from "../../apis/drug/drug.ts"
-import { pageQuery as deptQuery} from "../../apis/department/department.ts"
+import { pageQuery as deptQuery } from "../../apis/department/department.ts"
 // import { pageQuery as disQuery} from "../../apis/disease/disease.ts"
 import type { DrugPageResponse, DrugPageRequest } from "@/apis/drug/drug-interface.ts"
-import { Drug } from "@/apis/class";
+import { BOTools, Drug } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt.ts'
 var currentPage = 1;
 var entryNum = ref(0);
 var back = ref(false);
-const input = ref('');
-const DrugId = ref('');
-const Type = ref('');
-const Name = ref('');
-const DepartmentId = ref('');
-const DiseaseId = ref('');
-function clearFilter(){
-  DrugId.value='';
-  Type.value='';
-  Name.value='';
-  DepartmentId.value='';
-  DiseaseId.value='';
-}
+//handler
 const DrugPage = ref<DrugPageResponse>({ datas: [], total: 0, limit: 0 });
 class drugRowCRUD implements rowCRUD {
   updateMsg(Msg: Object[], data: any[], index: number): void {
@@ -137,13 +123,14 @@ class drugRowCRUD implements rowCRUD {
   createRow(msg: Object): void {
   }
   search(msg: Object): void {
-    console.log('drug111',(msg as Drug).diseaseIdList);
+    console.log('drug111', (msg as Drug).diseaseIdList);
     fetchDrugs(undefined, 999, msg, true);
   }
   constructor() {
 
   }
 }
+var tool: BOTools = new BOTools();
 var CRUDhandler = new drugRowCRUD();
 async function fetchDrugs(pageNum?: number, pageLimit?: number, msg?: Object, search?: boolean) {
   var temp = msg || {
@@ -185,8 +172,12 @@ async function fetchDrugs(pageNum?: number, pageLimit?: number, msg?: Object, se
   }
 }
 onMounted(() => {
-  fetchDrugs();
+  getDeptInfo();
+  getDiseaseInfo();
+  fetchDrugs(undefined,defaultNum);
 });
+//paginate
+var defaultNum = 10;//默认条件下进行查询返回的条目数
 var tabLength = ref(0);//每页展示的条目数
 const clearPara = ref(false);
 var isSelected: Ref<boolean[]> = ref<boolean[]>([]);
@@ -195,83 +186,80 @@ var queryData = ref<any[]>([]);
 var currentPage = 1;
 function pagination(val: number) {
   currentPage = val
-  fetchDrugs(currentPage);
+  fetchDrugs(currentPage,defaultNum);
   //恢复初始值
-  isSelected=clearIsSelected(isSelected);
+  isSelected = clearIsSelected(isSelected);
   clearPara.value = true;
 }
-//request
+//filter
+import { pageQuery as deptPageQuery } from "@/apis/department/department";
+import { type DepartmentPageRequest } from '@/apis/department/department-interface';
+import { pageQuery as diseasePageQuery } from "@/apis/disease/disease";
+import { type DiseasePageRequest } from '@/apis/disease/disease-interface';
+const deptOptions: Ref<any[]> = ref<any[]>([])
+const deptMap = new Map();
+const diseaseMap = new Map();
+const input = ref('');
+const DrugId = ref('');
+const Type = ref('');
+const Name = ref('');
+const DepartmentId = ref('');
+const DiseaseId = ref('');
+function clearFilter() {
+  DrugId.value = '';
+  Type.value = '';
+  Name.value = '';
+  DepartmentId.value = '';
+  DiseaseId.value = '';
+}
+async function getDiseaseInfo() {
+  var request: DiseasePageRequest = {
+    limit: 999
+  }
+  try {
+    var diseaseResponse = await diseasePageQuery(request);
+    if (diseaseResponse && diseaseResponse.data && diseaseResponse.data.datas) {
+      console.log('Fetched diseases:', diseaseResponse.data.datas);
+      for (var i = 0; i < diseaseResponse.data.datas.length; i++) {
+        diseaseMap.set(diseaseResponse.data.datas[i].diseaseId, diseaseResponse.data.datas[i].name);
+      }
+      console.log('diseaseMap', diseaseMap)
+    } else {
+      console.error('No data returned from the API');
+    }
+
+  } catch (error) {
+    console.error('Error fetching departments:', error);
+  }
+}
+async function getDeptInfo() {
+  var request: DepartmentPageRequest = {
+    limit: 999
+  }
+  try {
+    var deptResponse = await deptPageQuery(request);
+    if (deptResponse && deptResponse.data && deptResponse.data.datas) {
+      console.log('Fetched departments:', deptResponse.data.datas);
+      for (var i = 0; i < deptResponse.data.datas.length; i++) {
+        deptOptions.value.push({
+          value: deptResponse.data.datas[i].departmentId,
+          label: deptResponse.data.datas[i].name
+        });
+        deptMap.set(deptResponse.data.datas[i].departmentId, deptResponse.data.datas[i].name);
+      }
+      console.log('deptMap', deptMap)
+    } else {
+      console.error('No data returned from the API');
+    }
+
+  } catch (error) {
+    console.error('Error fetching departments:', error);
+  }
+}
 defineComponent({
   name: "DrugResource"
 })
 
-// const drugs = [{
-//   value: '选项1',
-//   label: '黄金糕'
-// }, {
-//   value: '选项2',
-//   label: '双皮奶'
-// }, {
-//   value: '选项3',
-//   label: '蚵仔煎'
-// }, {
-//   value: '选项4',
-//   label: '龙须面'
-// }, {
-//   value: '选项5',
-//   label: '北京烤鸭'
-// }];
-
-// const drugTypes = [{
-//   value: '选项1',
-//   label: '黄金糕'
-// }, {
-//   value: '选项2',
-//   label: '双皮奶'
-// }, {
-//   value: '选项3',
-//   label: '蚵仔煎'
-// }, {
-//   value: '选项4',
-//   label: '龙须面'
-// }, {
-//   value: '选项5',
-//   label: '北京烤鸭'
-// }];
-
-// const departments = [{
-//   value: '选项1',
-//   label: '黄金糕'
-// }, {
-//   value: '选项2',
-//   label: '双皮奶'
-// }, {
-//   value: '选项3',
-//   label: '蚵仔煎'
-// }, {
-//   value: '选项4',
-//   label: '龙须面'
-// }, {
-//   value: '选项5',
-//   label: '北京烤鸭'
-// }];
-
-// const diseases = [{
-//   value: '选项1',
-//   label: '黄金糕'
-// }, {
-//   value: '选项2',
-//   label: '双皮奶'
-// }, {
-//   value: '选项3',
-//   label: '蚵仔煎'
-// }, {
-//   value: '选项4',
-//   label: '龙须面'
-// }, {
-//   value: '选项5',
-//   label: '北京烤鸭'
-// }];
 </script>
 
 <style scoped lang="scss">
@@ -335,7 +323,14 @@ defineComponent({
 }
 
 .optionButton {
-  width: 50%;
-  margin-top: 3%;
+  display: flex;
+  flex-direction: column;
+
+  .button {
+    margin: auto;
+    width: 50%;
+    margin-top: 3%;
+  }
+
 }
 </style>
