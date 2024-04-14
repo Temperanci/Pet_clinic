@@ -25,8 +25,8 @@
             :index="instance.instanceId"
             class="instance-item"
         >
-          <h2>{{ instance.desc }}</h2>
-          <p>{{ instance.instanceId }}</p>
+          <h2>病情描述：{{ instance.desc }}</h2>
+          <p>病例ID：{{ instance.instanceId }}</p>
         </el-menu-item>
       </el-menu>
     </div>
