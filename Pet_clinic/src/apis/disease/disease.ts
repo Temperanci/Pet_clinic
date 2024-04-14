@@ -1,7 +1,7 @@
 // disease.ts
 import axios from 'axios';
 import type { DiseaseBO } from '@/apis/schemas';
-import type { DiseasePageResponse, DiseaseUpdateRequest } from '@/apis/disease/disease-interface';
+import type { DiseasePageResponse, DiseaseUpdateRequest,DiseasePageRequest } from '@/apis/disease/disease-interface';
 
 // 定义一个通用的结果类型，你可能需要根据实际的后端响应格式调整这个定义
 interface Result<T> {
@@ -15,9 +15,9 @@ const API_BASE_URL = '/api';
 const disease = {}
 
 // 分页查询疾病信息
-export async function DiseasePageQuery(){
+export async function pageQuery(request?:DiseasePageRequest){
     try {
-        const response = await axios.post<Result<DiseasePageResponse>>(`${API_BASE_URL}/disease/pageQuery`, disease);
+        const response = await axios.post<Result<DiseasePageResponse>>(`${API_BASE_URL}/disease/pageQuery`, request||disease);
         return response.data;
     } catch (error) {
         // If there's an error, handle it here

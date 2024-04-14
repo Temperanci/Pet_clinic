@@ -12,7 +12,7 @@ export interface Permission {
 }
 
 export interface BasePageRequest {
-    limit: number;
-    currPageNo: number;
+    limit?: number;
+    currPageNo?: number;
     // ...其他属性
 }
