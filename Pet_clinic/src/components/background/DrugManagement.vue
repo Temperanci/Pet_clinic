@@ -1,7 +1,7 @@
 <template>
 <div style="height: 100%;display: flex;flex-flow: column;">
     <div style="height: 90%;" class="table">
-      <el-table :data="queryData" height="100%">
+      <el-table :data="queryData" height="100%" empty-text="来到了没有数据的荒原...">
         <el-table-column prop="drugId" label="药品编号">
           <template #default="scope">
             <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].drugId"></el-input> -->
@@ -30,13 +30,36 @@
         </el-table-column>
         <el-table-column prop="diseaseIdList" label="适用疾病">
           <template #default="scope">
-            <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].diseaseIdList"></el-input>
+            <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].diseaseIdList"></el-input> -->
+            <el-select v-if="isSelected[scope.$index] === true"
+      v-model="edited[scope.$index].diseaseIdList"
+      multiple
+      collapse-tags
+      collapse-tags-tooltip
+      placeholder="Select"
+      style="width: 100%"
+    >
+      <el-option
+        v-for="item in diseaseOptions"
+        :key="item.value"
+        :label="item.label"
+        :value="item.value"
+      />
+    </el-select>
             <span v-else>{{ tool.listToString(tool.batchMap(diseaseMap, scope.row.diseaseIdList)) }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="departmentId" label="科室">
           <template #default="scope">
-            <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].departmentId"></el-input>
+            <el-select v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].departmentId" placeholder="Select" style="width: 100%">
+    <el-option
+      v-for="item in deptOptions"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value"
+      :disabled="item.disabled"
+    />
+  </el-select>
             <span v-else>{{ deptMap.get(scope.row.departmentId) }}</span>
           </template>
         </el-table-column>
@@ -53,7 +76,7 @@
           @create-confirm="(index)=>{CRUDhandler.createRow(edited[index]);unwritableBar[0]=false;}"
           @search="(index)=>{CRUDhandler.clear(edited[index]);isSelected[index] = true;clearPara=false;searchBar[0]=true;}"
           @search-confirm="(index)=>{CRUDhandler.search(edited[index]);searchBar[0]=false;back=true;}"
-          @back="fetchDrugs(undefined,defaultNum);back=false;"
+          @back="backToHome();back=false;"
           />
       </el-table>
     </div>
@@ -88,7 +111,7 @@ class drugRowCRUD implements rowCRUD {
     (Msg[index] as Drug).departmentId = data[index].departmentId;
     (Msg[index] as Drug).desc = data[index].desc;
     (Msg[index] as Drug).type = data[index].type;
-    (Msg[index] as Drug).diseaseIdList = tool.listToString(data[index].diseaseIdList);
+    (Msg[index] as Drug).diseaseIdList = data[index].diseaseIdList;
     console.log('editedDrug',Msg);
   }//更新buffer
   deleteRow(Msg: Object[],index:number): void {
@@ -104,7 +127,7 @@ class drugRowCRUD implements rowCRUD {
     delete:true}
     console.log('delete request',request);
     var response= update(request);
-    setTimeout(()=>{fetchDrugs(currentPage);},500);
+    setTimeout(()=>{backToHome()},500);
     console.log('delete response',response); 
   }//删除
   editRow(Msg: Object[],index:number): void {
@@ -115,12 +138,12 @@ class drugRowCRUD implements rowCRUD {
         departmentId:(Msg[index] as Drug).departmentId,
         type:(Msg[index] as Drug).type, 
         desc:(Msg[index] as Drug).desc, 
-        diseaseIdList:tool.stringToList((Msg[index] as Drug).diseaseIdList)  
+        diseaseIdList:((Msg[index] as Drug).diseaseIdList===null)?[]:(Msg[index] as Drug).diseaseIdList  
       },
     delete:false}
     console.log('update request',request);
     var response= update(request);
-    setTimeout(()=>{fetchDrugs(currentPage);},500);
+    setTimeout(()=>{backToHome();},500);
     console.log('update response',response);
   }//修改
   clear(edited:Drug){
@@ -129,7 +152,7 @@ class drugRowCRUD implements rowCRUD {
     edited.name='';
     edited.type='';
     edited.desc='';
-    edited.diseaseIdList='';
+    edited.diseaseIdList=[];
   }
   createRow(msg:Object):void{
     var request:DrugUpdateRequest = {
@@ -138,12 +161,12 @@ class drugRowCRUD implements rowCRUD {
         departmentId:(msg as Drug).departmentId,
         type:(msg as Drug).type, 
         desc:(msg as Drug).desc, 
-        diseaseIdList:tool.stringToList((msg as Drug).diseaseIdList),  
+        diseaseIdList:((msg as Drug).diseaseIdList===null)?[]:(msg as Drug).diseaseIdList,  
       },
     delete:false}
     console.log('create request',request);
     var response= update(request);
-    setTimeout(()=>{fetchDrugs(currentPage);},500);
+    setTimeout(()=>{backToHome();},500);
     console.log('create response',response); 
   }//创建
   search(msg:Object):void{
@@ -212,12 +235,15 @@ var queryData = ref<any[]>([]);
 var currentPage = 1;
 function pagination(val: number) {
   currentPage = val
-  fetchDrugs(currentPage,defaultNum);
+  backToHome();
   //恢复初始值
   isSelected=clearIsSelected(isSelected);
   clearPara.value = true;
   searchBar.value[0]=false;
   unwritableBar.value[0]=false;
+}
+function backToHome(){
+  fetchDrugs(currentPage,defaultNum);
 }
 //filter && view
 import { pageQuery as deptPageQuery } from "@/apis/department/department";
@@ -225,8 +251,9 @@ import { type DepartmentPageRequest } from '@/apis/department/department-interfa
 import { pageQuery as diseasePageQuery } from "@/apis/disease/disease";
 import { type DiseasePageRequest } from '@/apis/disease/disease-interface';
 const deptOptions: Ref<any[]> = ref<any[]>([])
-const deptMap = new Map();
-const diseaseMap = new Map();
+const deptMap:Ref<Map<any,any>> = ref<Map<any,any>>(new Map());
+const diseaseMap:Ref<Map<any,any>> = ref<Map<any,any>>(new Map());
+const diseaseOptions: Ref<any[]> = ref<any[]>([])
 async function getDiseaseInfo() {
   var request: DiseasePageRequest = {
     limit: 999
@@ -236,7 +263,11 @@ async function getDiseaseInfo() {
     if (diseaseResponse && diseaseResponse.data && diseaseResponse.data.datas) {
       console.log('Fetched diseases:', diseaseResponse.data.datas);
       for (var i = 0; i < diseaseResponse.data.datas.length; i++) {
-        diseaseMap.set(diseaseResponse.data.datas[i].diseaseId, diseaseResponse.data.datas[i].name);
+        diseaseOptions.value.push({
+          value: diseaseResponse.data.datas[i].diseaseId,
+          label: diseaseResponse.data.datas[i].name
+        })
+        diseaseMap.value.set(diseaseResponse.data.datas[i].diseaseId, diseaseResponse.data.datas[i].name);
       }
       console.log('diseaseMap', diseaseMap)
     } else {
@@ -260,7 +291,7 @@ async function getDeptInfo() {
           value: deptResponse.data.datas[i].departmentId,
           label: deptResponse.data.datas[i].name
         });
-        deptMap.set(deptResponse.data.datas[i].departmentId, deptResponse.data.datas[i].name);
+        deptMap.value.set(deptResponse.data.datas[i].departmentId, deptResponse.data.datas[i].name);
       }
       console.log('deptMap', deptMap)
     } else {

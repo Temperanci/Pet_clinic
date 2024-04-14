@@ -36,10 +36,18 @@
             <span v-else>{{ scope.row.price }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="departmentId" label="科室编号">
+        <el-table-column prop="departmentId" label="科室">
           <template #default="scope">
-            <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].departmentId"></el-input>
-            <span v-else>{{ scope.row.departmentId }}</span>
+            <el-select v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].departmentId" placeholder="Select" style="width: 100%">
+    <el-option
+      v-for="item in deptOptions"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value"
+      :disabled="item.disabled"
+    />
+  </el-select>
+            <span v-else>{{ deptMap.get(scope.row.departmentId) }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="type" label="服务类型">
@@ -61,7 +69,7 @@
           @create-confirm="(index)=>{CRUDhandler.createRow(edited[index]);unwritableBar[0]=false;}"
           @search="(index)=>{CRUDhandler.clear(edited[index]);isSelected[index] = true;clearPara=false;searchBar[0]=true;}"
           @search-confirm="(index)=>{CRUDhandler.search(edited[index]);searchBar[0]=false;back=true;}"
-          @back="fetchPrices();back=false;"
+          @back="backToHome();back=false;"
           />
       </el-table>
     </div>
@@ -114,7 +122,7 @@ class priceRowCRUD implements rowCRUD {
     delete:true}
     console.log('delete request',request);
     var response= update(request);
-    setTimeout(()=>{fetchPrices();},500);
+    setTimeout(()=>{backToHome();},500);
     console.log('delete response',response); 
   }//删除
   editRow(Msg: Object[],index:number): void {
@@ -131,7 +139,7 @@ class priceRowCRUD implements rowCRUD {
     delete:false}
     console.log('update request',request);
     var response= update(request);
-    setTimeout(()=>{fetchPrices();},500);
+    setTimeout(()=>{backToHome();},500);
     console.log('update response',response);
   }//修改
   clear(edited:Price){
@@ -155,7 +163,7 @@ class priceRowCRUD implements rowCRUD {
     delete:false}
     console.log('create request',request);
     var response= update(request);
-    setTimeout(()=>{fetchPrices();},500);
+    setTimeout(()=>{backToHome();},500);
     console.log('create response',response); 
   }//创建
   search(msg:Object):void{
@@ -211,9 +219,11 @@ async function fetchPrices(pageNum?:number,pageLimit?:number,msg?:Object,search?
   }
 }
 onMounted(() => {
-  fetchPrices();
+  getDeptInfo();
+  fetchPrices(undefined,defaultNum);
 });
-//request
+//paginate
+const defaultNum =10;
 var entryNum = ref(0);
 var tabLength = ref(0);//每页展示的条目数
 const clearPara = ref(false);//让子组件复位
@@ -224,14 +234,45 @@ var queryData = ref<any[]>([]);
 var currentPage = 1;
 function pagination(val: number) {
   currentPage = val
-  fetchPrices(currentPage);
+  backToHome();
   //恢复初始值
   isSelected=clearIsSelected(isSelected);
   clearPara.value = true;
   searchBar.value[0]=false;
   unwritableBar.value[0]=false;
 }
-//分页
+function backToHome(){
+  fetchPrices(currentPage,defaultNum);
+}
+//filter && view
+import { pageQuery as deptPageQuery } from "@/apis/department/department";
+import { type DepartmentPageRequest } from '@/apis/department/department-interface';
+const deptOptions: Ref<any[]> = ref<any[]>([])
+  const deptMap:Ref<Map<any,any>> = ref<Map<any,any>>(new Map());
+async function getDeptInfo() {
+  var request: DepartmentPageRequest = {
+    limit: 999
+  }
+  try {
+    var deptResponse = await deptPageQuery(request);
+    if (deptResponse && deptResponse.data && deptResponse.data.datas) {
+      console.log('Fetched departments:', deptResponse.data.datas);
+      for (var i = 0; i < deptResponse.data.datas.length; i++) {
+        deptOptions.value.push({
+          value: deptResponse.data.datas[i].departmentId,
+          label: deptResponse.data.datas[i].name
+        });
+        deptMap.value.set(deptResponse.data.datas[i].departmentId, deptResponse.data.datas[i].name);
+      }
+      console.log('deptMap', deptMap)
+    } else {
+      console.error('No data returned from the API');
+    }
+
+  } catch (error) {
+    console.error('Error fetching departments:', error);
+  }
+}
 const component = defineComponent({
   name: "ChargeManagement"
 })
