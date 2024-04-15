@@ -154,10 +154,9 @@ function submit() {
         startTime: new Date(),
         // submitted: true,
         // answerList: [],
-        submitTime: new Date(),
-        candidateId: '114514',
-        problemSetId: '',
-
+        // submitTime: new Date(),
+        candidateId: 'user',
+        problemSetId: ''
     };
     testRecord.problemSetId = props.testId ?? '';
     testRecord.answerMap = Object.fromEntries(answerMap);
@@ -166,9 +165,10 @@ function submit() {
     const submitContent: TestRecordUpdateRequest = {
         testRecord: testRecord,
         // delete: false,
-        submitted: true
+        submitted: false
     };
-    update(submitContent);
+    var temp = update(submitContent);
+    console.log("测试记录:", temp);
     emit('page',2);
 }
 function saveAnswer() { //切换题目时自动保存答案

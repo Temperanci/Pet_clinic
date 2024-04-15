@@ -1,4 +1,37 @@
+import type { StringLiteralType } from 'typescript';
 import * as schemas from './schemas.ts';
+import { ku } from 'element-plus/es/locales.mjs';
+export class BOTools{
+    listToString(list:string[]){
+        var str = '';
+        if(list===null||list.length<=0) return str;
+        str=list[0];
+        for(var i=1;i<list.length;i++){
+            str=str+','+list[i];
+        }
+        return str;
+    }
+    stringToList(str:string){
+        var list:string[] = [];
+        if(str===''||str===null) return list;
+        return list=str.split(',');
+    }
+    formalDate(date:Date){
+        var str = '';
+        str=date.getFullYear+'-'+date.getMonth+'-'+date.getDate+','+date.getHours+':'+date.getMinutes+':'+date.getSeconds;   
+        console.log('date is',str);
+        return str;
+    }
+    batchMap(map:Map<any,any>,list:any[]){
+        if(map===null||list===null||list.length<=0) return [];
+        var res:string[]=[];
+        for(var i =0;i<list.length;i++){
+            res.push(map.get(list[i]));
+        }
+        // console.log('batchMap',res);
+        return res;
+    }
+}
 export class Bed implements schemas.BedBO{
     bedId: string;
     location: string;
@@ -15,7 +48,7 @@ export class Bed implements schemas.BedBO{
     }
 }
 
-export class Drug implements schemas.DrugBO{
+export class Drug{
     drugId: string;
     name: string;
     type: string;
@@ -28,7 +61,7 @@ export class Drug implements schemas.DrugBO{
         this.name='';
         this.drugId='';
         this.desc='';
-        this.diseaseIdList=[]
+        this.diseaseIdList=[];
     }
 }
 
@@ -52,20 +85,20 @@ export class Price implements schemas.PriceBO{
     }
 }
 
-export class DiseaseInstance implements schemas.DiseaseInstanceBO{
+export class DiseaseInstance {
     desc: string;
     time: number;
     diseaseId: string;
     instanceId: string;
-    fileUrlList: string[];
-    pictureUrlList: string[];
+    fileUrlList: string;
+    pictureUrlList: string;
     constructor(){
         this.desc='';
         this.time=0;
         this.diseaseId='';
         this.instanceId='';
-        this.fileUrlList=[];
-        this.pictureUrlList=[];
+        this.fileUrlList='';
+        this.pictureUrlList='';
     }
 }
 

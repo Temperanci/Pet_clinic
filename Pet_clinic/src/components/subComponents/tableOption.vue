@@ -8,33 +8,33 @@
         <template #default="scope">
             <span v-if="status[scope.$index] === 0">
                 <el-button link type="primary" size="small"
-                    @click="emit('edit', scope.$index); status[scope.$index] = 1">Edit</el-button>
+                    @click="emit('edit', scope.$index); status[scope.$index] = 1">编辑</el-button>
                 <el-button link type="primary" size="small"
-                    @click="emit('delete', scope.$index); status[scope.$index] = 2;">Delete</el-button>
+                    @click="emit('delete', scope.$index); status[scope.$index] = 2;">删除</el-button>
             </span>
             <span v-if="status[scope.$index] === 1">
-                <el-button link type="primary" size="small" @click="editConfirm(scope.$index);">Confirm
+                <el-button link type="primary" size="small" @click="editConfirm(scope.$index);">确定
                 </el-button>
                 <el-button link type="primary" size="small"
-                    @click="status[scope.$index] = 0; emit('cancel', scope.$index);">Cancel</el-button>
+                    @click="status[scope.$index] = 0; emit('cancel', scope.$index);">取消</el-button>
             </span>
             <span v-if="status[scope.$index] === 2">
                 <el-button link type="primary" size="small"
-                    @click="emit('deleteConfirm', scope.$index); status[scope.$index] = 0;">Confirm
+                    @click="emit('deleteConfirm', scope.$index); status[scope.$index] = 0;">确定
                 </el-button>
-                <el-button link type="primary" size="small" @click="status[scope.$index] = 0">Cancel</el-button>
+                <el-button link type="primary" size="small" @click="status[scope.$index] = 0">取消</el-button>
             </span>
             <span v-if="status[scope.$index] === 3">
                 <el-button link type="primary" size="small"
-                    @click="emit('createConfirm', scope.$index); status[scope.$index] = 0;">Confirm
+                    @click="emit('createConfirm', scope.$index); status[scope.$index] = 0;">确定
                 </el-button>
-                <el-button link type="primary" size="small" @click="cancel(scope.$index)">Cancel</el-button>
+                <el-button link type="primary" size="small" @click="cancel(scope.$index)">取消</el-button>
             </span>
             <span v-if="status[scope.$index] === 4">
                 <el-button link type="primary" size="small"
-                    @click="emit('searchConfirm', scope.$index); status[scope.$index] = 0;">Confirm
+                    @click="emit('searchConfirm', scope.$index); status[scope.$index] = 0;">确定
                 </el-button>
-                <el-button link type="primary" size="small" @click="cancel(scope.$index)">Cancel</el-button>
+                <el-button link type="primary" size="small" @click="cancel(scope.$index)">取消</el-button>
             </span>
         </template>
     </el-table-column>
