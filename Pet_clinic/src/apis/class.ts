@@ -126,7 +126,7 @@ export class Problem implements schemas.ProblemBO{
 
 export class ProblemSet implements schemas.ProblemSetBO{
     problemSetId: string;
-    des: string;
+    desc: string;
     title: string;
     endTime: Date;
     duration: number;
