@@ -2,7 +2,7 @@
 <div style="height: 100%;display: flex;flex-flow: column;">
     <div style="height: 90%;" class="table">
       <el-table :data="queryData" height="100%">
-        <el-table-column prop="instanceId" label="病例编号">
+        <el-table-column prop="instanceId" label="病例编号" empty-text="来到了没有数据的荒原...">
           <template #default="scope">
             <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].instanceId"></el-input> -->
             <el-input v-if="searchBar[scope.$index]" v-model="edited[0].instanceId"></el-input>
@@ -65,7 +65,7 @@
           @create-confirm="(index)=>{CRUDhandler.createRow(edited[index]);unwritableBar[0]=false;}"
           @search="(index)=>{CRUDhandler.clear(edited[index]);isSelected[index] = true;clearPara=false;searchBar[0]=true;}"
           @search-confirm="(index)=>{CRUDhandler.search(edited[index]);searchBar[0]=false;back=true;}"
-          @back="fetchDiseaseInstances();back=false;"
+          @back="backToHome();back=false;"
           />
       </el-table>
     </div>
@@ -114,7 +114,7 @@ class bedRowCRUD implements rowCRUD {
     delete:true}
     console.log('delete request',request);
     var response= update(request);
-    setTimeout(()=>{fetchDiseaseInstances();},500);
+    setTimeout(()=>{backToHome();},500);
     console.log('delete response',response); 
   }//删除
   editRow(Msg: Object[],index:number): void {
@@ -131,7 +131,7 @@ class bedRowCRUD implements rowCRUD {
     delete:false}
     console.log('update request',request);
     var response= update(request);
-    setTimeout(()=>{fetchDiseaseInstances();},500);
+    setTimeout(()=>{backToHome();},500);
     console.log('update response',response);
   }//修改
   clear(edited:DiseaseInstance){
@@ -154,7 +154,7 @@ class bedRowCRUD implements rowCRUD {
     delete:false}
     console.log('create request',request);
     var response= update(request);
-    setTimeout(()=>{fetchDiseaseInstances();},500);
+    setTimeout(()=>{backToHome();},500);
     console.log('create response',response); 
   }//创建
   search(msg:Object):void{
@@ -165,6 +165,7 @@ class bedRowCRUD implements rowCRUD {
 
   }
 }
+//handler
 var CRUDhandler = new bedRowCRUD();
 async function fetchDiseaseInstances(pageNum?:number,pageLimit?:number,msg?:Object,search?:boolean) {
   var temp = msg||{
@@ -209,9 +210,10 @@ async function fetchDiseaseInstances(pageNum?:number,pageLimit?:number,msg?:Obje
 }
 onMounted(() => {
   getSelection();
-  fetchDiseaseInstances();
+  fetchDiseaseInstances(undefined,defaultNum);
 });
-//request
+//paginate
+const defaultNum = 10;
 var entryNum = ref(0);
 var tabLength = ref(0);//每页展示的条目数
 const clearPara = ref(false);//让子组件复位
@@ -222,12 +224,15 @@ var queryData = ref<any[]>([]);
 var currentPage = 1;
 function pagination(val: number) {
   currentPage = val
-  fetchDiseaseInstances(currentPage);
+  backToHome();
   //恢复初始值
   isSelected=clearIsSelected(isSelected);
   clearPara.value = true;
   searchBar.value[0]=false;
   unwritableBar.value[0]=false;
+}
+function backToHome(){
+  fetchDiseaseInstances(currentPage,defaultNum);
 }
 //分页
 const component = defineComponent({

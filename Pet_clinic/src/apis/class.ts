@@ -52,7 +52,7 @@ export class Drug{
     drugId: string;
     name: string;
     type: string;
-    diseaseIdList: string;
+    diseaseIdList: string[];
     departmentId: string;
     desc: string;
     constructor(){
@@ -61,7 +61,7 @@ export class Drug{
         this.name='';
         this.drugId='';
         this.desc='';
-        this.diseaseIdList='';
+        this.diseaseIdList=[];
     }
 }
 
