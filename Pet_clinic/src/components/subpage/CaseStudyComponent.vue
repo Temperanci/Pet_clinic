@@ -14,8 +14,41 @@
       </el-menu-item>
     </el-menu>
     <div class="case-details" v-if="selectedCase">
-      <h2>{{ selectedCase.name }}</h2>
+      <h1>{{ selectedCase.name }}</h1>
       <p>{{ selectedCase.desc }}</p>
+      <el-divider />
+      <p>病例列表：(点击条目展开详情)</p>
+      <el-collapse v-model="activeInstance" accordion class="collapse-area">
+        <el-collapse-item
+            v-for="instance in selectedCaseInstance"
+            :key="instance.instanceId"
+            :name="instance.instanceId"
+            class="instance-item"
+        >
+          <template #title>
+            <h2>病情描述：{{ instance.desc }}</h2>
+          </template>
+          <div>
+            <!-- 在这里可以放置病例的详细内容，如图片、视频等 -->
+            <p>病例ID：{{ instance.instanceId }}</p>
+            <img
+                v-for="(picUrl, index) in instance.pictureUrlList"
+                :key="index"
+                :src="picUrl"
+                alt="病例图片"
+                class="case-image"
+            >
+            <!-- 如果有视频URL列表，展示所有视频 -->
+            <video
+                v-for="(videoUrl, index) in instance.fileUrlList"
+                :key="index"
+                :src="videoUrl"
+                controls
+                class="case-video"
+            ></video>
+          </div>
+        </el-collapse-item>
+      </el-collapse>
     </div>
   </div>
 </template>
@@ -23,9 +56,11 @@
 <script setup lang="ts">
 import {defineComponent, onMounted, ref} from 'vue';
 import { ElMenu, ElMenuItem } from 'element-plus';
-import { DiseasePageQuery } from "@/apis/disease/disease";
-import type { DiseaseBO } from "@/apis/schemas";
+import { pageQuery as DiseasePageQuery } from "@/apis/disease/disease";
+import type { DiseaseBO, DiseaseInstanceBO } from "@/apis/schemas";
 import type { DiseasePageResponse } from "@/apis/disease/disease-interface";
+import type {DiseaseInstancePageResponse} from "@/apis/diseaseInstance/diseaseInstance-interface";
+import { pageQuery } from "@/apis/diseaseInstance/diseaseInstance";
 
 // 声明组件名称
 defineComponent({
@@ -36,6 +71,7 @@ defineComponent({
 const diseasePage = ref<DiseasePageResponse>({ datas: [], total: 0, limit: 0 });
 // 定义选中的疾病详情
 const selectedCase = ref<DiseaseBO | null>(null);
+const activeInstance = ref(null);
 
 // 定义获取疾病列表的函数
 async function fetchDisease() {
@@ -46,14 +82,31 @@ async function fetchDisease() {
     console.error('Failed to fetch disease:', error);
   }
 }
+const diseaseInstance = ref<DiseaseInstancePageResponse>({ datas: [], total: 0, limit: 0 });
+const selectedCaseInstance = ref<DiseaseInstanceBO[] | null>(null);
+async function fetchDiseaseInstance() {
+  try {
+    const response = await pageQuery();
+    console.log('response:', response)
+    diseaseInstance.value = response.data;
+  } catch (error) {
+    console.error('Failed to fetch diseaseInstance:', error);
+  }
+}
 
 // 定义展示疾病详情的函数
 function showCaseDetails(disease: DiseaseBO) {
   selectedCase.value = disease;
+  selectedCaseInstance.value = diseaseInstance.value.datas.filter(item => item.diseaseId === disease.diseaseId);
+  console.log('selectedCaseInstance:', selectedCaseInstance.value)
 }
 
 // 组件挂载后获取疾病数据
-onMounted(fetchDisease);
+
+onMounted(() => {
+  fetchDisease();
+  fetchDiseaseInstance();
+});
 </script>
 
 
@@ -81,6 +134,17 @@ onMounted(fetchDisease);
   width: 60%; // 根据需要调整宽度
   max-height: 80vh; // 最大高度占视口的80%
   border-radius: 20px;
+  border: #2a1f1f 1px solid;
+}
+.collapse-area{
+  height: 60vh;
+  overflow: scroll;
+}
+.instance-item{
+  justify-content: space-around;
+  border-radius: 10px;
+  margin: 10px;
+  padding: 10px;
   border: #2a1f1f 1px solid;
 }
 </style>

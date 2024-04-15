@@ -8,11 +8,15 @@
         </el-container>
       </div> -->
       <div class="filter">
-        <el-input class="option" v-model="ServiceId" placeholder="请输入服务编号"></el-input>
+        <!-- <el-input class="option" v-model="ServiceId" placeholder="请输入服务编号"></el-input> -->
         <el-input class="option" v-model="Title" placeholder="请输入服务名称"></el-input>
-        <el-input class="option" v-model="PriceId" placeholder="请输入价格编号"></el-input>
-        <el-input class="option" v-model="DepartmentId" placeholder="请输入科室编号"></el-input>
+        <!-- <el-input class="option" v-model="PriceId" placeholder="请输入价格编号"></el-input> -->
+        <!-- <el-input class="option" v-model="DepartmentId" placeholder="请输入科室编号"></el-input> -->
         <el-input class="option" v-model="Type" placeholder="请输入服务类型"></el-input>
+        <el-select class="option" placeholder="请选择科室" v-model="DepartmentId" style="width: 100%">
+          <el-option v-for="item in deptOptions" :key="item.value" :label="item.label" :value="item.value"
+            :disabled="item.disabled" />
+        </el-select>
         <!-- <el-select class="option" v-model="service" clearable placeholder="请选择服务名称">
           <el-option v-for="item in services" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
@@ -25,59 +29,53 @@
           <el-option v-for="item in departments" :key="item.value" :label="item.label" :value="item.value">
           </el-option>
         </el-select> -->
-        <el-button v-if="back" class="optionButton" 
-        @click="fetchPrice();back=false;clearFilter();">返回</el-button>
-        <el-button v-else class="optionButton" 
-        @click="CRUDhandler.search({
-            priceId: PriceId,
-            type: Type,
-            title: Title,
-            departmentId: DepartmentId,
-            serviceId: ServiceId
-          });
-          back=true;">筛选</el-button>
+        <div class="optionButton">
+          <el-button class="button" @click="CRUDhandler.search({
+          priceId: PriceId,
+          type: Type,
+          title: Title,
+          departmentId: DepartmentId,
+          serviceId: ServiceId
+        });
+        back = true;">筛选</el-button>
+        <el-button v-if="back" class="button" @click="fetchPrice(undefined,defaultNum); back = false; clearFilter();">返回</el-button>
+        </div>
+        
       </div>
     </el-aside>
     <div class="main">
       <div style="height: 100%;display: flex;flex-flow: column;">
         <div style="height: 90%;" class="table">
-          <el-table :data="queryData" height="100%">
-            <el-table-column prop="serviceId" label="服务编号">
+          <el-table :data="queryData" height="100%" empty-text="来到了没有数据的荒原...">
+            <!-- <el-table-column prop="serviceId" label="服务编号">
               <template #default="scope">
                 <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].serviceId"></el-input>
                 <span v-else>{{ scope.row.serviceId }}</span>
               </template>
-            </el-table-column>
+</el-table-column> -->
             <el-table-column prop="title" label="服务名称">
               <template #default="scope">
-                <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].title"></el-input>
-                <span v-else>{{ scope.row.title }}</span>
+                <span>{{ scope.row.title }}</span>
               </template>
             </el-table-column>
             <el-table-column prop="type" label="服务类型">
               <template #default="scope">
-                <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].type"></el-input>
-                <span v-else>{{ scope.row.type }}</span>
+                <span>{{ scope.row.type }}</span>
               </template>
             </el-table-column>
             <el-table-column prop="desc" label="描述">
               <template #default="scope">
-                <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].desc"></el-input>
-                <span v-else>{{ scope.row.desc }}</span>
+                <span>{{ scope.row.desc }}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="priceId" label="价格编号">
+            <el-table-column prop="priceId" label="价格">
               <template #default="scope">
-                <el-input v-if="isSelected[scope.$index] === true"
-                  v-model="edited[scope.$index].priceId"></el-input>
-                <span v-else>{{ scope.row.priceId }}</span>
+                <span>{{ priceMap.get(scope.row.priceId) }}</span>
               </template>
             </el-table-column>
             <el-table-column prop="departmentId" label="科室">
-              <template #default="scope">
-                <el-input v-if="isSelected[scope.$index] === true"
-                  v-model="edited[scope.$index].departmentId"></el-input>
-                <span v-else>{{ scope.row.departmentId }}</span>
+              <template #default="scope">       
+                <span>{{ deptMap.get(scope.row.departmentId) }}</span>
               </template>
             </el-table-column>
           </el-table>
@@ -99,27 +97,12 @@ import '@/assets/table.css'
 import { isSelectGen, EditedGen, clearIsSelected } from "../subComponents/tableOption.vue";
 import { onMounted } from "vue";
 import type { Ref } from "vue";
-import { pageQuery} from "../../apis/price/price.ts"
+import { pageQuery } from "../../apis/price/price.ts"
 import type { PricePageResponse, PricePageRequest } from "@/apis/price/price-interface.ts"
 import { Price } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt.ts'
 
-var currentPage = 1;
-var entryNum = ref(0);
-var back = ref(false);
-const ServiceId = ref('');
-const input = ref('');
-const Type = ref('');
-const Title = ref('');
-const DepartmentId = ref('');
-const PriceId = ref('');
-function clearFilter(){
-  ServiceId.value='';
-  Type.value='';
-  Title.value='';
-  DepartmentId.value='';
-  PriceId.value='';
-}
+
 const PricePage = ref<PricePageResponse>({ datas: [], total: 0, limit: 0 });
 class priceRowCRUD implements rowCRUD {
   updateMsg(Msg: Object[], data: any[], index: number): void {
@@ -144,7 +127,7 @@ async function fetchPrice(pageNum?: number, pageLimit?: number, msg?: Object, se
     type: '',
     departmentId: '',
     title: '',
-    serviceId:'',
+    serviceId: '',
   }
   var request: PricePageRequest = {
     priceId: ((temp as Price).priceId === '') ? undefined : (temp as Price).priceId,
@@ -174,12 +157,16 @@ async function fetchPrice(pageNum?: number, pageLimit?: number, msg?: Object, se
       console.error('No data returned from the API');
     }
   } catch (error) {
-  console.error('Error fetching Price:', error);
+    console.error('Error fetching Price:', error);
   }
 }
 onMounted(() => {
-  fetchPrice();
+  getDeptInfo()
+  getPriceInfo()
+  fetchPrice(undefined,defaultNum);
 });
+//paginate
+var defaultNum = 10;
 var tabLength = ref(0);//每页展示的条目数
 const clearPara = ref(false);
 var isSelected: Ref<boolean[]> = ref<boolean[]>([]);
@@ -188,62 +175,79 @@ var queryData = ref<any[]>([]);
 var currentPage = 1;
 function pagination(val: number) {
   currentPage = val
+  fetchPrice(currentPage,defaultNum);
   isSelected = clearIsSelected(isSelected);
   clearPara.value = true;
+}
+//filter && view
+import { pageQuery as deptPageQuery } from "@/apis/department/department";
+import { type DepartmentPageRequest } from '@/apis/department/department-interface';
+var currentPage = 1;
+var entryNum = ref(0);
+var back = ref(false);
+const ServiceId = ref('');
+const input = ref('');
+const Type = ref('');
+const Title = ref('');
+const DepartmentId = ref('');
+const PriceId = ref('');
+function clearFilter() {
+  ServiceId.value = '';
+  Type.value = '';
+  Title.value = '';
+  DepartmentId.value = '';
+  PriceId.value = '';
+}
+const deptOptions: Ref<any[]> = ref<any[]>([])
+const deptMap = new Map();
+const priceMap = new Map();
+async function getPriceInfo(){
+  var request: PricePageRequest = {
+    limit: 999
+  }
+  try {
+    var priceResponse = await pageQuery(request);
+    if (priceResponse && priceResponse.data && priceResponse.data.datas) {
+      console.log('Fetched price:', priceResponse.data.datas);
+      for (var i = 0; i < priceResponse.data.datas.length; i++) {
+        priceMap.set(priceResponse.data.datas[i].priceId, priceResponse.data.datas[i].price);
+      }
+      console.log('priceMap', priceMap)
+    } else {
+      console.error('No data returned from the API');
+    }
+
+  } catch (error) {
+    console.error('Error fetching price:', error);
+  }
+}
+async function getDeptInfo() {
+  var request: DepartmentPageRequest = {
+    limit: 999
+  }
+  try {
+    var deptResponse = await deptPageQuery(request);
+    if (deptResponse && deptResponse.data && deptResponse.data.datas) {
+      console.log('Fetched departments:', deptResponse.data.datas);
+      for (var i = 0; i < deptResponse.data.datas.length; i++) {
+        deptOptions.value.push({
+          value: deptResponse.data.datas[i].departmentId,
+          label: deptResponse.data.datas[i].name
+        });
+        deptMap.set(deptResponse.data.datas[i].departmentId, deptResponse.data.datas[i].name);
+      }
+      console.log('deptMap', deptMap)
+    } else {
+      console.error('No data returned from the API');
+    }
+
+  } catch (error) {
+    console.error('Error fetching departments:', error);
+  }
 }
 defineComponent({
   name: "ServiceCharge"
 })
-// const services = [{
-//   value: '选项1',
-//   label: '黄金糕'
-// }, {
-//   value: '选项2',
-//   label: '双皮奶'
-// }, {
-//   value: '选项3',
-//   label: '蚵仔煎'
-// }, {
-//   value: '选项4',
-//   label: '龙须面'
-// }, {
-//   value: '选项5',
-//   label: '北京烤鸭'
-// }];
-
-// const serviceTypes = [{
-//   value: '选项1',
-//   label: '黄金糕'
-// }, {
-//   value: '选项2',
-//   label: '双皮奶'
-// }, {
-//   value: '选项3',
-//   label: '蚵仔煎'
-// }, {
-//   value: '选项4',
-//   label: '龙须面'
-// }, {
-//   value: '选项5',
-//   label: '北京烤鸭'
-// }];
-
-// const departments = [{
-//   value: '选项1',
-//   label: '黄金糕'
-// }, {
-//   value: '选项2',
-//   label: '双皮奶'
-// }, {
-//   value: '选项3',
-//   label: '蚵仔煎'
-// }, {
-//   value: '选项4',
-//   label: '龙须面'
-// }, {
-//   value: '选项5',
-//   label: '北京烤鸭'
-// }];
 </script>
 
 <style scoped lang="scss">
@@ -306,7 +310,13 @@ defineComponent({
 }
 
 .optionButton {
-  width: 50%;
-  margin-top: 3%;
+  display: flex;
+  flex-direction: column;
+
+  .button {
+    margin: auto;
+    width: 50%;
+    margin-top: 3%;
+  }
 }
 </style>

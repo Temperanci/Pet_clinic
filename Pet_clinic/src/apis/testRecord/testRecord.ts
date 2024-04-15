@@ -27,6 +27,7 @@ export async function pageQuery(request?:TestRecordPageRequest){
 export async function update(request: TestRecordUpdateRequest) : Promise<Result<TestRecordBO>> {
     try {
         const response = await axios.post<Result<TestRecordBO>>(`${API_BASE_URL}/testRecord/update`, request);
+        console.log("提交测试记录:",request);
         return response.data;
     } catch (error) {
         console.error('update testRecord error', error);
