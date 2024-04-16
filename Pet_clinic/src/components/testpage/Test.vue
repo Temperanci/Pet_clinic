@@ -3,7 +3,7 @@
         <el-container>
             <el-container width="60%">
                 <el-header>
-                    <h3>题{{ selectedIndex+1 }}:{{ selectedProblem.title }}</h3>
+                    <h3>题{{ selectedIndex + 1 }}:{{ selectedProblem.title }}</h3>
                 </el-header>
                 <el-main>
                     <div class="problemContent">
@@ -13,11 +13,11 @@
                                 {{ choice }}
                             </el-radio>
                         </el-radio-group>
-                        <el-checkbox-group v-else-if="selectedProblem.type === '多选题'" v-model="chosenAnswers">
+                        <!-- <el-checkbox-group v-else-if="selectedProblem.type === '多选题'" v-model="chosenAnswers">
                             <el-checkbox v-for="(choice, index) in choices" :key="index" :label="choices">
                                 {{ choice }}
                             </el-checkbox>
-                        </el-checkbox-group>
+                        </el-checkbox-group> -->
                         <el-input v-else-if="selectedProblem.type === 'subjective'" type="textarea" placeholder="在此输入答案"
                             v-model="answer[selectedIndex]" />
                     </div>
@@ -48,7 +48,7 @@
         <template #footer>
             <div class="dialog-footer">
                 <el-button @click="dialogVisible = false">Cancel</el-button>
-                <el-button type="primary" @click="dialogVisible = false;submit()">
+                <el-button type="primary" @click="dialogVisible = false; submit()">
                     Confirm
                 </el-button>
             </div>
@@ -92,7 +92,7 @@ async function fetchProblems() {
             if (response && response.data && response.data.datas) {
                 ProblemPage.value = response.data;
                 for (var j in ProblemPage.value.datas) { //单选题内容换行
-                    ProblemPage.value.datas[j].content = ProblemPage.value.datas[j].content.replace(/(A\.|B\.|C\.|D\.)/g, '\n$1');
+                    ProblemPage.value.datas[j].content = ProblemPage.value.datas[j].content ?? ''.replace(/(A\.|B\.|C\.|D\.)/g, '\n$1');
                 }
                 problemList.value = problemList.value.concat(ProblemPage.value.datas);
                 selectedProblem.value = problemList.value[selectedIndex.value];
@@ -111,7 +111,7 @@ onMounted(async () => {
 });
 
 
-const emit = defineEmits(['page']);
+const emit = defineEmits(['content']);
 const props = defineProps({
     testId: String
 })
@@ -169,7 +169,7 @@ function submit() {
     };
     var temp = update(submitContent);
     console.log("测试记录:", temp);
-    emit('page',2);
+    emit('content', 'ProblemSet');
 }
 function saveAnswer() { //切换题目时自动保存答案
     var pro = selectedProblem.value;
@@ -177,13 +177,13 @@ function saveAnswer() { //切换题目时自动保存答案
     if (temp != null) {
         if (pro.type == 'objective') {
             console.log("单选:", temp);
-            answerMap.set(pro.problemId, temp);
-        } else if (pro.type == '多选题') {
-            console.log("多选:", temp);
-            answerMap.set(pro.problemId, temp);
+            answerMap.set(pro.problemId ?? '', temp);
+            // } else if (pro.type == '多选题') {
+            //     console.log("多选:", temp);
+            //     answerMap.set(pro.problemId??'', temp);
         } else if (pro.type == 'subjective') {
             console.log("简答:", temp);
-            answerMap.set(pro.problemId, temp);
+            answerMap.set(pro.problemId ?? '', temp);
         }
     }
 }

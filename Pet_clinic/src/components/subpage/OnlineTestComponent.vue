@@ -1,12 +1,12 @@
 <template>
   <div class="online-test-component">
-    <el-button class="back-button" @click="returnUpper" v-if="content !== 0">返回上一级</el-button>
+    <el-button class="back-button" @click="returnUpper" v-if="content !== 'Menu'">返回上一级</el-button>
     <!-- 在这里添加在线测试相关的内容 -->
     <div class="test-content">
-      <template v-if="content === 0">
-        <div class="testType">
+      <template v-if="content === 'Menu'">
+        <div class="test-module">
           <el-row :gutter="40">
-            <el-col :span="12">
+            <el-col :span="8">
               <el-card shadow="hover">
                 <el-result title="套题" sub-title="选择试卷参加测试">
                   <template #icon>
@@ -15,21 +15,36 @@
                     </el-icon>
                   </template>
                   <template #extra>
-                    <el-button type="primary" size="large" @click="changeContent(2)">进入</el-button>
+                    <el-button type="primary" size="large" @click="changeContent('ProblemSet')">进入</el-button>
                   </template>
                 </el-result>
               </el-card>
             </el-col>
-            <el-col :span="12">
+            <el-col :span="8">
               <el-card shadow="hover">
-                <el-result title="单题" sub-title="按知识点筛选相关题目">
+                <el-result title="单题" sub-title="按知识点筛选题目练习">
                   <template #icon>
                     <el-icon size="50">
                       <Checked />
                     </el-icon>
                   </template>
                   <template #extra>
-                    <el-button type="primary" size="large" @click="changeContent(1)">进入</el-button>
+                    <el-button type="primary" size="large" @click="changeContent('SingleProblem')">进入</el-button>
+                  </template>
+                </el-result>
+              </el-card>
+
+            </el-col>
+            <el-col :span="8">
+              <el-card shadow="hover">
+                <el-result title="测试记录" sub-title="查看套题的答题记录和分数">
+                  <template #icon>
+                    <el-icon size="50">
+                      <Checked />
+                    </el-icon>
+                  </template>
+                  <template #extra>
+                    <el-button type="primary" size="large" @click="changeContent('TestRecord')">进入</el-button>
                   </template>
                 </el-result>
               </el-card>
@@ -38,9 +53,10 @@
           </el-row>
         </div>
       </template>
-      <SingleProblem v-if="content === 1" @page="(n: number) => content = n" />
-      <ProblemSet v-if="content === 2" @page="(n: number) => content = n" @id="(id: string) => testId = id" />
-      <Test v-if="content === 3" @page="(n: number) => content = n" :testId="testId" />
+      <SingleProblem v-if="content === 'SingleProblem'" @content="(c: string) => content = c" />
+      <ProblemSet v-if="content === 'ProblemSet'" @content="(c: string) => content = c"
+        @id="(id: string) => testId = id" />
+      <Test v-if="content === 'Test'" @content="(c: string) => content = c" :testId="testId" />
     </div>
   </div>
 </template>
@@ -61,24 +77,27 @@ defineComponent({
 })
 
 const testId = ref('')
-const content = ref(0)
-function changeContent(n: number) { //改变测试页面内容
-  content.value = n;
-  console.log('测试页面内容: ', content.value)
+const content = ref('Menu')
+function changeContent(c: string) { //改变测试页面内容
+  content.value = c;
+  console.log('测试页面内容:', content.value)
 }
-function returnUpper() {
+function returnUpper() { //返回测试页面上一级
   switch (content.value) {
-    case 1:
-      changeContent(0);
+    case 'TestRecord':
+      changeContent('Menu');
       break;
-    case 2:
-      changeContent(0);
+    case 'SingleProblem':
+      changeContent('Menu');
       break;
-    case 3:
-      changeContent(2);
+    case 'ProblemSet':
+      changeContent('Menu');
+      break;
+    case 'Test':
+      changeContent('ProblemSet');
       break;
     default:
-      changeContent(0);
+      changeContent('Menu');
   }
 }
 
@@ -90,11 +109,13 @@ const close = defineEmits(['close'])
   position: relative;
   /* 这里添加您自己的样式 */
 }
-.testType{
+
+.test-module{
   margin-top: 100px;
   margin-left: 200px;
   margin-right: 200px;
 }
+
 .back-button {
   position: absolute;
   top: 10px;
