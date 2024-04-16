@@ -14,12 +14,12 @@
                                 {{ choice }}
                             </el-radio>
                         </el-radio-group>
-                        <el-checkbox-group v-else-if="currentProblemRef.type === '多选'" v-model="chosenAnswers">
+                        <!-- <el-checkbox-group v-else-if="currentProblemRef.type === '多选'" v-model="chosenAnswers">
                             <el-checkbox v-for="(choice, index) in currentProblemRef.choices" :key="index"
                                 :label="index + 1">
                                 {{ choice }}
                             </el-checkbox>
-                        </el-checkbox-group>
+                        </el-checkbox-group> -->
                         <el-input v-else-if="currentProblemRef.type === '简答'" type="textarea" placeholder="在此输入答案"
                             v-model="inputAnswer" />
                     </div>

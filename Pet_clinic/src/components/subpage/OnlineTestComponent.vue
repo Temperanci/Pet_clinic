@@ -53,10 +53,16 @@
           </el-row>
         </div>
       </template>
-      <SingleProblem v-if="content === 'SingleProblem'" @content="(c: string) => content = c" />
-      <ProblemSet v-if="content === 'ProblemSet'" @content="(c: string) => content = c"
-        @id="(id: string) => testId = id" />
-      <Test v-if="content === 'Test'" @content="(c: string) => content = c" :testId="testId" />
+      <SingleProblem v-if="content === 'SingleProblem'"
+        @content="(c: string) => content = c" />
+      <ProblemSet v-if="content === 'ProblemSet'"
+        @content="(c: string) => content = c"
+        @id="(id: string) => testId = id"
+        @time="(time: Date) => enterTime = time" />
+      <Test v-if="content === 'Test'"
+        @content="(c: string) => content = c"
+        :testId="testId"
+        :enterTime="enterTime" />
     </div>
   </div>
 </template>
@@ -76,8 +82,10 @@ defineComponent({
   }
 })
 
-const testId = ref('')
-const content = ref('Menu')
+const testId = ref(''); //所选测试id
+const enterTime = ref(new Date()); //进入测试时间
+
+const content = ref('Menu');
 function changeContent(c: string) { //改变测试页面内容
   content.value = c;
   console.log('测试页面内容:', content.value)
@@ -110,7 +118,7 @@ const close = defineEmits(['close'])
   /* 这里添加您自己的样式 */
 }
 
-.test-module{
+.test-module {
   margin-top: 100px;
   margin-left: 200px;
   margin-right: 200px;

@@ -4,7 +4,7 @@
             <div class="problemset-content">
                 <el-table :data="loadCurrentList()" border>
                     <!-- <el-table-column prop="problemSetId" label="id" width="" /> -->
-                    <el-table-column prop="title" label="名称" width="" />
+                    <el-table-column prop="title" label="名称" width="300px" />
                     <el-table-column prop="desc" label="描述" width="" />
                     <el-table-column prop="startTimeStr" label="开始时间" width="200px" />
                     <el-table-column prop="endTimeStr" label="截止时间" width="200px" />
@@ -87,6 +87,7 @@ onMounted(async () => {
 
 });
 
+// 处理试卷列表
 function loadCurrentList() {
     const currentList: { problemSetId: string, title: string, desc: string, startTimeStr: string, startTime: Date, endTimeStr: string, endTime: Date, durationStr: string, duration: number }[] = [];
     for (var i in problemSetList.value) {
@@ -123,7 +124,7 @@ function loadCurrentList() {
             currentList.push(temp);
         }
     }
-    console.log("当前分页数据:", currentList);
+    // console.log("当前分页数据:", currentList);
     return currentList;
 }
 
@@ -158,10 +159,11 @@ const selectedTest = ref({
     end: new Date('9999-12-31T23:59:59'),
     duration: 999999999
 });
-const emit = defineEmits(['content', 'id'])
+const emit = defineEmits(['content', 'id', 'time'])
 const enterTest = () => {
     emit('content', 'Test');
     emit('id', selectedTest.value.id);
+    emit('time', new Date());
     console.log('进入测试:', selectedTest.value);
 }
 
@@ -182,7 +184,7 @@ function handleSizeChange(n: number) {
 .problemset-content {
     min-height: 500px;
     max-height: 500px;
-    padding: 0 20px;
+    padding: 0 50px;
 }
 
 .problemset-pagination {
