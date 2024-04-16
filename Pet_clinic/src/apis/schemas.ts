@@ -90,10 +90,10 @@ export interface ProblemSetBO{
 }
 
 export interface ProcessBO{
-    type: string;
-    title: string;
-    content: string;
-    processId: string;
+    type?: string;
+    title?: string;
+    content?: string;
+    processId?: string;
 }
 
 export interface TestRecordBO {
@@ -106,12 +106,12 @@ export interface TestRecordBO {
     answerList?: string[];
     submitTime?: Date;
     candidateId?: string;
-    problemSetId: string;
+    problemSetId?: string;
     testRecordId?: string;
 }
 
 // 假设还需要创建 GradeResultBO 接口
 export interface GradeResultBO{
-    scores: number;
-    reason: string;
+    scores?: number;
+    reason?: string;
 }
