@@ -20,22 +20,19 @@ export const store = new Vuex.Store({
   mutations: {
     //存储token方法
     //设置token等于外部传递进来的值
-    setToken(state, token) {
+    setToken(state:any, token:Personnel) {
         state.token = token
         StorageToken.set('token',token); //同步存储token至localStorage
       },
-    clearToken(state){
-      state.token='';
-      StorageToken.set('token',{
-        id:'',
-        pwd:''
-      });
+    clearToken(state:any){
+      state.token=new Personnel();
+      StorageToken.set('token',new Personnel());
     }
   },
  getters : {
   //获取token方法
   //判断是否有token,如果没有重新赋值，返回给state的token
-  getToken(state) {
+  getToken(state:any) {
     if (!state.token) {
       if(StorageToken.get('token')!==null && StorageToken.get('token')!==undefined){
         state.token = StorageToken.get('token')

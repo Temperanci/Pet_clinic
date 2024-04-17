@@ -60,16 +60,16 @@
 <script setup lang="ts">
 import { defineComponent } from "vue";
 import { ref } from 'vue'
-import { getPagination, LENGTH } from '../../scripts/paginate.ts'
+import { getPagination, LENGTH } from '../../scripts/paginate'
 import '@/assets/table.css'
 import tableOption from "../subComponents/tableOption.vue";
 import { isSelectGen, EditedGen,clearIsSelected } from "../subComponents/tableOption.vue";
 import { onMounted } from "vue";
 import type { Ref } from "vue";
-import { pageQuery ,update} from "../../apis/department/department.ts"
+import { pageQuery ,update} from "../../apis/department/department"
 import type { DepartmentPageRequest, DepartmentPageResponse,DepartmentUpdateRequest } from "@/apis/department/department-interface.ts"
 import { Department } from "@/apis/class";
-import { type rowCRUD } from '../../scripts/tableOpt.ts'
+import { type rowCRUD } from '../../scripts/tableOpt'
 const DepartmentPage = ref<DepartmentPageResponse>({ datas: [], total: 0, limit: 0 });
 var searchBar = ref([false]);
 var unwritableBar = ref([false]);

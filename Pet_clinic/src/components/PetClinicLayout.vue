@@ -110,6 +110,7 @@ import {accout} from  '../scripts/data'
 import {store} from '@/main'
 import { onMounted } from 'vue';
 import {StorageToken} from '../scripts/storage'
+import { Personnel } from '@/apis/class';
 defineComponent({
   name: "PetClinicLayout"
 })
@@ -151,10 +152,10 @@ function Login(){
   if(userName.value===accout.account && userPwdLogin.value===accout.psw){
     ifLogined.value = true;
     userStatus.value = accout.status;
-    store.commit('setToken',{
-      id:userName.value,
-      pwd:userPwdLogin.value
-    })
+    let token = new Personnel();
+    token.name = userName.value;
+    token.password = userPwdLogin.value;
+    store.commit('setToken',token)
     console.log('Login.userName',store.state.token.id)
   }
 }
