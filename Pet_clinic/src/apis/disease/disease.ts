@@ -11,7 +11,7 @@ interface Result<T> {
 }
 
 // 假设这是你的API的基础URL
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'http://123.60.5.195:8084';
 const disease = {}
 
 // 分页查询疾病信息
