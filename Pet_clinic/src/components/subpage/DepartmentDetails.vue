@@ -78,7 +78,7 @@
 import {onMounted, defineComponent, nextTick} from "vue";
 import { ref, watch } from 'vue';
 import 'element-plus/dist/index.css';
-import { Viewer } from "photo-sphere-viewer";
+import * as PSV from "photo-sphere-viewer";
 import "photo-sphere-viewer/dist/photo-sphere-viewer.css";
 import { ArrowDown } from '@element-plus/icons-vue'
 import { pageQuery } from "@/apis/department/department";
@@ -90,7 +90,7 @@ defineComponent({
   name: "DepartmentDetails"
 })
 
-let viewer: Viewer | null;
+let viewer: PSV.Viewer | null;
 const props = defineProps({
   name: String,
 });
@@ -127,7 +127,7 @@ async function fetchDepartments() {
       if (DepartmentPage.value.datas.length > 0) {
         selectedDepartment.value = DepartmentPage.value.datas[0];
         // 初始化全景图查看器
-        viewer = new Viewer({
+        viewer = new PSV.Viewer({
           container: "viewer",
           //全景图路径，全景图放置在public路径下的写法；放置在src路径下需要改写为require("路径")
           panorama: selectedDepartment.value.picture,
