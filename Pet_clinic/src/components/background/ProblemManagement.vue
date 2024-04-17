@@ -214,6 +214,7 @@ async function fetchProblems(pageNum?: number, pageLimit?: number, msg?: Object,
       }
       else { tabLength.value = ProblemPage.value.limit; }//保证搜索只有一页
       entryNum.value = ProblemPage.value.total;
+      // eslint-disable-next-line vue/no-ref-as-operand
       isSelected = isSelectGen(tabLength.value);
       edited.value = EditedGen(tabLength.value, new Problem()) as Problem[];
       // selectPage(currentPage - 1, tableData, queryData);
@@ -241,6 +242,7 @@ function pagination(val: number) {
   currentPage = val
   fetchProblems(currentPage);
   //恢复初始值
+  // eslint-disable-next-line vue/no-ref-as-operand
   isSelected = clearIsSelected(isSelected);
   clearPara.value = true;
   searchBar.value[0] = false;

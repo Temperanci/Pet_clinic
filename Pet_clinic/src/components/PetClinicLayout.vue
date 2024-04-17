@@ -8,11 +8,11 @@
         <div class="card-container">
           <div class="card-left">
             <el-avatar :size="40" />
-            <el-text>用户名</el-text>
+            <el-text>{{store.state.token.id}}</el-text>
           </div>
           <div class="card-right">
-            <div style="height: 50%;">
-              <el-text style="margin:auto" v-if="userStatus === 0" @click="Switch(0)">后台页面</el-text>
+            <div style="width: 100%;margin:auto;">
+              <el-text  v-if="userStatus === 0" @click="Switch(0)">后台页面</el-text>
             </div>
             <!-- <el-divider /> -->
             <div style="height: 50%;">
@@ -35,7 +35,7 @@
             <el-input v-model="userName" class="input" placeholder="用户名" />
           </div>
           <div style="width: 100%;">
-            <el-input v-model="userPwd" class="input" placeholder="密码" />
+            <el-input v-model="userPwdLogin" type="password" show-password class="input" placeholder="密码" />
           </div>
           <div style="width: 100%;">
             <el-button class="Btn" @click="Login">登录</el-button>
@@ -53,10 +53,10 @@
             <el-input v-model="userName" class="input" placeholder="用户名" />
           </div>
           <div>
-            <el-input v-model="userPwd" class="input" placeholder="密码" />
+            <el-input v-model="userPwdRegister" type="password" show-password class="input" placeholder="密码" />
           </div>
           <div>
-            <el-input v-model="userPwdConfirm" class="input" placeholder="确认密码" />
+            <el-input v-model="userPwdConfirm" type="password" show-password class="input" placeholder="确认密码" />
           </div>
           <div style="width: 100%;">
             <el-button class="Btn" @click="Login">注册</el-button>
@@ -107,7 +107,10 @@ import DrugResource from './subpage/DrugResource.vue'
 import BedInquiry from './subpage/BedInquiry.vue'
 import FunctionalStudy from './subpage/FunctionalStudy.vue'
 import {accout} from  '../scripts/data'
-
+import {store} from '@/main'
+import { onMounted } from 'vue';
+import {StorageToken} from '../scripts/storage'
+import { Personnel } from '@/apis/class';
 defineComponent({
   name: "PetClinicLayout"
 })
@@ -139,14 +142,21 @@ const handleSelect = (index: string) => {
   currentComponent.value = componentsMap[index]
 }
 // TODO:登录注册的详细逻辑
+
 const userName = ref('')
-const userPwd = ref('')
+const userPwdLogin = ref('')
+const userPwdRegister = ref('')
 const userPwdConfirm = ref('')
 
 function Login(){
-  if(userName.value===accout.account && userPwd.value===accout.psw){
+  if(userName.value===accout.account && userPwdLogin.value===accout.psw){
     ifLogined.value = true;
     userStatus.value = accout.status;
+    let token = new Personnel();
+    token.name = userName.value;
+    token.password = userPwdLogin.value;
+    store.commit('setToken',token)
+    console.log('Login.userName',store.state.token.id)
   }
 }
 function Register(){
@@ -154,10 +164,24 @@ function Register(){
 }
 function Logout(){
   userName.value='';
-  userPwd.value='';
+  userPwdLogin.value='';
   userStatus.value=1;
-  ifLogined.value=false;  
+  ifLogined.value=false;
+  store.commit('clearToken');
 }
+function refreshLogin(){
+  if(StorageToken.get('token')!==null){
+    store.commit('setToken',StorageToken.get('token'));
+    ifLogined.value = true;
+    userStatus.value = accout.status;
+    console.log('refreshLogin1',store.token);
+  }
+  console.log('refreshLogin2',StorageToken.get('token'))
+}
+onMounted(() => {
+  console.log('onMounted','success');
+  refreshLogin();
+});
 // 当 marker 被点击时调用
 const markerClicked = (name: string) => {
   // 切换到科室详情页面
@@ -209,6 +233,8 @@ const markerClicked = (name: string) => {
           margin-left: -0.5vw;
         }
         .card-right{
+        width: 100%;
+        height: 100%;
         display: flex;
         flex-direction: column;
       }

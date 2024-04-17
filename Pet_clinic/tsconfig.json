@@ -9,7 +9,10 @@
     }
   ],
   "compilerOptions": {
-    "types": ["node"] // Add this line
+    "types": ["node"], // Add this line
+    "paths": {
+      "vuex": ["./node_modules/vuex/types"] 
+    }
     // ... other options
   }
 }

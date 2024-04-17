@@ -98,7 +98,7 @@ import { isSelectGen, EditedGen, clearIsSelected } from "../subComponents/tableO
 import { onMounted } from "vue";
 import type { Ref } from "vue";
 import { pageQuery } from "../../apis/price/price"
-import type { PricePageResponse, PricePageRequest } from "@/apis/price/price-interface.ts"
+import type { PricePageResponse, PricePageRequest } from "@/apis/price/price-interface"
 import { Price } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt'
 
@@ -149,6 +149,7 @@ async function fetchPrice(pageNum?: number, pageLimit?: number, msg?: Object, se
       }
       else { tabLength.value = PricePage.value.limit; }//保证搜索只有一页
       entryNum.value = PricePage.value.total;
+      // eslint-disable-next-line vue/no-ref-as-operand
       isSelected = isSelectGen(tabLength.value);
       edited.value = EditedGen(tabLength.value, new Price()) as Price[];
       // selectPage(currentPage - 1, tableData, queryData);
@@ -176,13 +177,13 @@ var currentPage = 1;
 function pagination(val: number) {
   currentPage = val
   fetchPrice(currentPage,defaultNum);
+  // eslint-disable-next-line vue/no-ref-as-operand
   isSelected = clearIsSelected(isSelected);
   clearPara.value = true;
 }
 //filter && view
 import { pageQuery as deptPageQuery } from "@/apis/department/department";
 import { type DepartmentPageRequest } from '@/apis/department/department-interface';
-var currentPage = 1;
 var entryNum = ref(0);
 var back = ref(false);
 const ServiceId = ref('');
@@ -199,8 +200,8 @@ function clearFilter() {
   PriceId.value = '';
 }
 const deptOptions: Ref<any[]> = ref<any[]>([])
-const deptMap = new Map();
-const priceMap = new Map();
+const deptMap:Ref<Map<any,any>> = ref<Map<any,any>>(new Map());
+const priceMap:Ref<Map<any,any>> =ref<Map<any,any>>( new Map());
 async function getPriceInfo(){
   var request: PricePageRequest = {
     limit: 999
@@ -210,7 +211,7 @@ async function getPriceInfo(){
     if (priceResponse && priceResponse.data && priceResponse.data.datas) {
       console.log('Fetched price:', priceResponse.data.datas);
       for (var i = 0; i < priceResponse.data.datas.length; i++) {
-        priceMap.set(priceResponse.data.datas[i].priceId, priceResponse.data.datas[i].price);
+        priceMap.value.set(priceResponse.data.datas[i].priceId, priceResponse.data.datas[i].price);
       }
       console.log('priceMap', priceMap)
     } else {
@@ -234,7 +235,7 @@ async function getDeptInfo() {
           value: deptResponse.data.datas[i].departmentId,
           label: deptResponse.data.datas[i].name
         });
-        deptMap.set(deptResponse.data.datas[i].departmentId, deptResponse.data.datas[i].name);
+        deptMap.value.set(deptResponse.data.datas[i].departmentId, deptResponse.data.datas[i].name);
       }
       console.log('deptMap', deptMap)
     } else {

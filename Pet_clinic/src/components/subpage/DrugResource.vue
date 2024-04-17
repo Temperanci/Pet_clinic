@@ -96,18 +96,18 @@
 <script setup lang="ts">
 import { defineComponent } from "vue";
 import { ref } from 'vue'
-import { getPagination } from '../../scripts/paginate.ts'
+import { getPagination } from '../../scripts/paginate'
 import '@/assets/table.css'
 //request
 import { isSelectGen, EditedGen, clearIsSelected } from "../subComponents/tableOption.vue";
 import { onMounted } from "vue";
 import type { Ref } from "vue";
-import { pageQuery, update } from "../../apis/drug/drug.ts"
-import { pageQuery as deptQuery } from "../../apis/department/department.ts"
+import { pageQuery, update } from "../../apis/drug/drug"
+import { pageQuery as deptQuery } from "../../apis/department/department"
 // import { pageQuery as disQuery} from "../../apis/disease/disease.ts"
 import type { DrugPageResponse, DrugPageRequest } from "@/apis/drug/drug-interface.ts"
 import { BOTools, Drug } from "@/apis/class";
-import { type rowCRUD } from '../../scripts/tableOpt.ts'
+import { type rowCRUD } from '../../scripts/tableOpt'
 var currentPage = 1;
 var entryNum = ref(0);
 var back = ref(false);
@@ -183,7 +183,6 @@ const clearPara = ref(false);
 var isSelected: Ref<boolean[]> = ref<boolean[]>([]);
 var edited: Ref<Drug[]> = ref<Drug[]>([]);
 var queryData = ref<any[]>([]);
-var currentPage = 1;
 function pagination(val: number) {
   currentPage = val
   fetchDrugs(currentPage,defaultNum);
@@ -197,8 +196,8 @@ import { type DepartmentPageRequest } from '@/apis/department/department-interfa
 import { pageQuery as diseasePageQuery } from "@/apis/disease/disease";
 import { type DiseasePageRequest } from '@/apis/disease/disease-interface';
 const deptOptions: Ref<any[]> = ref<any[]>([])
-const deptMap = new Map();
-const diseaseMap = new Map();
+const deptMap:Ref<Map<any,any>> = ref<Map<any,any>>(new Map());
+const diseaseMap:Ref<Map<any,any>> = ref<Map<any,any>>(new Map());
 const input = ref('');
 const DrugId = ref('');
 const Type = ref('');
@@ -221,7 +220,7 @@ async function getDiseaseInfo() {
     if (diseaseResponse && diseaseResponse.data && diseaseResponse.data.datas) {
       console.log('Fetched diseases:', diseaseResponse.data.datas);
       for (var i = 0; i < diseaseResponse.data.datas.length; i++) {
-        diseaseMap.set(diseaseResponse.data.datas[i].diseaseId, diseaseResponse.data.datas[i].name);
+        diseaseMap.value.set(diseaseResponse.data.datas[i].diseaseId, diseaseResponse.data.datas[i].name);
       }
       console.log('diseaseMap', diseaseMap)
     } else {
@@ -245,7 +244,7 @@ async function getDeptInfo() {
           value: deptResponse.data.datas[i].departmentId,
           label: deptResponse.data.datas[i].name
         });
-        deptMap.set(deptResponse.data.datas[i].departmentId, deptResponse.data.datas[i].name);
+        deptMap.value.set(deptResponse.data.datas[i].departmentId, deptResponse.data.datas[i].name);
       }
       console.log('deptMap', deptMap)
     } else {

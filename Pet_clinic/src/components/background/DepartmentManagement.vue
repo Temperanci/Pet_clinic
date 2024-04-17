@@ -47,7 +47,7 @@
           @create-confirm="(index)=>{CRUDhandler.createRow(edited[index]);unwritableBar[0]=false;}"
           @search="(index)=>{CRUDhandler.clear(edited[index]);isSelected[index] = true;clearPara=false;searchBar[0]=true;}"
           @search-confirm="(index)=>{CRUDhandler.search(edited[index]);searchBar[0]=false;back=true;}"
-          @back="fetchDepartments();back=false;"
+          @back="backToHome();back=false;"
           />
       </el-table>
     </div>
@@ -60,16 +60,16 @@
 <script setup lang="ts">
 import { defineComponent } from "vue";
 import { ref } from 'vue'
-import { getPagination, LENGTH } from '../../scripts/paginate.ts'
+import { getPagination, LENGTH } from '../../scripts/paginate'
 import '@/assets/table.css'
 import tableOption from "../subComponents/tableOption.vue";
 import { isSelectGen, EditedGen,clearIsSelected } from "../subComponents/tableOption.vue";
 import { onMounted } from "vue";
 import type { Ref } from "vue";
-import { pageQuery ,update} from "../../apis/department/department.ts"
+import { pageQuery ,update} from "../../apis/department/department"
 import type { DepartmentPageRequest, DepartmentPageResponse,DepartmentUpdateRequest } from "@/apis/department/department-interface.ts"
 import { Department } from "@/apis/class";
-import { type rowCRUD } from '../../scripts/tableOpt.ts'
+import { type rowCRUD } from '../../scripts/tableOpt'
 const DepartmentPage = ref<DepartmentPageResponse>({ datas: [], total: 0, limit: 0 });
 var searchBar = ref([false]);
 var unwritableBar = ref([false]);
@@ -94,7 +94,7 @@ class departmentRowCRUD implements rowCRUD {
     delete:true}
     console.log('delete request',request);
     var response= update(request);
-    setTimeout(()=>{fetchDepartments();},500);
+    setTimeout(()=>{backToHome();},500);
     console.log('delete response',response); 
   }//删除
   editRow(Msg: Object[],index:number): void {
@@ -109,7 +109,7 @@ class departmentRowCRUD implements rowCRUD {
     delete:false}
     console.log('update request',request);
     var response= update(request);
-    setTimeout(()=>{fetchDepartments();},500);
+    setTimeout(()=>{backToHome();},500);
     console.log('update response',response);
   }//修改
   clear(edited:Department){
@@ -130,7 +130,7 @@ class departmentRowCRUD implements rowCRUD {
     delete:false}
     console.log('create request',request);
     var response= update(request);
-    setTimeout(()=>{fetchDepartments();},500);
+    setTimeout(()=>{backToHome();},500);
     console.log('create response',response); 
   }//创建
   search(msg:Object):void{
@@ -182,9 +182,10 @@ async function fetchDepartments(pageNum?:number,pageLimit?:number,msg?:Object,se
   }
 }
 onMounted(() => {
-  fetchDepartments();
+  backToHome();
 });
-//request
+//paginate
+const defaultNum = 10;
 var entryNum = ref(0);
 var tabLength = ref(0);//每页展示的条目数
 const clearPara = ref(false);//让子组件复位
@@ -195,12 +196,15 @@ var queryData = ref<any[]>([]);
 var currentPage = 1;
 function pagination(val: number) {
   currentPage = val
-  fetchDepartments(currentPage);
+  backToHome();
   //恢复初始值
   isSelected=clearIsSelected(isSelected);
   clearPara.value = true;
   searchBar.value[0]=false;
   unwritableBar.value[0]=false;
+}
+function backToHome(){
+  fetchDepartments(currentPage,defaultNum);
 }
 //分页
 const component = defineComponent({
