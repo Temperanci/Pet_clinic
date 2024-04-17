@@ -106,7 +106,7 @@ import DepartmentDetails from './subpage/DepartmentDetails.vue'
 import DrugResource from './subpage/DrugResource.vue'
 import BedInquiry from './subpage/BedInquiry.vue'
 import FunctionalStudy from './subpage/FunctionalStudy.vue'
-import {accout} from  '../scripts/data.ts'
+import {accout} from  '../scripts/data'
 
 defineComponent({
   name: "PetClinicLayout"

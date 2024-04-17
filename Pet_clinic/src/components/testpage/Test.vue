@@ -40,6 +40,7 @@
                 </div>
 
                 <div class="problem-table">
+                    // eslint-disable-next-line vue/require-v-for-key
                     <div class="problem-number" v-for="(pro, index) in problemList">
                         <el-button style="width: 45px" @click="jumpProblem(index)" :style="{
                         background: index === selectedIndex ? 'aqua' : (answer[index] !== undefined && answer[index] !== '' ? 'aquamarine' : '')
@@ -140,6 +141,7 @@ async function fetchProblems() {
         console.error('Error fetching problems:', error);
     }
 }
+
 onMounted(async () => {
     await fetchProblems();
 })

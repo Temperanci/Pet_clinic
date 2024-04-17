@@ -91,16 +91,16 @@
 <script setup lang="ts">
 import { defineComponent } from "vue";
 import { ref } from 'vue'
-import { getPagination } from '../../scripts/paginate.ts'
+import { getPagination } from '../../scripts/paginate'
 import '@/assets/table.css'
 //request
 import { isSelectGen, EditedGen, clearIsSelected } from "../subComponents/tableOption.vue";
 import { onMounted } from "vue";
 import type { Ref } from "vue";
-import { pageQuery } from "../../apis/price/price.ts"
+import { pageQuery } from "../../apis/price/price"
 import type { PricePageResponse, PricePageRequest } from "@/apis/price/price-interface.ts"
 import { Price } from "@/apis/class";
-import { type rowCRUD } from '../../scripts/tableOpt.ts'
+import { type rowCRUD } from '../../scripts/tableOpt'
 
 
 const PricePage = ref<PricePageResponse>({ datas: [], total: 0, limit: 0 });
