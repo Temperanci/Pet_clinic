@@ -11,6 +11,7 @@ export default {
 }
 </script>
 <script setup lang="ts">
+
  const status = ref(1)
 </script>
 <template>

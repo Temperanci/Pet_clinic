@@ -79,17 +79,17 @@
 import { defineComponent } from "vue";
 //分页
 import { ref } from 'vue'
-import { getPagination, LENGTH } from '../../scripts/paginate.ts'
+import { getPagination, LENGTH } from '../../scripts/paginate'
 import '@/assets/table.css'
 //request
 import tableOption from "../subComponents/tableOption.vue";
 import { isSelectGen, EditedGen, clearIsSelected } from "../subComponents/tableOption.vue";
 import { onMounted } from "vue";
 import type { Ref } from "vue";
-import { pageQuery, update } from "../../apis/problem/problem.ts"
+import { pageQuery, update } from "../../apis/problem/problem"
 import type { ProblemPageRequest, ProblemPageResponse, ProblemUpdateRequest } from "@/apis/problem/problem-interface.ts"
 import { Problem } from "@/apis/class";
-import { type rowCRUD } from '../../scripts/tableOpt.ts'
+import { type rowCRUD } from '../../scripts/tableOpt'
 const ProblemPage = ref<ProblemPageResponse>({ datas: [], total: 0, limit: 0 });
 var searchBar = ref([false]);
 var unwritableBar = ref([false]);

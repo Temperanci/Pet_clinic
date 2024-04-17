@@ -1,31 +1,31 @@
 import type { StringLiteralType } from 'typescript';
-import * as schemas from './schemas.ts';
+import * as schemas from './schemas';
 import { ku } from 'element-plus/es/locales.mjs';
 export class BOTools{
     listToString(list:string[]){
-        var str = '';
+        let str = '';
         if(list===null||list.length<=0) return str;
         str=list[0];
-        for(var i=1;i<list.length;i++){
+        for(let i=1;i<list.length;i++){
             str=str+','+list[i];
         }
         return str;
     }
     stringToList(str:string){
-        var list:string[] = [];
+        let list:string[] = [];
         if(str===''||str===null) return list;
         return list=str.split(',');
     }
     formalDate(date:Date){
-        var str = '';
+        let str = '';
         str=date.getFullYear+'-'+date.getMonth+'-'+date.getDate+','+date.getHours+':'+date.getMinutes+':'+date.getSeconds;   
         console.log('date is',str);
         return str;
     }
     batchMap(map:Map<any,any>,list:any[]){
         if(map===null||list===null||list.length<=0) return [];
-        var res:string[]=[];
-        for(var i =0;i<list.length;i++){
+        let res:string[]=[];
+        for(let i =0;i<list.length;i++){
             res.push(map.get(list[i]));
         }
         // console.log('batchMap',res);
@@ -169,7 +169,7 @@ export class ProblemSet implements schemas.ProblemSetBO{
     problemScoreMap: Record<string, number>;
     constructor(){
         this.problemSetId='';
-        this.des='';
+        this.desc='';
         this.title='';
         this.endTime=new Date();
         this.duration=0;

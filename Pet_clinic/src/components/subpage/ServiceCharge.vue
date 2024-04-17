@@ -91,16 +91,16 @@
 <script setup lang="ts">
 import { defineComponent } from "vue";
 import { ref } from 'vue'
-import { getPagination } from '../../scripts/paginate.ts'
+import { getPagination } from '../../scripts/paginate'
 import '@/assets/table.css'
 //request
 import { isSelectGen, EditedGen, clearIsSelected } from "../subComponents/tableOption.vue";
 import { onMounted } from "vue";
 import type { Ref } from "vue";
-import { pageQuery } from "../../apis/price/price.ts"
-import type { PricePageResponse, PricePageRequest } from "@/apis/price/price-interface.ts"
+import { pageQuery } from "../../apis/price/price"
+import type { PricePageResponse, PricePageRequest } from "@/apis/price/price-interface"
 import { Price } from "@/apis/class";
-import { type rowCRUD } from '../../scripts/tableOpt.ts'
+import { type rowCRUD } from '../../scripts/tableOpt'
 
 
 const PricePage = ref<PricePageResponse>({ datas: [], total: 0, limit: 0 });
@@ -182,7 +182,6 @@ function pagination(val: number) {
 //filter && view
 import { pageQuery as deptPageQuery } from "@/apis/department/department";
 import { type DepartmentPageRequest } from '@/apis/department/department-interface';
-var currentPage = 1;
 var entryNum = ref(0);
 var back = ref(false);
 const ServiceId = ref('');
@@ -199,8 +198,8 @@ function clearFilter() {
   PriceId.value = '';
 }
 const deptOptions: Ref<any[]> = ref<any[]>([])
-const deptMap = new Map();
-const priceMap = new Map();
+const deptMap:Ref<Map<any,any>> = ref<Map<any,any>>(new Map());
+const priceMap:Ref<Map<any,any>> =ref<Map<any,any>>( new Map());
 async function getPriceInfo(){
   var request: PricePageRequest = {
     limit: 999
@@ -210,7 +209,7 @@ async function getPriceInfo(){
     if (priceResponse && priceResponse.data && priceResponse.data.datas) {
       console.log('Fetched price:', priceResponse.data.datas);
       for (var i = 0; i < priceResponse.data.datas.length; i++) {
-        priceMap.set(priceResponse.data.datas[i].priceId, priceResponse.data.datas[i].price);
+        priceMap.value.set(priceResponse.data.datas[i].priceId, priceResponse.data.datas[i].price);
       }
       console.log('priceMap', priceMap)
     } else {
@@ -234,7 +233,7 @@ async function getDeptInfo() {
           value: deptResponse.data.datas[i].departmentId,
           label: deptResponse.data.datas[i].name
         });
-        deptMap.set(deptResponse.data.datas[i].departmentId, deptResponse.data.datas[i].name);
+        deptMap.value.set(deptResponse.data.datas[i].departmentId, deptResponse.data.datas[i].name);
       }
       console.log('deptMap', deptMap)
     } else {

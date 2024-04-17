@@ -79,19 +79,19 @@
 // TODO:正确展示list字段
 import { defineComponent } from "vue";
 import { ref } from 'vue'
-import { getPagination,} from '../../scripts/paginate.ts'
+import { getPagination,} from '../../scripts/paginate'
 import '@/assets/table.css'
 //request
 import tableOption from "../subComponents/tableOption.vue";
 import { isSelectGen, EditedGen,clearIsSelected } from "../subComponents/tableOption.vue";
 import { onMounted } from "vue";
 import type { Ref } from "vue";
-import { pageQuery ,update} from "../../apis/diseaseInstance/diseaseInstance.ts"
-import {pageQuery as DiseasePageQuery} from "../../apis/disease/disease.ts"
+import { pageQuery ,update} from "../../apis/diseaseInstance/diseaseInstance"
+import {pageQuery as DiseasePageQuery} from "../../apis/disease/disease"
 import type { DiseaseInstancePageRequest, DiseaseInstancePageResponse,DiseaseInstanceUpdateRequest } from "@/apis/diseaseInstance/diseaseInstance-interface.ts"
 import {type DiseasePageResponse} from '@/apis/disease/disease-interface'
 import { DiseaseInstance,BOTools } from "@/apis/class";
-import { type rowCRUD } from '../../scripts/tableOpt.ts'
+import { type rowCRUD } from '../../scripts/tableOpt'
 const DiseaseInstancePage = ref<DiseaseInstancePageResponse>({ datas: [], total: 0, limit: 0 });
 var searchBar = ref([false]);
 var unwritableBar = ref([false]);
