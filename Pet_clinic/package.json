@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "run-p type-check \"build-only {@}\" --",
+    "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
@@ -19,6 +19,7 @@
     "element-plus": "^2.6.0",
     "marker": "^0.1.2",
     "photo-sphere-viewer": "^4.8.1",
+    "vite-plugin-checker": "^0.6.4",
     "vue": "^3.4.15",
     "vue-leaflet": "^0.1.0",
     "vue-router": "^4.2.5"

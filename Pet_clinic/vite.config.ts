@@ -7,6 +7,7 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import requireTransform from 'vite-plugin-require-transform';
+import Checker from 'vite-plugin-checker';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -21,7 +22,10 @@ export default defineConfig({
     }),
     requireTransform({
       fileRegex: /.js$|.vue$/
-    })
+    }),
+    Checker({
+      typescript: true
+    }),
   ],
   resolve: {
     alias: {
