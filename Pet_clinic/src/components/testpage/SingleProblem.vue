@@ -80,8 +80,10 @@
 import { defineComponent } from "vue";
 import { ref, onMounted } from 'vue'
 import { pageQuery as problemQuery } from '@/apis/problem/problem';
+import { pageQuery as diseaseQuery } from '@/apis/disease/disease';
 import type { ProblemPageRequest, ProblemPageResponse, ProblemUpdateRequest } from '@/apis/problem/problem-interface';
-import type { ProblemBO } from '@/apis/schemas';
+import type { DiseasePageRequest, DiseasePageResponse, DiseaseUpdateRequest } from '@/apis/disease/disease-interface';
+import type { ProblemBO, DiseaseBO } from '@/apis/schemas';
 
 
 defineComponent({
@@ -107,6 +109,43 @@ const selectedProblem = ref<ProblemBO>({});
 
 const problemList = ref<ProblemBO[]>([]);
 async function fetchProblems() {
+    try {
+        const request: ProblemPageRequest = { currPageNo: 1 };
+        const response = await problemQuery(request);
+        const pages = Math.ceil(response.data.total / response.data.limit); //总页数
+        console.log("total=", response.data.total, " limit=", response.data.limit);
+        for (var i = 1; i <= pages; i++) {
+            request.currPageNo = i;
+            const response = await problemQuery(request);
+            if (response && response.data && response.data.datas) {
+                for (var j in response.data.datas) { //单选题内容换行
+                    response.data.datas[j].content = (response.data.datas[j].content ?? '').replace(/(A\.|B\.|C\.|D\.)/g, '\n$1');
+                }
+                problemList.value = problemList.value.concat(response.data.datas);
+                // selectedProblem.value = problemList.value[selectedIndex.value];
+            } else {
+                console.error('No data returned from the API');
+            }
+        }
+        setTimeout(() => {
+            resultList.value = JSON.parse(JSON.stringify(problemList.value));
+            for (var pro of resultList.value) {
+                if (pro.type === 'subjective') {
+                    pro.typeName = '简答题';
+                } else if (pro.type === 'objective') {
+                    pro.typeName = '单选题';
+                }
+                
+            }
+            selectedProblem.value = resultList.value[0];
+            selectedIndex.value = 0;
+        }, 100);
+        console.log("获取problemList:", problemList.value);
+    } catch (error) {
+        console.error('Error fetching problems:', error);
+    }
+}
+async function fetchDiseases() {
     try {
         const request: ProblemPageRequest = { currPageNo: 1 };
         const response = await problemQuery(request);

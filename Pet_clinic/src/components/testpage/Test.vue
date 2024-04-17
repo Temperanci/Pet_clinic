@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/require-v-for-key -->
 <template>
     <div class="onlineTestLayout">
         <el-container>
@@ -40,7 +41,6 @@
                 </div>
 
                 <div class="problem-table">
-                    // eslint-disable-next-line vue/require-v-for-key
                     <div class="problem-number" v-for="(pro, index) in problemList">
                         <el-button style="width: 45px" @click="jumpProblem(index)" :style="{
                         background: index === selectedIndex ? 'aqua' : (answer[index] !== undefined && answer[index] !== '' ? 'aquamarine' : '')
