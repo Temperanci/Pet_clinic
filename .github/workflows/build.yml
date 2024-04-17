@@ -27,5 +27,5 @@ jobs:
           secret_key: ${{ secrets.SECRET_KEY }}
           cos_bucket: ecnu-1308722423
           cos_region: ap-shanghai
-          local_path: dist
+          local_path: Pet_clinic/dist
           clean: true
