@@ -14,32 +14,38 @@ interface Result<T> {
 // Base URL for your API
 const API_BASE_URL = '/api';
 
-const problemSet = {
-    // desc: '',
-    // title: '',
-    // endTime: '',
-    // duration: '',
-    // startTime: '',
-    // whiteList: '',
-    // problemSetId: '',
-    // problemIdList: '',
-    // problemScoreMap: '',
+const temp = {
     currPageNo: 1
 }
 
-export async function pageQuery(pageNo:number){
+export async function pageNoQuery(pageNo:number){ //前端分页用的
     try {
-        problemSet.currPageNo=pageNo;
+        temp.currPageNo=pageNo;
         const response = await axios.post(`${API_BASE_URL}/problemSet/pageQuery`, problemSet);
         return response.data;
     } catch (error) {
-        console.error('Error occurred during the page query:', error);
+        console.error('Error occurred during the pageSet query:', error);
         throw error; 
     }
 }
 
+const problemSet = {}
+export async function pageQuery(request?:ProblemSetPageRequest){
+    try {
+        const response = await axios.post(`${API_BASE_URL}/problemSet/pageQuery`, request||problemSet);
+        return response.data;
+    } catch (error) {
+        console.error('page query problemSet error', error);
+        throw error;
+    }
+}
 
-export const update = async (request: ProblemSetUpdateRequest): Promise<Result<ProblemSetBO>> => {
-    const response = await axios.post<Result<ProblemSetBO>>(`${API_BASE_URL}/problemSet/update`, request);
-    return response.data; 
+export async function update(request: ProblemSetUpdateRequest) : Promise<Result<ProblemSetBO>> {
+    try {
+        const response = await axios.post<Result<ProblemSetBO>>(`${API_BASE_URL}/problemSet/update`, request);
+        return response.data;
+    } catch (error) {
+        console.error('update problemSet error', error);
+        throw error;
+    }
 };
