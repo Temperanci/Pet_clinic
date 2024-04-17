@@ -2,9 +2,9 @@
 <p>
   {{ component.name }}
 </p>
-<el-table class="table" :data="tableData" style="width: 100%">
+<!-- <el-table class="table" :data="tableData" style="width: 100%">
         <el-table-column v-for="column in columnMap" :prop="column[0]" :label="column[1]" />
-  </el-table>
+  </el-table> -->
 </template>
 
 <script setup lang="ts">

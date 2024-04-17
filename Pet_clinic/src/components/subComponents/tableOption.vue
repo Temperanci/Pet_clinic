@@ -2,7 +2,7 @@
     <el-table-column fixed="right" label="Operations" width="120">
         <template #header>
             <el-button link type="primary" size="small" @click="create">创建</el-button>
-            <el-button v-if="searchPage" link type="primary" size="small" @click="back">返回</el-button>
+            <el-button v-if="searchPage" link type="primary" size="small" @click="Back">返回</el-button>
             <el-button v-else link type="primary" size="small" @click="search">搜索</el-button>
         </template>
         <template #default="scope">
@@ -88,7 +88,7 @@ function search(){
     emit('search',0);
 }
 var searchPage=ref(false);
-function back(){
+function Back(){
     searchPage.value=false;
     emit('back');
 }
@@ -128,7 +128,7 @@ export function isSelectGen(num: number): Ref<boolean[]> {
     console.log(temp);
     return temp;
 }
-export function clearIsSelected(isSelected: Ref<boolean[]>) {
+export function clearIsSelected(isSelected: Ref<boolean[]>) :Ref<boolean[]>{
     for (var i = 0; i < isSelected.value.length; i++) {
         isSelected.value[i] = false;
     }

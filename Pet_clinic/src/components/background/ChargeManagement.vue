@@ -83,17 +83,17 @@
 import { defineComponent } from "vue";
 //分页
 import { ref } from 'vue'
-import { getPagination, LENGTH } from '../../scripts/paginate.ts'
+import { getPagination, LENGTH } from '../../scripts/paginate'
 import '@/assets/table.css'
 //request
 import tableOption from "../subComponents/tableOption.vue";
 import { isSelectGen, EditedGen,clearIsSelected } from "../subComponents/tableOption.vue";
 import { onMounted } from "vue";
 import type { Ref } from "vue";
-import { pageQuery ,update} from "../../apis/price/price.ts"
+import { pageQuery ,update} from "../../apis/price/price"
 import type { PricePageRequest, PricePageResponse,PriceUpdateRequest } from "@/apis/price/price-interface.ts"
 import { Price } from "@/apis/class";
-import { type rowCRUD } from '../../scripts/tableOpt.ts'
+import { type rowCRUD } from '../../scripts/tableOpt'
 const PricePage = ref<PricePageResponse>({ datas: [], total: 0, limit: 0 });
 var searchBar = ref([false]);
 var unwritableBar = ref([false]);
