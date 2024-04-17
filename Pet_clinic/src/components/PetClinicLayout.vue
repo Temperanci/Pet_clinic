@@ -8,7 +8,7 @@
         <div class="card-container">
           <div class="card-left">
             <el-avatar :size="40" />
-            <el-text>{{store.state.token.id}}</el-text>
+            <el-text>{{userName}}</el-text>
           </div>
           <div class="card-right">
             <div style="width: 100%;margin:auto;">
@@ -111,6 +111,8 @@ import {store} from '@/main'
 import { onMounted } from 'vue';
 import {StorageToken} from '../scripts/storage'
 import { Personnel } from '@/apis/class';
+import type { PersonnelPageRequest, PersonnelPageResponse,PersonnelUpdateRequest } from "@/apis/personnel/personnel-interface"
+import { pageQuery as personnelPageQuery } from "@/apis/personnel/personnel"
 defineComponent({
   name: "PetClinicLayout"
 })
@@ -148,15 +150,19 @@ const userPwdLogin = ref('')
 const userPwdRegister = ref('')
 const userPwdConfirm = ref('')
 
-function Login(){
-  if(userName.value===accout.account && userPwdLogin.value===accout.psw){
+async function Login(){
+  await LoginRequest(userName.value,userPwdLogin.value);
+  if(PersonnelPage.value.datas.length>0){
     ifLogined.value = true;
-    userStatus.value = accout.status;
+    userStatus.value = 1;//路人
+    if(PersonnelPage.value.datas[0].role==="管理员"){
+      userStatus.value = 0;
+    }
     let token = new Personnel();
     token.name = userName.value;
     token.password = userPwdLogin.value;
     store.commit('setToken',token)
-    console.log('Login.userName',store.state.token.id)
+    console.log('Login.userName',store.state.token.name)
   }
 }
 function Register(){
@@ -174,10 +180,33 @@ function refreshLogin(){
     store.commit('setToken',StorageToken.get('token'));
     ifLogined.value = true;
     userStatus.value = accout.status;
-    console.log('refreshLogin1',store.token);
+    userName.value = store.state.token.name;
+    console.log('refreshLogin.store.state.token',store.state.token);
   }
-  console.log('refreshLogin2',StorageToken.get('token'))
+  console.log('refreshLogin.StrorageToken',StorageToken.get('token'))
 }
+const PersonnelPage = ref<PersonnelPageResponse>({ datas: [], total: 0, limit: 0 });
+async function LoginRequest(name:string,pwd:string){
+  let request:PersonnelPageRequest={
+    name:name,
+    password:pwd
+  }
+  console.log('LoginRequest.request',request);
+  try {
+    const response:any = await personnelPageQuery(request||undefined);
+    if (response && response.data && response.data.datas) {
+      PersonnelPage.value = response.data; // 假设响应中有data属性，且包含datas数组
+      console.log('Fetched personnels:', PersonnelPage.value.datas);
+      // selectPage(currentPage - 1, tableData, queryData);
+    } else {
+      console.error('No data returned from the API');
+    }
+  } catch (error) {
+    console.error('Error fetching personnels:', error);
+  }
+  console.log('LoginRequest.PersonnelPage');
+}
+
 onMounted(() => {
   console.log('onMounted','success');
   refreshLogin();
