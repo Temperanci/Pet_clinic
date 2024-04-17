@@ -135,7 +135,7 @@ async function fetchProblems() {
             problemList.value.push(temp);
         })
         console.log("获取problemList:", problemList.value);
-        setTimeout(() => { jumpProblem(selectedIndex.value); }, 100);
+        setTimeout(() => { jumpProblem(selectedIndex.value); }, 50);
 
     } catch (error) {
         console.error('Error fetching problems:', error);
