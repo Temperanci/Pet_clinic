@@ -22,7 +22,7 @@
       :disabled="item.disabled"
     />
   </el-select>
-            <span v-else>{{ diseaseOptions.filter((t)=>{if(t.value===scope.row.diseaseId) return t})[0].label }}</span>
+            <span v-else>{{ diseaseMap.get(scope.row.diseaseId) }}</span>
             <!-- 通过病种id显示病种 -->
           </template>
         </el-table-column>
@@ -247,13 +247,13 @@ async function getDiseaseInfo() {
   try {
     var deptResponse = await diseasePageQuery(request);
     if (deptResponse && deptResponse.data && deptResponse.data.datas) {
-      console.log('Fetched departments:', deptResponse.data.datas);
+      console.log('Fetched diseases:', deptResponse.data.datas);
       for (var i = 0; i < deptResponse.data.datas.length; i++) {
         diseaseOptions.value.push({
           value: deptResponse.data.datas[i].diseaseId,
           label: deptResponse.data.datas[i].name
         });
-        diseaseMap.value.set(deptResponse.data.datas[i].departmentId, deptResponse.data.datas[i].name);
+        diseaseMap.value.set(deptResponse.data.datas[i].diseaseId, deptResponse.data.datas[i].name);
       }
       console.log('deptMap', diseaseMap)
     } else {
@@ -261,7 +261,7 @@ async function getDiseaseInfo() {
     }
 
   } catch (error) {
-    console.error('Error fetching departments:', error);
+    console.error('Error fetching diseases:', error);
   }
 }
 //分页
