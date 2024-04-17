@@ -9,15 +9,17 @@ export class Table {
 }
 export function selectPage(page: number, table: Table, data: Ref<any[]>,length?:number) {
     table.tab = [];
-    var len=0;
+    let len=0;
     if(length){len=length;}
     else{len=LENGTH}
     if (page * len + len <= data.value.length) {
+        // eslint-disable-next-line no-var
         for (var i = page * len; i < (page * len + len); i++) {
             table.tab.push(data.value[i]);
         }
     }
     else{
+        // eslint-disable-next-line no-var
         for (var i = page * len; i < (data.value.length); i++) {
             table.tab.push(data.value[i]);
         }
@@ -25,7 +27,7 @@ export function selectPage(page: number, table: Table, data: Ref<any[]>,length?:
 
 }
 export function updateTab(currentPage: number, table: Table, data: Ref<any[]>, ctx: any,length?:number) {
-    var len=0;
+    let len=0;
     if(length){len=length;}
     else{len=LENGTH}
     selectPage(currentPage - 1, table, data,len)

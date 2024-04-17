@@ -21,7 +21,7 @@
         <el-footer>
             <div class="problemset-pagination">
                 <el-pagination background @current-change="handleCurrentChange" @size-change="handleSizeChange"
-                    :current-page="current" :page-size="size" :total=49 layout="prev, pager, next, jumper" />
+                    :current-page="current" :page-size="size" :total=problemSetList.length layout="prev, pager, next, jumper" />
             </div>
         </el-footer>
     </el-container>

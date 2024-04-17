@@ -25,13 +25,13 @@
             <span v-else>{{ scope.row.type }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="location" label="题目内容">
+        <el-table-column prop="location" label="题目内容" >
           <template #default="scope">
             <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].content"></el-input>
             <span v-else>{{ scope.row.content }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="location" label="答案">
+        <el-table-column prop="location" label="答案" width="200px">
           <template #default="scope">
             <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].answer"></el-input>
             <span v-else>{{ scope.row.answer }}</span>
@@ -87,7 +87,7 @@ import { isSelectGen, EditedGen, clearIsSelected } from "../subComponents/tableO
 import { onMounted } from "vue";
 import type { Ref } from "vue";
 import { pageQuery, update } from "../../apis/problem/problem"
-import type { ProblemPageRequest, ProblemPageResponse, ProblemUpdateRequest } from "@/apis/problem/problem-interface.ts"
+import type { ProblemPageRequest, ProblemPageResponse, ProblemUpdateRequest } from "@/apis/problem/problem-interface"
 import { Problem } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt'
 const ProblemPage = ref<ProblemPageResponse>({ datas: [], total: 0, limit: 0 });
@@ -214,6 +214,7 @@ async function fetchProblems(pageNum?: number, pageLimit?: number, msg?: Object,
       }
       else { tabLength.value = ProblemPage.value.limit; }//保证搜索只有一页
       entryNum.value = ProblemPage.value.total;
+      // eslint-disable-next-line vue/no-ref-as-operand
       isSelected = isSelectGen(tabLength.value);
       edited.value = EditedGen(tabLength.value, new Problem()) as Problem[];
       // selectPage(currentPage - 1, tableData, queryData);
@@ -241,6 +242,7 @@ function pagination(val: number) {
   currentPage = val
   fetchProblems(currentPage);
   //恢复初始值
+  // eslint-disable-next-line vue/no-ref-as-operand
   isSelected = clearIsSelected(isSelected);
   clearPara.value = true;
   searchBar.value[0] = false;

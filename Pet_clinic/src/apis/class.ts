@@ -24,7 +24,7 @@ export class BOTools{
     }
     batchMap(map:Map<any,any>,list:any[]){
         if(map===null||list===null||list.length<=0) return [];
-        let res:string[]=[];
+        const res:string[]=[];
         for(let i =0;i<list.length;i++){
             res.push(map.get(list[i]));
         }
@@ -159,7 +159,7 @@ export class Problem implements schemas.ProblemBO{
 
 export class ProblemSet implements schemas.ProblemSetBO{
     problemSetId: string;
-    desc: string;
+    desc: string | undefined;
     title: string;
     endTime: Date;
     duration: number;

@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/require-v-for-key -->
 <template>
     <div class="onlineTestLayout">
         <el-container>
@@ -28,14 +29,13 @@
                     <div class="test-button">
                         <el-button @click="priorProblem()">上一题</el-button>
                         <el-button @click="nextProblem()">下一题</el-button>
-                        <!-- <el-button @click="submitDialog = true">提交</el-button> -->
                     </div>
                 </el-footer>
             </el-container>
             <el-aside>
 
                 <div class="countdown">
-                    剩余时间:
+                    剩余时间：
                     {{ Math.floor(clock / 3600000) }}h {{ Math.floor((clock % 3600000) / 60000) }}min {{
                         Math.floor((clock % 60000) / 1000) }}s
                 </div>
@@ -121,7 +121,7 @@ async function fetchProblems() {
         const idList = problemSetResponse.data.datas[0].problemIdList;
         const scoreList = problemSetResponse.data.datas[0].problemScoreMap;
         clock.value = problemSetResponse.data.datas[0].duration;
-        clock.value = 2000;
+        // clock.value = 2000;
         console.log('获取测试:', problemSetResponse.data.datas[0]);
         idList.forEach(async (id: string) => {
             const problemRequest: ProblemPageRequest = { problemId: id };
@@ -141,29 +141,7 @@ async function fetchProblems() {
         console.error('Error fetching problems:', error);
     }
 }
-// async function fetchProblems() {
-//     try {
-//         const response = await problemQuery(1);
-//         const pages = Math.ceil(response.data.total / response.data.limit); //总页数
-//         console.log("total=", response.data.total, " limit=", response.data.limit);
-//         for (var i = 1; i <= pages; i++) {
-//             const response = await problemQuery(i);
-//             if (response && response.data && response.data.datas) {
-//                 ProblemPage.value = response.data;
-//                 for (var j in ProblemPage.value.datas) { //单选题内容换行
-//                     ProblemPage.value.datas[j].content = (ProblemPage.value.datas[j].content ?? '').replace(/(A\.|B\.|C\.|D\.)/g, '\n$1');
-//                 }
-//                 problemList.value = problemList.value.concat(ProblemPage.value.datas);
-//                 selectedProblem.value = problemList.value[selectedIndex.value];
-//             } else {
-//                 console.error('No data returned from the API');
-//             }
-//         }
-//         console.log("获取problemList:", problemList.value);
-//     } catch (error) {
-//         console.error('Error fetching problems:', error);
-//     }
-// }
+
 onMounted(async () => {
     await fetchProblems();
 })
@@ -242,8 +220,8 @@ function submit() {
         testRecord: testRecord,
         submitted: false
     };
-    // var temp = update(submitContent);
-    // console.log("提交测试记录:", temp);
+    var temp = update(submitContent);
+    console.log("提交测试记录:", temp);
     emit('content', 'ProblemSet'); //返回试卷列表
 }
 var submitDialog = ref(false)
@@ -274,5 +252,8 @@ var submitDialog = ref(false)
 .test-button {
     display: flex;
     justify-content: center;
+}
+.countdown{
+    color: crimson;
 }
 </style>

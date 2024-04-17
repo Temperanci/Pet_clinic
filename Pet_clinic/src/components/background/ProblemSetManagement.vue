@@ -20,48 +20,6 @@
                         <span v-else>{{ scope.row.title }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="location" label="题目类型">
-                    <template #default="scope">
-                        <el-input v-if="isSelected[scope.$index] === true"
-                            v-model="edited[scope.$index].type"></el-input>
-                        <span v-else>{{ scope.row.type }}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="location" label="题目内容">
-                    <template #default="scope">
-                        <el-input v-if="isSelected[scope.$index] === true"
-                            v-model="edited[scope.$index].content"></el-input>
-                        <span v-else>{{ scope.row.content }}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="location" label="答案">
-                    <template #default="scope">
-                        <el-input v-if="isSelected[scope.$index] === true"
-                            v-model="edited[scope.$index].answer"></el-input>
-                        <span v-else>{{ scope.row.answer }}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="location" label="得分点">
-                    <template #default="scope">
-                        <el-input v-if="isSelected[scope.$index] === true"
-                            v-model="edited[scope.$index].gradingPoints"></el-input>
-                        <span v-else>{{ scope.row.gradingPoints }}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="location" label="病种知识点">
-                    <template #default="scope">
-                        <el-input v-if="isSelected[scope.$index] === true"
-                            v-model="edited[scope.$index].subjectId"></el-input>
-                        <span v-else>{{ scope.row.subjectId }}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="location" label="出题背景">
-                    <template #default="scope">
-                        <el-input v-if="isSelected[scope.$index] === true"
-                            v-model="edited[scope.$index].background"></el-input>
-                        <span v-else>{{ scope.row.background }}</span>
-                    </template>
-                </el-table-column>
                 <tableOption :clear=clearPara :num=tabLength :back=back
                     @edit-confirm="(index) => { CRUDhandler.editRow(edited, index); }"
                     @edit="(index) => { CRUDhandler.updateMsg(edited, queryData, index); isSelected[index] = !isSelected[index]; clearPara = false; }"
@@ -94,7 +52,7 @@ import { isSelectGen, EditedGen, clearIsSelected } from "../subComponents/tableO
 import { onMounted } from "vue";
 import type { Ref } from "vue";
 import { pageQuery, update } from "../../apis/problemSet/problemSet"
-import type { ProblemSetPageRequest, ProblemSetPageResponse, ProblemSetUpdateRequest } from "@/apis/problemSet/problemSet-interface.ts"
+import type { ProblemSetPageRequest, ProblemSetPageResponse, ProblemSetUpdateRequest } from "@/apis/problemSet/problemSet-interface"
 import { ProblemSet } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt'
 const ProblemSetPage = ref<ProblemSetPageResponse>({ datas: [], total: 0, limit: 0 });
@@ -139,12 +97,7 @@ class problemSetRowCRUD implements rowCRUD {
             problemSet: {
                 problemSetId: (Msg[index] as ProblemSet).problemSetId,
                 title: (Msg[index] as ProblemSet).title,
-                type: (Msg[index] as ProblemSet).type,
-                content: (Msg[index] as ProblemSet).content,
-                answer: (Msg[index] as ProblemSet).answer,
-                gradingPoints: (Msg[index] as ProblemSet).gradingPoints,
-                subjectId: (Msg[index] as ProblemSet).subjectId,
-                background: (Msg[index] as ProblemSet).background
+
             },
             delete: false
         }
@@ -156,23 +109,13 @@ class problemSetRowCRUD implements rowCRUD {
     clear(edited: ProblemSet) {
         edited.problemSetId = '';
         edited.title = '';
-        edited.type = '';
-        edited.content = '';
-        edited.answer = '';
-        edited.gradingPoints = '';
-        edited.subjectId = '';
-        edited.background = '';
+
     }
     createRow(msg: Object): void {
         var request: ProblemSetUpdateRequest = {
             problemSet: {
                 title: (msg as ProblemSet).title,
-                type: (msg as ProblemSet).type,
-                content: (msg as ProblemSet).content,
-                answer: (msg as ProblemSet).answer,
-                gradingPoints: (msg as ProblemSet).gradingPoints,
-                subjectId: (msg as ProblemSet).subjectId,
-                background: (msg as ProblemSet).background
+
             },
             delete: false
         }
@@ -204,12 +147,7 @@ async function fetchProblemSets(pageNum?: number, pageLimit?: number, msg?: Obje
     var request: ProblemSetPageRequest = {
         problemSetId: ((temp as ProblemSet).problemSetId === '') ? undefined : (temp as ProblemSet).problemSetId,
         title: ((temp as ProblemSet).title === '') ? undefined : (temp as ProblemSet).title,
-        type: ((temp as ProblemSet).type === '') ? undefined : (temp as ProblemSet).type,
-        content: ((temp as ProblemSet).content === '') ? undefined : (temp as ProblemSet).content,
-        answer: ((temp as ProblemSet).answer === '') ? undefined : (temp as ProblemSet).answer,
-        gradingPoints: ((temp as ProblemSet).gradingPoints === '') ? undefined : (temp as ProblemSet).gradingPoints,
-        subjectId: ((temp as ProblemSet).subjectId === '') ? undefined : (temp as ProblemSet).subjectId,
-        background: ((temp as ProblemSet).background === '') ? undefined : (temp as ProblemSet).background,
+
         currPageNo: pageNum || 1,
         limit: pageLimit || 20
     }
@@ -224,6 +162,7 @@ async function fetchProblemSets(pageNum?: number, pageLimit?: number, msg?: Obje
             }
             else { tabLength.value = ProblemSetPage.value.limit; }//保证搜索只有一页
             entryNum.value = ProblemSetPage.value.total;
+            // eslint-disable-next-line vue/no-ref-as-operand
             isSelected = isSelectGen(tabLength.value);
             edited.value = EditedGen(tabLength.value, new ProblemSet()) as ProblemSet[];
             // selectPage(currentPage - 1, tableData, queryData);
@@ -251,6 +190,7 @@ function pagination(val: number) {
     currentPage = val
     fetchProblemSets(currentPage);
     //恢复初始值
+    // eslint-disable-next-line vue/no-ref-as-operand
     isSelected = clearIsSelected(isSelected);
     clearPara.value = true;
     searchBar.value[0] = false;

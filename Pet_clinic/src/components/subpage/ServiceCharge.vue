@@ -149,6 +149,7 @@ async function fetchPrice(pageNum?: number, pageLimit?: number, msg?: Object, se
       }
       else { tabLength.value = PricePage.value.limit; }//保证搜索只有一页
       entryNum.value = PricePage.value.total;
+      // eslint-disable-next-line vue/no-ref-as-operand
       isSelected = isSelectGen(tabLength.value);
       edited.value = EditedGen(tabLength.value, new Price()) as Price[];
       // selectPage(currentPage - 1, tableData, queryData);
@@ -176,6 +177,7 @@ var currentPage = 1;
 function pagination(val: number) {
   currentPage = val
   fetchPrice(currentPage,defaultNum);
+  // eslint-disable-next-line vue/no-ref-as-operand
   isSelected = clearIsSelected(isSelected);
   clearPara.value = true;
 }
