@@ -1,7 +1,7 @@
 <template>
   <div style="height: 100%;display: flex;flex-flow: column;">
     <div style="height: 90%;" class="table">
-      <el-table :data="queryData" height="100%">
+      <el-table :data="queryData" height="100%" empty-text="来到了没有数据的荒原...">
         <el-table-column prop="departmentId" label="科室编号">
           <template #default="scope">
             <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].departmentId"></el-input> -->
