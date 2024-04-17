@@ -14,7 +14,7 @@
             <div class="card-right">
               <el-button @click="Switch(1)">前台页面</el-button>
               <el-text>后台管理</el-text>
-              <el-divider />
+              <!-- <el-divider /> -->
               <!-- <el-text>注销</el-text> -->
             </div>
           </div>
@@ -196,6 +196,7 @@ const currentComponent = ref(componentsMap['1']);
 
     .card-container {
       display: flex;
+      flex-direction: row;
       justify-content: space-between;
       /* 根据需要选择 space-between 或其他 */
       align-items: center;
