@@ -8,14 +8,14 @@
         <el-card shadow="hover">
           <div class="card-container">
             <div class="card-left">
-              <el-avatar :size="40" />
+              <el-avatar :size="45" />
               <el-text>{{userName}}</el-text>
+
             </div>
             <div class="card-right">
               <el-button @click="Switch(1)">前台页面</el-button>
-              <el-text>后台管理</el-text>
-              <!-- <el-divider /> -->
-              <!-- <el-text>注销</el-text> -->
+               <el-divider />
+              <el-button>注销</el-button>
             </div>
           </div>
         </el-card>
@@ -50,7 +50,7 @@
 
         </div>
       </div>
-      <div style="align-items:center;display: flex;width:0%">
+      <div style="align-items:center;display: flex">
         <span class="asideBtn" @click="() => aside = !aside">
           <el-icon v-if="!aside">
             <ArrowRight />
@@ -190,44 +190,58 @@ onMounted(()=>{
   font-weight: bold;
   color: #be9367;
   align-items: center;
-
-  .h1 {
+  .h1{
     width: 90%;
     font-size: xx-large;
   }
-
   .el-card {
     width: 15vw;
     height: 10vh;
     background-color: #f6efef;
     margin-top: 2vh;
+  }
 
-    .card-container {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      /* 根据需要选择 space-between 或其他 */
-      align-items: center;
-      /* 垂直居中 */
-      margin-top: -1.5vh;
+  .card-container {
+    display: flex;
+    justify-content: space-between; /* 根据需要选择 space-between 或其他 */
+    align-items: center; /* 垂直居中 */
+    margin-top: -1.5vh;
+    height: 8vh;
+  }
 
-      .card-left {
-        display: flex;
-        justify-content: center;
-        padding: 1vw 1vw 1vw 0;
-        border-right: #DCDFE6 solid 2px;
+  .card-left {
+    display: flex;
+    //justify-content: space-between;
+    padding: 1vw 1vw 1vw 0;
+    border-right: #DCDFE6 solid 2px;
+    width: 40%;
+    height: 5vh;
+    .el-avatar {
+      margin-right: 0.5vw;
+      margin-left: -0.5vw;
+    }
+    .el-text {
+      font-size: medium;
+    }
+  }
 
-        .el-avatar {
-          margin-right: 0.5vw;
-          margin-left: -0.5vw;
-        }
-      }
+  .el-avatar {
+    margin-right: 0.5vw;
+    margin-left: -0.5vw;
+  }
 
-      .card-right {
-        display: flex;
-        flex-direction: column;
-        line-height: 0;
-      }
+  .card-right {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* 如果你想要垂直居中里面的元素 */
+    align-items: center; /* 水平居中 */
+    .el-divider {
+      margin: 0.5vh 0;
+    }
+    .el-button {
+      width: 5vw;
     }
   }
 }

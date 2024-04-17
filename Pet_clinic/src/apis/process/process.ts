@@ -9,7 +9,7 @@ export interface Result<T> {
     // 可能还有其他字段，如消息文本等
 }
 // API 基础路径，确保这是后端服务的正确地址
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'http://123.60.5.195:8084';
 const process = {}
 
 // 分页查询流程信息的函数

@@ -11,9 +11,9 @@ interface Result<T> {
 }
 
 // This is the base URL for your API
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'http://123.60.5.195:8084';
 const price = {
-    
+
 }
 // Function to query prices with pagination
 export async function pageQuery(request?:PricePageRequest){

@@ -12,9 +12,9 @@ export interface Result<T> {
 }
 
 // API 基础路径
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'http://123.60.5.195:8084';
 const personnel = {
-    
+
 }
 // 分页查询人事信息
 export async function pageQuery(request?:PersonnelPageRequest){

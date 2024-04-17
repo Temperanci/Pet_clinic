@@ -78,7 +78,7 @@
 import {onMounted, defineComponent, nextTick} from "vue";
 import { ref, watch } from 'vue';
 import 'element-plus/dist/index.css';
-import * as PSV from "photo-sphere-viewer";
+import * as PSV from "@photo-sphere-viewer/core";
 import "photo-sphere-viewer/dist/photo-sphere-viewer.css";
 import { ArrowDown } from '@element-plus/icons-vue'
 import { pageQuery } from "@/apis/department/department";

@@ -11,9 +11,9 @@ export interface Result<T> {
 }
 
 // 接口地址，根据你的实际后端地址来修改
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'http://123.60.5.195:8084';
 const bed = {
-       
+
 }
 export async function pageQuery(request?:BedPageRequest){
     try {

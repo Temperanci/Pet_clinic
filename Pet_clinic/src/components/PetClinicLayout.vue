@@ -7,18 +7,15 @@
       <el-card v-if="ifLogined" shadow="hover">
         <div class="card-container">
           <div class="card-left">
-            <el-avatar :size="40" />
+
+        <el-avatar :size="45" />
             <el-text>{{userName}}</el-text>
+
           </div>
           <div class="card-right">
-            <div style="width: 100%;margin:auto;">
-              <el-text  v-if="userStatus === 0" @click="Switch(0)">后台页面</el-text>
-            </div>
-            <!-- <el-divider /> -->
-            <div style="height: 50%;">
-              <el-text @click="Logout">注销</el-text>
-            </div>
-            
+              <el-button  v-if="userStatus === 0" @click="Switch(0)">后台页面</el-button>
+             <el-divider />
+              <el-button @click="Logout">注销</el-button>
           </div>
         </div>
       </el-card>
@@ -106,10 +103,10 @@ import DepartmentDetails from './subpage/DepartmentDetails.vue'
 import DrugResource from './subpage/DrugResource.vue'
 import BedInquiry from './subpage/BedInquiry.vue'
 import FunctionalStudy from './subpage/FunctionalStudy.vue'
-import {accout} from  '../scripts/data'
+import {accout} from '@/scripts/data'
 import {store} from '@/main'
 import { onMounted } from 'vue';
-import {StorageToken} from '../scripts/storage'
+import {StorageToken} from '@/scripts/storage'
 import { Personnel } from '@/apis/class';
 import type { PersonnelPageRequest, PersonnelPageResponse,PersonnelUpdateRequest } from "@/apis/personnel/personnel-interface"
 import { pageQuery as personnelPageQuery } from "@/apis/personnel/personnel"
@@ -165,9 +162,9 @@ async function Login(){
     console.log('Login.userName',store.state.token.name)
   }
 }
-function Register(){
-
-}
+// function Register(){
+//
+// }
 function Logout(){
   userName.value='';
   userPwdLogin.value='';
@@ -242,33 +239,54 @@ const markerClicked = (name: string) => {
     width: 90%;
     font-size: xx-large;
   }
-  .el-card{
+  .el-card {
     width: 15vw;
     height: 10vh;
     background-color: #f6efef;
     margin-top: 2vh;
-    .card-container {
-      display: flex;
-      justify-content: space-between; /* 根据需要选择 space-between 或其他 */
-      align-items: center; /* 垂直居中 */
-      margin-top: -1.5vh;
-      .card-left{
-        display: flex;
-        justify-content: center;
-        padding: 1vw 1vw 1vw 0 ;
-        border-right: #DCDFE6 solid 2px;
-        .el-avatar{
-          margin-right: 0.5vw;
-          margin-left: -0.5vw;
-        }
-        .card-right{
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-      }
-      }
-      
+  }
+
+  .card-container {
+    display: flex;
+    justify-content: space-between; /* 根据需要选择 space-between 或其他 */
+    align-items: center; /* 垂直居中 */
+    margin-top: -1.5vh;
+    height: 8vh;
+  }
+
+  .card-left {
+    display: flex;
+    //justify-content: space-between;
+    padding: 1vw 1vw 1vw 0;
+    border-right: #DCDFE6 solid 2px;
+    width: 40%;
+    height: 5vh;
+    .el-avatar {
+      margin-right: 0.5vw;
+      margin-left: -0.5vw;
+    }
+    .el-text {
+      font-size: medium;
+    }
+  }
+
+  .el-avatar {
+    margin-right: 0.5vw;
+    margin-left: -0.5vw;
+  }
+
+  .card-right {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* 如果你想要垂直居中里面的元素 */
+    align-items: center; /* 水平居中 */
+    .el-divider {
+      margin: 0.5vh 0;
+    }
+    .el-button {
+      width: 5vw;
     }
   }
 }
