@@ -11,7 +11,7 @@ interface Result<T> {
 }
 
 // Base URL for your API
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'http://123.60.5.195:8084';
 
 const temp = {
     currPageNo: 1
@@ -23,7 +23,7 @@ export async function pageNoQuery(pageNo:number){ //前端分页用的
         return response.data;
     } catch (error) {
         console.error('Error occurred during the page query:', error);
-        throw error; 
+        throw error;
     }
 }
 

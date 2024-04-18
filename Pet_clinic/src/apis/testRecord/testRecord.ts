@@ -11,7 +11,7 @@ interface Result<T> {
 }
 
 // Base URL for your API, adjust it to match your actual environment
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'http://123.60.5.195:8084';
 
 const testRecord = {}
 export async function pageQuery(request?:TestRecordPageRequest){

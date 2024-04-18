@@ -32,14 +32,14 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-  server: {
-    proxy: {
-      '/api':{
-        target: 'http://123.60.5.195:8084',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
-      }
-      // ...additional proxies if needed
-    }
-  }
+  // server: {
+  //   proxy: {
+  //     '/api':{
+  //       target: 'http://123.60.5.195:8084',
+  //       changeOrigin: true,
+  //       rewrite: (path) => path.replace(/^\/api/, '')
+  //     }
+  //     // ...additional proxies if needed
+  //   }
+  // }
 })
