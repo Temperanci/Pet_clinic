@@ -5,7 +5,7 @@
     <div style="height: 100%;display: flex;flex-flow: column;">
         <div style="height: 90%;" class="table">
             <el-table :data="queryData" height="100%">
-                <el-table-column prop="problemSetId" label="题目编号">
+                <el-table-column prop="problemSetId" label="试卷编号">
                     <template #default="scope">
                         <el-input v-if="searchBar[scope.$index]" v-model="edited[0].problemSetId"></el-input>
                         <el-input v-else-if="unwritableBar[scope.$index]" disabled
@@ -13,13 +13,50 @@
                         <span v-else>{{ scope.row.problemSetId }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="departmentId" label="题目名称">
+                <el-table-column prop="title" label="名称">
                     <template #default="scope">
                         <el-input v-if="isSelected[scope.$index] === true"
                             v-model="edited[scope.$index].title"></el-input>
                         <span v-else>{{ scope.row.title }}</span>
                     </template>
                 </el-table-column>
+                <el-table-column prop="desc" label="描述" width="200px">
+                    <template #default="scope">
+                        <el-input v-if="isSelected[scope.$index] === true"
+                            v-model="edited[scope.$index].desc"></el-input>
+                        <span v-else>{{ scope.row.desc }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="startTime" label="开始时间">
+                    <template #default="scope">
+                        <el-input v-if="isSelected[scope.$index] === true"
+                            v-model="edited[scope.$index].startTime"></el-input>
+                        <span v-else>{{ scope.row.startTime }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="endTime" label="截止时间">
+                    <template #default="scope">
+                        <el-input v-if="isSelected[scope.$index] === true"
+                            v-model="edited[scope.$index].endTime"></el-input>
+                        <span v-else>{{ scope.row.endTime }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="duration" label="限时">
+                    <template #default="scope">
+                        <el-input v-if="isSelected[scope.$index] === true"
+                            v-model="edited[scope.$index].duration"></el-input>
+                        <span v-else>{{ scope.row.duration }}</span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column prop="problemIdList" label="题目列表">
+                    <template #default="scope">
+                        <el-input v-if="isSelected[scope.$index] === true"
+                            v-model="edited[scope.$index].problemIdList"></el-input>
+                        <span v-else>{{ }}</span>
+                    </template>
+                </el-table-column>
+
                 <tableOption :clear=clearPara :num=tabLength :back=back
                     @edit-confirm="(index) => { CRUDhandler.editRow(edited, index); }"
                     @edit="(index) => { CRUDhandler.updateMsg(edited, queryData, index); isSelected[index] = !isSelected[index]; clearPara = false; }"
@@ -51,10 +88,13 @@ import tableOption from "../subComponents/tableOption.vue";
 import { isSelectGen, EditedGen, clearIsSelected } from "../subComponents/tableOption.vue";
 import { onMounted } from "vue";
 import type { Ref } from "vue";
-import { pageQuery, update } from "../../apis/problemSet/problemSet"
+import { pageQuery as queryProblemSet, update as updateProblemSet } from "../../apis/problemSet/problemSet"
+import { pageQuery as queryProblem } from '@/apis/problem/problem';
 import type { ProblemSetPageRequest, ProblemSetPageResponse, ProblemSetUpdateRequest } from "@/apis/problemSet/problemSet-interface"
-import { ProblemSet } from "@/apis/class";
+import type { ProblemPageRequest, ProblemPageResponse, ProblemUpdateRequest } from "@/apis/problem/problem-interface"
+import { ProblemSet, Problem } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt'
+
 const ProblemSetPage = ref<ProblemSetPageResponse>({ datas: [], total: 0, limit: 0 });
 var searchBar = ref([false]);
 var unwritableBar = ref([false]);
@@ -68,9 +108,7 @@ class problemSetRowCRUD implements rowCRUD {
         (Msg[index] as ProblemSet).duration = data[index].duration;
         (Msg[index] as ProblemSet).problemIdList = data[index].problemIdList;
         (Msg[index] as ProblemSet).problemScoreMap = data[index].problemScoreMap;
-        (Msg[index] as ProblemSet).whiteList = data[index].whiteList;
-
-        console.log('editedProblemSet', Msg);
+        // console.log('editedProblemSet', Msg);
     }//更新buffer
     deleteRow(Msg: Object[], index: number): void {
         var request: ProblemSetUpdateRequest = {
@@ -83,28 +121,32 @@ class problemSetRowCRUD implements rowCRUD {
                 duration: 0,
                 problemIdList: [],
                 problemScoreMap: {} as Record<string, number>,
-                whiteList: []
             },
             delete: true
         }
-        console.log('delete request', request);
-        var response = update(request);
+        // console.log('delete request', request);
+        var response = updateProblemSet(request);
         setTimeout(() => { fetchProblemSets(); }, 500);
-        console.log('delete response', response);
+        // console.log('delete response', response);
     }//删除
     editRow(Msg: Object[], index: number): void {
         var request: ProblemSetUpdateRequest = {
             problemSet: {
                 problemSetId: (Msg[index] as ProblemSet).problemSetId,
                 title: (Msg[index] as ProblemSet).title,
-
+                desc: (Msg[index] as ProblemSet).desc,
+                startTime: (Msg[index] as ProblemSet).startTime,
+                endTime: (Msg[index] as ProblemSet).endTime,
+                duration: (Msg[index] as ProblemSet).duration,
+                problemIdList: (Msg[index] as ProblemSet).problemIdList,
+                problemScoreMap: (Msg[index] as ProblemSet).problemScoreMap,
             },
             delete: false
         }
-        console.log('update request', request);
-        var response = update(request);
+        // console.log('update request', request);
+        var response = updateProblemSet(request);
         setTimeout(() => { fetchProblemSets(); }, 500);
-        console.log('update response', response);
+        // console.log('update response', response);
     }//修改
     clear(edited: ProblemSet) {
         edited.problemSetId = '';
@@ -115,17 +157,22 @@ class problemSetRowCRUD implements rowCRUD {
         var request: ProblemSetUpdateRequest = {
             problemSet: {
                 title: (msg as ProblemSet).title,
-
+                desc: (msg as ProblemSet).desc,
+                startTime: (msg as ProblemSet).startTime,
+                endTime: (msg as ProblemSet).endTime,
+                duration: (msg as ProblemSet).duration,
+                problemIdList: (msg as ProblemSet).problemIdList,
+                problemScoreMap: (msg as ProblemSet).problemScoreMap,
             },
             delete: false
         }
-        console.log('create request', request);
-        var response = update(request);
+        // console.log('create request', request);
+        var response = updateProblemSet(request);
         setTimeout(() => { fetchProblemSets(); }, 500);
-        console.log('create response', response);
+        // console.log('create response', response);
     }//创建
     search(msg: Object): void {
-        console.log('msg', msg)
+        // console.log('msg', msg)
         fetchProblemSets(undefined, 999, msg, true);
     }//查询
     constructor() {
@@ -137,26 +184,42 @@ async function fetchProblemSets(pageNum?: number, pageLimit?: number, msg?: Obje
     var temp = msg || {
         problemSetId: '',
         title: '',
-        type: '',
-        content: '',
-        answer: '',
-        gradingPoints: '',
-        subjectId: '',
-        background: ''
+        desc: '',
+        startTime: new Date(),
+        endTime: new Date(),
+        duration: 0,
+        problemIdList: [],
+        problemScoreMap: {} as Record<string, number>,
     }
     var request: ProblemSetPageRequest = {
         problemSetId: ((temp as ProblemSet).problemSetId === '') ? undefined : (temp as ProblemSet).problemSetId,
         title: ((temp as ProblemSet).title === '') ? undefined : (temp as ProblemSet).title,
+        desc: ((temp as ProblemSet).desc === '') ? undefined : (temp as ProblemSet).desc,
 
         currPageNo: pageNum || 1,
         limit: pageLimit || 20
     }
     console.log('request', request);
     try {
-        const response = await pageQuery(request || undefined);
+        const response = await queryProblemSet(request || undefined);
         if (response && response.data && response.data.datas) {
             ProblemSetPage.value = response.data; // 假设响应中有data属性，且包含datas数组
             queryData.value = ProblemSetPage.value.datas;
+
+            for (var item of queryData.value) { //处理起止时间和时限的显示格式
+                if(item.startTime){
+                    item.startTime = item.startTime.toString().slice(0, 10) + " " + item.startTime.toString().slice(11, 16);
+                }
+                if(item.endTime){
+                    item.endTime = item.endTime.toString().slice(0, 10) + " " + item.endTime.toString().slice(11, 16);
+                }
+                if (item.duration) {
+                    var hour = Math.floor(item.duration / (1000 * 60 * 60));
+                    var min = Math.floor(item.duration / (1000 * 60) - hour * 60);
+                    item.duration = hour + "h" + min + "min";
+                }
+            }
+
             if (search || false) {
                 tabLength.value = ProblemSetPage.value.total;
             }
@@ -166,7 +229,7 @@ async function fetchProblemSets(pageNum?: number, pageLimit?: number, msg?: Obje
             isSelected = isSelectGen(tabLength.value);
             edited.value = EditedGen(tabLength.value, new ProblemSet()) as ProblemSet[];
             // selectPage(currentPage - 1, tableData, queryData);
-            console.log('Fetched problemSets:', ProblemSetPage.value.datas);
+            // console.log('Fetched problemSets:', ProblemSetPage.value.datas);
         } else {
             console.error('No data returned from the API');
         }

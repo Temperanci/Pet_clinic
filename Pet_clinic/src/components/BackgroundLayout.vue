@@ -79,10 +79,13 @@ import DepartmentManagement from './background/DepartmentManagement.vue'
 import DrugManagement from './background/DrugManagement.vue'
 import StaffManagement from './background/StaffManagement.vue'
 import StudyManagement from './background/StudyManagement.vue'
-import CreateTest from './background/CreateTest.vue'
-// import QuestionBank from './background/QuestionBank.vue'
 import ProblemManagement from './background/ProblemManagement.vue'
+import ProblemSetManagement from './background/ProblemSetManagement.vue'
+import TestRecordManagement from './background/TestRecordManagement.vue'
+import CreateTest from './background/CreateTest.vue'
+import QuestionBank from './background/QuestionBank.vue'
 import FinishedTest from './background/FinishedTest.vue'
+
 defineComponent({
   name: "BackgroundLayout"
 })
@@ -104,10 +107,9 @@ const componentsMap: ComponentsMap = {
   '5': DrugManagement,
   '6': StaffManagement,
   '7': StudyManagement,
-  // '8': QuestionBank,
   '8': ProblemManagement,
-  '9': CreateTest,
-  '10': FinishedTest
+  '9': ProblemSetManagement,
+  '10': TestRecordManagement
 };
 const guidanceMap = new Map([
   ['1', '住院管理'],
@@ -119,8 +121,8 @@ const guidanceMap = new Map([
 ])//导航名称
 const studyMap = new Map([
   ['8', '题库管理'],
-  ['9', '创建测试'],
-  ['10', '已完成测试']
+  ['9', '套题管理'],
+  ['10', '测试记录']
 ])
 function handleSelect(n: string) {
   activeIndex.value = n;

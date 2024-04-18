@@ -121,7 +121,7 @@ async function fetchProblems() {
         const idList = problemSetResponse.data.datas[0].problemIdList;
         const scoreList = problemSetResponse.data.datas[0].problemScoreMap;
         clock.value = problemSetResponse.data.datas[0].duration;
-        // clock.value = 2000;
+        // clock.value = 3000;
         console.log('获取测试:', problemSetResponse.data.datas[0]);
         idList.forEach(async (id: string) => {
             const problemRequest: ProblemPageRequest = { problemId: id };
@@ -135,7 +135,7 @@ async function fetchProblems() {
             problemList.value.push(temp);
         })
         console.log("获取problemList:", problemList.value);
-        setTimeout(() => { jumpProblem(selectedIndex.value); }, 50);
+        setTimeout(() => { jumpProblem(selectedIndex.value); }, 1000);
 
     } catch (error) {
         console.error('Error fetching problems:', error);

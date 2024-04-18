@@ -66,7 +66,7 @@ async function fetchProblemSets() {
     try {
         const response = await pageNoQuery(1);
         const pages = Math.ceil(response.data.total / response.data.limit); //总页数
-        console.log("total=", response.data.total, " limit=", response.data.limit);
+        // console.log("total=", response.data.total, " limit=", response.data.limit);
         for (var i = 1; i <= pages; i++) {
             const response = await pageNoQuery(i);
             if (response && response.data && response.data.datas) {
@@ -77,7 +77,7 @@ async function fetchProblemSets() {
                 console.error('No data returned from the API');
             }
         }
-        console.log("获取problemSetList:", problemSetList.value);
+        // console.log("获取problemSetList:", problemSetList.value);
     } catch (error) {
         console.error('Error fetching problemSets:', error);
     }
@@ -102,7 +102,7 @@ function loadCurrentList() {
                 endTimeStr: "",
                 endTime: new Date('9999-12-31T23:59:59'),
                 durationStr: "",
-                duration: 999999999
+                duration: 0
             };
             temp.problemSetId = problemSetList.value[i].problemSetId ?? "";
             temp.title = problemSetList.value[i].title ?? "";

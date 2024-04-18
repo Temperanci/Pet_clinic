@@ -13,12 +13,6 @@
                                 {{ choice }}
                             </el-radio>
                         </el-radio-group>
-                        <!-- <el-checkbox-group v-else-if="currentProblemRef.type === '多选'" v-model="chosenAnswers">
-                            <el-checkbox v-for="(choice, index) in currentProblemRef.choices" :key="index"
-                                :label="index + 1">
-                                {{ choice }}
-                            </el-checkbox>
-                        </el-checkbox-group> -->
                         <el-input v-else-if="selectedProblem.type === 'subjective'" type="textarea" placeholder="在此输入答案"
                             v-model="answer[selectedIndex]" />
                     </div>
@@ -43,7 +37,7 @@
                         <el-table :data="loadCurrentList()" :row-class-name="rowClassName">
                             <el-table-column prop="title" label="题目" width="120px" />
                             <el-table-column prop="subjectName" label="知识点" width="100px" />
-                            <el-table-column prop="typeName" label="题型" />
+                            <el-table-column prop="typeName" label="题型" width="60px"/>
                             <el-table-column label="" width="80px">
                                 <template #default="scope">
                                     <el-button size="small"
@@ -70,8 +64,8 @@
                     <p>病种知识点</p>
                     <el-cascader placeholder="病种知识点" :options="subjectOptions" filterable v-model="chosenSubject" />
                     <div class="button" style="margin-top: 50px;">
-                        <el-button style="background-color: antiquewhite;" @click="clearConditions()">清空筛选条件</el-button>
-                        <el-button style="background-color: paleturquoise;" @click="searchProblems()">查找相关题目</el-button>
+                        <el-button style="background-color: antiquewhite; width:100px;" @click="clearConditions()">清空筛选条件</el-button>
+                        <el-button style="background-color: paleturquoise; width:100px;" @click="searchProblems()">查找相关题目</el-button>
                     </div>
 
                 </div>
@@ -136,9 +130,9 @@ async function fetchProblems() {
             for (var pro of resultList.value) {
                 pro.subjectName = diseaseList.value.find(dis => dis.diseaseId === pro.subjectId)?.name;
                 if (pro.type === 'subjective') {
-                    pro.typeName = '简答题';
+                    pro.typeName = '简答';
                 } else if (pro.type === 'objective') {
-                    pro.typeName = '单选题';
+                    pro.typeName = '单选';
                 }
             }
             selectedProblem.value = resultList.value[0];
@@ -220,46 +214,7 @@ let subjectOptions = ref([{
     value: '',
     label: ''
 }]);
-// const subjectOptions = [
-//     {
-//         value: '01',
-//         label: '大类一',
-//         children: [
-//             {
-//                 value: '0101',
-//                 label: '病种一'
-//             },
-//             {
-//                 value: '0102',
-//                 label: '病种二'
-//             },
-//             {
-//                 value: '0103',
-//                 label: '病种三'
-//             }
-//         ]
-//     },
-//     {
-//         value: '02',
-//         label: '大类二',
-//         children: [
-//             {
-//                 value: '0201',
-//                 label: '病种四'
-//             }
-//         ]
-//     },
-//     {
-//         value: '03',
-//         label: '大类三',
-//         children: [
-//             {
-//                 value: '',
-//                 label: ''
-//             }
-//         ]
-//     }
-// ]
+
 const searchTitle = ref('');
 const chosenType = ref('');
 const chosenSubject = ref('');
@@ -276,9 +231,9 @@ function searchProblems() {
     for (var res of resultList.value) {
         res.subjectName = diseaseList.value.find(dis => dis.diseaseId === res.subjectId)?.name;
         if (res.type === 'subjective') {
-            res.typeName = '简答题';
+            res.typeName = '简答';
         } else if (res.type === 'objective') {
-            res.typeName = '单选题';
+            res.typeName = '单选';
         }
     }
     if (resultList.value[0]) {

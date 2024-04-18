@@ -13,43 +13,43 @@
             <span v-else>{{ scope.row.problemId }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="departmentId" label="题目名称">
+        <el-table-column prop="title" label="名称">
           <template #default="scope">
             <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].title"></el-input>
             <span v-else>{{ scope.row.title }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="location" label="题目类型">
+        <el-table-column prop="type" label="题型">
           <template #default="scope">
             <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].type"></el-input>
             <span v-else>{{ scope.row.type }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="location" label="题目内容" >
+        <el-table-column prop="content" label="内容" >
           <template #default="scope">
             <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].content"></el-input>
             <span v-else>{{ scope.row.content }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="location" label="答案" width="200px">
+        <el-table-column prop="answer" label="答案" width="200px">
           <template #default="scope">
             <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].answer"></el-input>
             <span v-else>{{ scope.row.answer }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="location" label="得分点">
+        <el-table-column prop="gradingPoints" label="得分点">
           <template #default="scope">
             <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].gradingPoints"></el-input>
             <span v-else>{{ scope.row.gradingPoints }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="location" label="病种知识点">
+        <el-table-column prop="subjectId" label="病种知识点">
           <template #default="scope">
             <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].subjectId"></el-input>
             <span v-else>{{ scope.row.subjectId }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="location" label="出题背景">
+        <el-table-column prop="background" label="出题背景">
           <template #default="scope">
             <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].background"></el-input>
             <span v-else>{{ scope.row.background }}</span>
