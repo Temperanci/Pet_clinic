@@ -11,10 +11,7 @@ import {StorageToken} from './scripts/storage'
 import {Personnel} from '@/apis/class'
 export const store = new Vuex.Store({
   state: {
-    token:{
-      id:'',
-      pwd:''
-    }  //初始化token
+    token:new Personnel()  //初始化token
   },
   mutations: {
     //存储token方法
@@ -25,7 +22,7 @@ export const store = new Vuex.Store({
       },
     clearToken(state:any){
       state.token=new Personnel();
-      StorageToken.set('token',new Personnel());
+      StorageToken.set('token',null);
     }
   },
  getters : {

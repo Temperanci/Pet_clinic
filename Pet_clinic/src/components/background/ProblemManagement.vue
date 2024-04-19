@@ -4,7 +4,7 @@
     </p> -->
   <div style="height: 100%;display: flex;flex-flow: column;">
     <div style="height: 90%;" class="table">
-      <el-table :data="queryData" height="100%">
+      <el-table :data="queryData" height="100%" empty-text="来到了没有数据的荒原...">
         <el-table-column prop="problemId" label="题目编号">
           <template #default="scope">
             <el-input v-if="searchBar[scope.$index]" v-model="edited[0].problemId"></el-input>

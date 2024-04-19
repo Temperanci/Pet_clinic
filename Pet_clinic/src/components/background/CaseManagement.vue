@@ -1,8 +1,8 @@
 <template>
 <div style="height: 100%;display: flex;flex-flow: column;">
     <div style="height: 90%;" class="table">
-      <el-table :data="queryData" height="100%">
-        <el-table-column prop="instanceId" label="病例编号" empty-text="来到了没有数据的荒原...">
+      <el-table :data="queryData" height="100%" empty-text="来到了没有数据的荒原...">
+        <el-table-column prop="instanceId" label="病例编号">
           <template #default="scope">
             <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].instanceId"></el-input> -->
             <el-input v-if="searchBar[scope.$index]" v-model="edited[0].instanceId"></el-input>
@@ -15,14 +15,14 @@
             <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].diseaseId"></el-input> -->
             <el-select v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].diseaseId" placeholder="Select" style="width: 100%">
     <el-option
-      v-for="item in options"
+      v-for="item in diseaseOptions"
       :key="item.value"
       :label="item.label"
       :value="item.value"
       :disabled="item.disabled"
     />
   </el-select>
-            <span v-else>{{ options.filter((t)=>{if(t.value===scope.row.diseaseId) return t})[0].label }}</span>
+            <span v-else>{{ diseaseMap.get(scope.row.diseaseId) }}</span>
             <!-- 通过病种id显示病种 -->
           </template>
         </el-table-column>
@@ -209,7 +209,7 @@ async function fetchDiseaseInstances(pageNum?:number,pageLimit?:number,msg?:Obje
   }
 }
 onMounted(() => {
-  getSelection();
+  getDiseaseInfo();
   fetchDiseaseInstances(undefined,defaultNum);
 });
 //paginate
@@ -234,32 +234,40 @@ function pagination(val: number) {
 function backToHome(){
   fetchDiseaseInstances(currentPage,defaultNum);
 }
+//filter && view
+import { pageQuery as diseasePageQuery } from "@/apis/disease/disease";
+import { type DiseasePageRequest } from '@/apis/disease/disease-interface';
+var diseaseOptions:Ref<any[]> = ref<any[]>([]);
+let diseaseMap:Ref<Map<any,any>>=ref<Map<any,any>>(new Map());
+const DiseasePage = ref<DiseasePageResponse>({ datas: [], total: 0, limit: 0 });
+async function getDiseaseInfo() {
+  var request: DiseasePageRequest = {
+    limit: 999
+  }
+  try {
+    var deptResponse = await diseasePageQuery(request);
+    if (deptResponse && deptResponse.data && deptResponse.data.datas) {
+      console.log('Fetched diseases:', deptResponse.data.datas);
+      for (var i = 0; i < deptResponse.data.datas.length; i++) {
+        diseaseOptions.value.push({
+          value: deptResponse.data.datas[i].diseaseId,
+          label: deptResponse.data.datas[i].name
+        });
+        diseaseMap.value.set(deptResponse.data.datas[i].diseaseId, deptResponse.data.datas[i].name);
+      }
+      console.log('deptMap', diseaseMap)
+    } else {
+      console.error('No data returned from the API');
+    }
+
+  } catch (error) {
+    console.error('Error fetching diseases:', error);
+  }
+}
 //分页
 const component = defineComponent({
   name: "CaseManagement"
 })
-async function getSelection(){
-  try {
-    const response =  await DiseasePageQuery();
-    if (response && response.data && response.data.datas) {
-      DiseasePage.value = response.data; // 假设响应中有data属性，且包含datas数组
-      console.log('Fetched beds:', DiseasePage.value.datas);
-      for(var i =0;i<DiseasePage.value.datas.length;i++){
-        options.value.push({value:DiseasePage.value.datas[i].diseaseId,
-          label:DiseasePage.value.datas[i].name});
-      }
-    } else {
-      console.error('No data returned from the API');
-    }
-  } catch (error) {
-    console.error('Error fetching beds:', error);
-  }
-}
-
-</script>
-<script lang="ts">
-var options:Ref<any[]> = ref<any[]>([]);
-const DiseasePage = ref<DiseasePageResponse>({ datas: [], total: 0, limit: 0 });
 </script>
 <style scoped lang="scss">
 // .el-table__body, .el-table__header{

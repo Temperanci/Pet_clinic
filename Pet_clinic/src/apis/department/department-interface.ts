@@ -18,3 +18,7 @@ export interface DepartmentUpdateRequest {
     department: DepartmentBO;
     delete?: boolean;
 }
+
+export interface DepartmentUploadRequest{
+    formdata:FormData;
+}

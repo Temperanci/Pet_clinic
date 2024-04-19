@@ -1,6 +1,11 @@
 import type { StringLiteralType } from 'typescript';
 import * as schemas from './schemas';
 import { ku } from 'element-plus/es/locales.mjs';
+import {type Ref,ref} from 'vue'
+export class OptionItem{
+    label:any;
+    value:any;
+}
 export class BOTools{
     listToString(list:string[]){
         let str = '';
@@ -102,18 +107,22 @@ export class DiseaseInstance {
     }
 }
 
-export class Department implements schemas.DepartmentBO{
+export class Department {
     departmentId: string;
     desc: string ;
     picture: string;
-    location?: string;
-    name?: string;
+    location: string;
+    name: string;
+    picOptions:Ref<OptionItem[]>
+    uploadFile:FormData;
     constructor(){
         this.departmentId='';
         this.desc='';
         this.picture='';
-        this.picture='';
+        this.location='';
         this.name='';
+        this.picOptions=ref<OptionItem[]>([]);
+        this.uploadFile=new FormData();
     }
 }
 

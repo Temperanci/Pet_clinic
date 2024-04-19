@@ -9,7 +9,8 @@
           <div class="card-container">
             <div class="card-left">
               <el-avatar :size="45" />
-              <el-text>用户名</el-text>
+              <el-text>{{userName}}</el-text>
+
             </div>
             <div class="card-right">
               <el-button @click="Switch(1)">前台页面</el-button>
@@ -70,7 +71,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, onMounted, ref } from 'vue'
 import type { DefineComponent } from 'vue'
 import BedManagement from './background/BedManagement.vue'
 import CaseManagement from './background/CaseManagement.vue'
@@ -83,6 +84,9 @@ import CreateTest from './background/CreateTest.vue'
 // import QuestionBank from './background/QuestionBank.vue'
 import ProblemManagement from './background/ProblemManagement.vue'
 import FinishedTest from './background/FinishedTest.vue'
+import { store } from '@/main'
+//登录
+const userName = ref('');
 defineComponent({
   name: "BackgroundLayout"
 })
@@ -128,6 +132,11 @@ function handleSelect(n: string) {
 }
 const activeIndex = ref('1')
 const currentComponent = ref(componentsMap['1']);
+onMounted(()=>{
+  if(store.state.token.name!==''){
+    userName.value = store.state.token.name;
+  }
+})
 </script>
 <style scoped lang="scss">
 .collapseTitle {

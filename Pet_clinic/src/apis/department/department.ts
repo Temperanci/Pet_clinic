@@ -1,7 +1,7 @@
 // department.ts
 import axios from 'axios';
 import type { DepartmentBO } from '@/apis/schemas';
-import type { DepartmentUpdateRequest ,DepartmentPageRequest,DepartmentPageResponse} from '@/apis/department/department-interface';
+import type { DepartmentUpdateRequest, DepartmentPageRequest, DepartmentPageResponse, DepartmentUploadRequest } from '@/apis/department/department-interface';
 
 // Result 接口定义，根据后端返回的实际结构定义
 export interface Result<T> {
@@ -19,9 +19,9 @@ const department = {
 }
 
 // 分页查询部门信息
-export async function pageQuery(request?:DepartmentPageRequest){
+export async function pageQuery(request?: DepartmentPageRequest) {
     try {
-        const response = await axios.post<Result<DepartmentPageResponse>>(`${API_BASE_URL}/department/pageQuery`, request||department);
+        const response = await axios.post<Result<DepartmentPageResponse>>(`${API_BASE_URL}/department/pageQuery`, request || department);
         return response.data;
     } catch (error) {
         // If there's an error, handle it here
@@ -34,4 +34,23 @@ export async function pageQuery(request?:DepartmentPageRequest){
 export async function update(request: DepartmentUpdateRequest): Promise<Result<DepartmentBO>> {
     const response = await axios.post<Result<DepartmentBO>>(`${API_BASE_URL}/department/update`, request);
     return response.data;
+}
+
+export async function upload(request: DepartmentUploadRequest, type?: any) {
+    switch (1) {
+        case 1:
+            try {
+                const response = await axios.post<Result<DepartmentPageResponse>>(`${API_BASE_URL}/department/pageQuery`, request,{
+                    headers: {
+                        'Content-Type': 'multipart/form-data' // 设置 Content-Type 为 multipart/form-data
+                      }
+                });
+                console.log('deptUpload','success');
+                return response.data;
+            } catch (error) {
+                console.error('Error occurred during the file upload:', error);
+                throw error;
+            }
+            break;
+    }
 }
