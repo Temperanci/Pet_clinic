@@ -92,6 +92,7 @@ import type { DiseaseInstancePageRequest, DiseaseInstancePageResponse,DiseaseIns
 import {type DiseasePageResponse} from '@/apis/disease/disease-interface'
 import { DiseaseInstance,BOTools } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt'
+import { throwMessage } from "@/scripts/display";
 const DiseaseInstancePage = ref<DiseaseInstancePageResponse>({ datas: [], total: 0, limit: 0 });
 var searchBar = ref([false]);
 var unwritableBar = ref([false]);
@@ -106,18 +107,24 @@ class bedRowCRUD implements rowCRUD {
     (Msg[index] as DiseaseInstance).pictureUrlList = tool.listToString(data[index].pictureUrlList);
     console.log('editedDiseaseInstance',Msg);
   }//更新buffer
-  deleteRow(Msg: Object[],index:number): void {
+ async deleteRow(Msg: Object[],index:number){
     var request:DiseaseInstanceUpdateRequest = {
       diseaseInstance:{
         instanceId:(Msg[index] as DiseaseInstance).instanceId,  
       },
     delete:true}
     console.log('delete request',request);
-    var response= update(request);
-    setTimeout(()=>{backToHome();},500);
-    console.log('delete response',response); 
+    var caseDelResponse= await update(request);
+    if(caseDelResponse){//更改成功
+      throwMessage('delete fail');
+    }
+    else{
+      throwMessage('delete success');
+      setTimeout(()=>{backToHome();},500);
+    }
+    console.log('delete response',caseDelResponse); 
   }//删除
-  editRow(Msg: Object[],index:number): void {
+  async editRow(Msg: Object[],index:number){
     console.log('msg!!!',Msg)
     var request:DiseaseInstanceUpdateRequest = {
       diseaseInstance:{
@@ -130,9 +137,15 @@ class bedRowCRUD implements rowCRUD {
       },
     delete:false}
     console.log('update request',request);
-    var response= update(request);
-    setTimeout(()=>{backToHome();},500);
-    console.log('update response',response);
+    var caseUpdateResponse= await update(request);
+    if(caseUpdateResponse){//更改成功
+      throwMessage('update success');
+      setTimeout(()=>{backToHome();},500);
+    }
+    else{
+      throwMessage('update fail');
+    }
+    console.log('update response',caseUpdateResponse);
   }//修改
   clear(edited:DiseaseInstance){
     edited.desc='';
@@ -142,7 +155,7 @@ class bedRowCRUD implements rowCRUD {
     edited.fileUrlList='';
     edited.pictureUrlList='';
   }
-  createRow(msg:Object):void{
+async  createRow(msg:Object){
     var request:DiseaseInstanceUpdateRequest = {
       diseaseInstance:{
         desc:(msg as DiseaseInstance).desc, 
@@ -153,9 +166,15 @@ class bedRowCRUD implements rowCRUD {
       },
     delete:false}
     console.log('create request',request);
-    var response= update(request);
-    setTimeout(()=>{backToHome();},500);
-    console.log('create response',response); 
+    var caseCreateResponse=await update(request);
+    if(caseCreateResponse){//更改成功
+      throwMessage('create success');
+      setTimeout(()=>{backToHome();},500);
+    }
+    else{
+      throwMessage('create fail');
+    }
+    console.log('create response',caseCreateResponse); 
   }//创建
   search(msg:Object):void{
     console.log('msg',msg)

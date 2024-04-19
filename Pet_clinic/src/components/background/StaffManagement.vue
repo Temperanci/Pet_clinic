@@ -10,7 +10,7 @@
             <span v-else>{{ scope.row.personnelId }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="name" label="角色">
+        <el-table-column prop="name" label="姓名">
           <template #default="scope">
             <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].name"></el-input>
             <span v-else>{{ scope.row.name }}</span>
@@ -32,13 +32,29 @@
         </el-table-column>
         <el-table-column prop="role" label="角色">
           <template #default="scope">
-            <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].role"></el-input>
+            <el-select v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].role" placeholder="Select" style="width: 100%">
+    <el-option
+      v-for="item in roleOptions"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value"
+    />
+  </el-select>
+            <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].role"></el-input> -->
             <span v-else>{{ scope.row.role }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="status" label="状态">
           <template #default="scope">
-            <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].status"></el-input>
+            <el-select v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].status" placeholder="Select" style="width: 100%">
+    <el-option
+      v-for="item in statuOptions"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value"
+    />
+  </el-select>
+            <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].status"></el-input> -->
             <span v-else>{{ scope.row.status }}</span>
           </template>
         </el-table-column>
@@ -90,6 +106,7 @@ import { pageQuery ,update} from "../../apis/personnel/personnel"
 import type { PersonnelPageRequest, PersonnelPageResponse,PersonnelUpdateRequest } from "@/apis/personnel/personnel-interface.ts"
 import { Personnel } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt'
+import { throwMessage } from "@/scripts/display";
 const PersonnelPage = ref<PersonnelPageResponse>({ datas: [], total: 0, limit: 0 });
 var searchBar = ref([false]);
 var unwritableBar = ref([false]);
@@ -104,7 +121,7 @@ class personnelRowCRUD implements rowCRUD {
     (Msg[index] as Personnel).departmentId = data[index].departmentId;
     console.log('editedPersonnel',Msg);
   }//更新buffer
-  deleteRow(Msg: Object[],index:number): void {
+async  deleteRow(Msg: Object[],index:number) {
     var request:PersonnelUpdateRequest = {
       personnel:{
         personnelId:(Msg[index] as Personnel).personnelId,
@@ -117,11 +134,17 @@ class personnelRowCRUD implements rowCRUD {
       },
     delete:true}
     console.log('delete request',request);
-    var response= update(request);
-    setTimeout(()=>{backToHome();},500);
-    console.log('delete response',response); 
+    var personnelDelResponse=await update(request);
+    if(personnelDelResponse){//更改成功
+      throwMessage('delete fail');
+    }
+    else{
+      throwMessage('delete success');
+      setTimeout(()=>{backToHome();},500);
+    }
+    console.log('delete response',personnelDelResponse); 
   }//删除
-  editRow(Msg: Object[],index:number): void {
+  async editRow(Msg: Object[],index:number) {
     var request:PersonnelUpdateRequest = {
       personnel:{
         personnelId:(Msg[index] as Personnel).personnelId,
@@ -134,9 +157,15 @@ class personnelRowCRUD implements rowCRUD {
       },
     delete:false}
     console.log('update request',request);
-    var response= update(request);
-    setTimeout(()=>{backToHome();},500);
-    console.log('update response',response);
+    var personnelUpdateResponse=await update(request);
+    if(personnelUpdateResponse){//更改成功
+      throwMessage('update success');
+      setTimeout(()=>{backToHome();},500);
+    }
+    else{
+      throwMessage('update fail');
+    }
+    console.log('update response',personnelUpdateResponse);
   }//修改
   clear(edited:Personnel){
     edited.personnelId='';
@@ -147,7 +176,7 @@ class personnelRowCRUD implements rowCRUD {
     edited.phoneNumber='';
     edited.status='';
   }
-  createRow(msg:Object):void{
+ async createRow(msg:Object){
     var request:PersonnelUpdateRequest = {
       personnel:{
         role:(msg as Personnel).role, 
@@ -159,9 +188,15 @@ class personnelRowCRUD implements rowCRUD {
       },
     delete:false}
     console.log('create request',request);
-    var response= update(request);
-    setTimeout(()=>{backToHome();},500);
-    console.log('create response',response); 
+    var personnelCreateResponse=await update(request);
+    if(personnelCreateResponse){//更改成功
+      throwMessage('create success');
+      setTimeout(()=>{backToHome();},500);
+    }
+    else{
+      throwMessage('create fail');
+    }
+    console.log('create response',personnelCreateResponse); 
   }//创建
   search(msg:Object):void{
     console.log('msg',msg)
@@ -270,6 +305,38 @@ async function getDeptInfo() {
     console.error('Error fetching departments:', error);
   }
 }
+const roleOptions = [
+  {
+    label:'医助',
+    value:'医助'
+  },
+  {
+    label:'管理员',
+    value:'管理员'
+  },
+  {
+    label:'前台',
+    value:'前台'
+  },
+  {
+    label:'医师',
+    value:'医师'
+  },
+  {
+    label:'游客',
+    value:'游客'
+  },
+]
+const statuOptions = [
+  {
+    label:'banned',
+    value:'banned'
+  },
+  {
+    label:'normal',
+    value:'normal'
+  }
+]
 const component = defineComponent({
   name: "StaffManagement"
 })
