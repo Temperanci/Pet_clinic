@@ -209,8 +209,6 @@ async function submit() {
         candidateId: '',
         startTime: new Date(0),
         answerMap: {}
-        // graded: false,
-        // gradeMap: {},
     };
     testRecord.problemSetId = props.testId;
     testRecord.candidateId = 'testUser'; //考生id
@@ -226,12 +224,12 @@ async function submit() {
         console.log("更新测试记录:", updateResponse.data);
         const confirmSubmission: TestRecordUpdateRequest = {
             testRecord: {
-                testRecordId: id
+                testRecordId: id,
             },
             submitted: true
         };
         const submitResponse = await update(confirmSubmission);
-        // console.log("提交测试记录:", submitResponse.data);
+        console.log("提交测试记录:", submitResponse.data);
         console.log(props.enterTime);
     }
     emit('content', 'ProblemSet'); //返回试卷列表

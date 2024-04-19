@@ -1,7 +1,7 @@
 <template>
     <div>
-        用户名:{{ userInfo.name }}<br>
-        用户id:{{ userInfo.personnelId }}
+        用户名:{{ loadUserInfo().value.name }}<br>
+        用户id:{{ loadUserInfo().value.personnelId }}
     </div>
 </template>
 
@@ -27,8 +27,14 @@ defineComponent({
     name: "TestRecord",
 })
 //加载用户信息
-const userInfo = ref(store.state.token);
 
+
+
+function loadUserInfo(){
+    const userInfo = ref(store.state.token);
+    console.log(userInfo);
+    return userInfo;
+}
 const problemList = ref<ProblemBO[]>([]);
 const diseaseList = ref<DiseaseBO[]>([]);
 async function fetchProblems() {

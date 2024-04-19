@@ -172,14 +172,13 @@ async function fetchTestRecords(pageNum?: number, pageLimit?: number, msg?: Obje
     answerMap: {},
     gradeMap: {},
     // startTime: new Date(),
-    submitTime: new Date(),
-    graded: false
+    submitTime: new Date()
   }
   var request: TestRecordPageRequest = {
     testRecordId: ((temp as TestRecord).testRecordId === '') ? undefined : (temp as TestRecord).testRecordId,
     problemSetId: ((temp as TestRecord).problemSetId === '') ? undefined : (temp as TestRecord).problemSetId,
     candidateId: ((temp as TestRecord).candidateId === '') ? undefined : (temp as TestRecord).candidateId,
-    graded: ((temp as TestRecord).graded) ? undefined : (temp as TestRecord).graded,
+    // graded: ((temp as TestRecord).graded) ? undefined : (temp as TestRecord).graded
 
     currPageNo: pageNum || 1,
     limit: pageLimit || 20
