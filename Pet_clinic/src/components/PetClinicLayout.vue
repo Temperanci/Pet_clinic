@@ -152,7 +152,7 @@ async function Login(){
   if(PersonnelPage.value.datas.length>0){
     let token = PersonnelPage.value.datas[0];
     store.commit('setToken',token)
-    userName.value = token.name;
+    userName.value = token.name as string;
     ifLogined.value = true;
     userStatus.value = 1;//路人
     if(PersonnelPage.value.datas[0].role==="管理员"){

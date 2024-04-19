@@ -29,14 +29,23 @@
                 </el-table-column>
                 <el-table-column prop="startTime" label="开始时间">
                     <template #default="scope">
-                        <el-input v-if="isSelected[scope.$index] === true"
+                        <!-- 
+                        <span v-else>{{ scope.row.startTime }}</span> -->
+                        <el-input v-if="searchBar[scope.$index]" disabled></el-input>
+                        <!-- <el-input v-else-if="unwritableBar[scope.$index]" disabled
+                            v-model="edited[scope.$index].startTime"></el-input> -->
+                        <el-input v-else-if="isSelected[scope.$index] === true"
                             v-model="edited[scope.$index].startTime"></el-input>
                         <span v-else>{{ scope.row.startTime }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="endTime" label="截止时间">
                     <template #default="scope">
-                        <el-input v-if="isSelected[scope.$index] === true"
+                        <!-- <el-input v-if="isSelected[scope.$index] === true"
+                            v-model="edited[scope.$index].endTime"></el-input>
+                        <span v-else>{{ scope.row.endTime }}</span> -->
+                        <el-input v-if="searchBar[scope.$index]" disabled></el-input>
+                        <el-input v-else-if="isSelected[scope.$index] === true"
                             v-model="edited[scope.$index].endTime"></el-input>
                         <span v-else>{{ scope.row.endTime }}</span>
                     </template>
@@ -51,13 +60,17 @@
 
                 <el-table-column prop="problemIdList" label="题目列表">
                     <template #default="scope">
-                        <el-input v-if="isSelected[scope.$index] === true"
+                        <!-- <el-input v-if="isSelected[scope.$index] === true"
                             v-model="edited[scope.$index].problemIdList"></el-input>
-                        <span v-else>{{ }}</span>
+                        <span v-else>{{ }}</span> -->
+                        <el-input v-if="searchBar[scope.$index]" disabled></el-input>
+                        <el-input v-else-if="isSelected[scope.$index] === true"
+                            v-model="edited[scope.$index].problemIdList"></el-input>
+                        <span v-else>{{ scope.row.problemIdList }}</span>
                     </template>
                 </el-table-column>
 
-                <!-- <tableOption :clear=clearPara :num=tabLength :back=back
+                <tableOption :clear=clearPara :num=tabLength :back=back
                     @edit-confirm="(index) => { CRUDhandler.editRow(edited, index); }"
                     @edit="(index) => { CRUDhandler.updateMsg(edited, queryData, index); isSelected[index] = !isSelected[index]; clearPara = false; }"
                     @cancel="(index) => { isSelected[index] = !isSelected[index]; clearPara = false; unwritableBar[0] = false; searchBar[0] = false; }"
@@ -67,7 +80,7 @@
                     @create-confirm="(index) => { CRUDhandler.createRow(edited[index]); unwritableBar[0] = false; }"
                     @search="(index) => { CRUDhandler.clear(edited[index]); isSelected[index] = true; clearPara = false; searchBar[0] = true; }"
                     @search-confirm="(index) => { CRUDhandler.search(edited[index]); searchBar[0] = false; back = true; }"
-                    @back="fetchProblemSets(); back = false;" /> -->
+                    @back="backToHome(); back = false;" />
             </el-table>
         </div>
         <div class="pagination-block">
@@ -94,6 +107,7 @@ import type { ProblemSetPageRequest, ProblemSetPageResponse, ProblemSetUpdateReq
 import type { ProblemPageRequest, ProblemPageResponse, ProblemUpdateRequest } from "@/apis/problem/problem-interface"
 import { ProblemSet, Problem } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt'
+import { throwMessage } from "@/scripts/display";
 
 const ProblemSetPage = ref<ProblemSetPageResponse>({ datas: [], total: 0, limit: 0 });
 var searchBar = ref([false]);
@@ -110,7 +124,7 @@ class problemSetRowCRUD implements rowCRUD {
         (Msg[index] as ProblemSet).problemScoreMap = data[index].problemScoreMap;
         // console.log('editedProblemSet', Msg);
     }//更新buffer
-    deleteRow(Msg: Object[], index: number): void {
+   async deleteRow(Msg: Object[], index: number) {
         var request: ProblemSetUpdateRequest = {
             problemSet: {
                 problemSetId: (Msg[index] as ProblemSet).problemSetId,
@@ -125,11 +139,17 @@ class problemSetRowCRUD implements rowCRUD {
             delete: true
         }
         // console.log('delete request', request);
-        var response = updateProblemSet(request);
-        setTimeout(() => { fetchProblemSets(); }, 500);
+        var ProSetDelresponse =await updateProblemSet(request);
+        if (ProSetDelresponse) {//更改成功
+            throwMessage('delete fail');
+        }
+        else {
+           throwMessage('delete success');
+            setTimeout(() => { backToHome(); }, 500); 
+        }
         // console.log('delete response', response);
     }//删除
-    editRow(Msg: Object[], index: number): void {
+   async editRow(Msg: Object[], index: number) {
         var request: ProblemSetUpdateRequest = {
             problemSet: {
                 problemSetId: (Msg[index] as ProblemSet).problemSetId,
@@ -144,8 +164,14 @@ class problemSetRowCRUD implements rowCRUD {
             delete: false
         }
         // console.log('update request', request);
-        var response = updateProblemSet(request);
-        setTimeout(() => { fetchProblemSets(); }, 500);
+        var ProSetUpdateResponse =await updateProblemSet(request);
+        if (ProSetUpdateResponse) {//更改成功
+            throwMessage('update success');
+            setTimeout(() => { backToHome(); }, 500);
+        }
+        else {
+            throwMessage('update fail');
+        }
         // console.log('update response', response);
     }//修改
     clear(edited: ProblemSet) {
@@ -153,7 +179,7 @@ class problemSetRowCRUD implements rowCRUD {
         edited.title = '';
 
     }
-    createRow(msg: Object): void {
+    async createRow(msg: Object) {
         var request: ProblemSetUpdateRequest = {
             problemSet: {
                 title: (msg as ProblemSet).title,
@@ -167,8 +193,14 @@ class problemSetRowCRUD implements rowCRUD {
             delete: false
         }
         // console.log('create request', request);
-        var response = updateProblemSet(request);
-        setTimeout(() => { fetchProblemSets(); }, 500);
+        var ProSetCreateResponse = await updateProblemSet(request);
+        if (ProSetCreateResponse) {//更改成功
+            throwMessage('create success');
+            setTimeout(() => { backToHome(); }, 500);
+        }
+        else {
+            throwMessage('create fail');
+        }
         // console.log('create response', response);
     }//创建
     search(msg: Object): void {
@@ -207,10 +239,10 @@ async function fetchProblemSets(pageNum?: number, pageLimit?: number, msg?: Obje
             queryData.value = ProblemSetPage.value.datas;
 
             for (var item of queryData.value) { //处理起止时间和时限的显示格式
-                if(item.startTime){
+                if (item.startTime) {
                     item.startTime = item.startTime.toString().slice(0, 10) + " " + item.startTime.toString().slice(11, 16);
                 }
-                if(item.endTime){
+                if (item.endTime) {
                     item.endTime = item.endTime.toString().slice(0, 10) + " " + item.endTime.toString().slice(11, 16);
                 }
                 if (item.duration) {
@@ -249,9 +281,12 @@ var isSelected: Ref<boolean[]> = ref<boolean[]>([]);
 var edited: Ref<ProblemSet[]> = ref<ProblemSet[]>([]);
 var queryData = ref<any[]>([]);
 var currentPage = 1;
+function backToHome() {
+    fetchProblemSets(currentPage);
+}
 function pagination(val: number) {
     currentPage = val
-    fetchProblemSets(currentPage);
+    backToHome();
     //恢复初始值
     // eslint-disable-next-line vue/no-ref-as-operand
     isSelected = clearIsSelected(isSelected);

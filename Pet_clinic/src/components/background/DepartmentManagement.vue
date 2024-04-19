@@ -79,6 +79,7 @@ import { pageQuery, update,upload as deptUpload } from "../../apis/department/de
 import type { DepartmentPageRequest, DepartmentPageResponse, DepartmentUpdateRequest, DepartmentUploadRequest } from "@/apis/department/department-interface.ts"
 import { Department } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt'
+import { throwMessage } from "@/scripts/display";
 const DepartmentPage = ref<DepartmentPageResponse>({ datas: [], total: 0, limit: 0 });
 var searchBar = ref([false]);
 var unwritableBar = ref([false]);
@@ -106,7 +107,7 @@ class departmentRowCRUD implements rowCRUD {
     //console.log('updateMsg.data', data[index])
     //console.log('editedDepartment', Msg);
   }//更新buffer
-  deleteRow(Msg: Object[], index: number): void {
+  async deleteRow(Msg: Object[], index: number) {
     var request: DepartmentUpdateRequest = {
       department: {
         departmentId: (Msg[index] as Department).departmentId,
@@ -118,11 +119,17 @@ class departmentRowCRUD implements rowCRUD {
       delete: true
     }
     //console.log('delete request', request);
-    var response = update(request);
-    setTimeout(() => { backToHome(); }, 500);
+    var deptDelResponse =await update(request);
+    if(deptDelResponse){//更改成功
+      throwMessage('delete fail');
+    }
+    else{
+      throwMessage('delete success');
+      setTimeout(()=>{backToHome();},500);
+    }
     //console.log('delete response', response);
   }//删除
-  editRow(Msg: Object[], index: number): void {
+ async  editRow(Msg: Object[], index: number) {
     var request: DepartmentUpdateRequest = {
       department: {
         departmentId: (Msg[index] as Department).departmentId,
@@ -134,12 +141,18 @@ class departmentRowCRUD implements rowCRUD {
       delete: false
     }
     //console.log('update request', request);
-    let updateResponse = update(request);
+    let deptUpdateResponse =await update(request);
+    if(deptUpdateResponse){//更改成功
+      throwMessage('update success');
+      setTimeout(()=>{backToHome();},500);
+    }
+    else{
+      throwMessage('update fail');
+    }
     if((Msg[index] as Department).uploadFile.has((Msg[index] as Department).picture)){
       let uploadResponse = deptUpload({formdata:(Msg[index] as Department).uploadFile});
       console.log('dept.editRow.uploadResponse',uploadResponse);
     }
-    setTimeout(() => { backToHome(); }, 500);
     //console.log('update response', response);
   }//修改
   clear(edited: Department) {
@@ -150,7 +163,7 @@ class departmentRowCRUD implements rowCRUD {
     edited.desc = '';
     edited.picOptions.value = []
   }
-  createRow(msg: Object): void {
+async  createRow(msg: Object) {
     var request: DepartmentUpdateRequest = {
       department: {
         location: (msg as Department).location,
@@ -161,8 +174,14 @@ class departmentRowCRUD implements rowCRUD {
       delete: false
     }
     //console.log('create request', request);
-    var response = update(request);
-    setTimeout(() => { backToHome(); }, 500);
+    var deptCreateResponse =await update(request);
+    if(deptCreateResponse){//更改成功
+      throwMessage('create success');
+      setTimeout(()=>{backToHome();},500);
+    }
+    else{
+      throwMessage('create fail');
+    }
     //console.log('create response', response);
   }//创建
   search(msg: Object): void {
