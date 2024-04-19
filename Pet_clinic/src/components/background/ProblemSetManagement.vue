@@ -57,7 +57,7 @@
                     </template>
                 </el-table-column>
 
-                <tableOption :clear=clearPara :num=tabLength :back=back
+                <!-- <tableOption :clear=clearPara :num=tabLength :back=back
                     @edit-confirm="(index) => { CRUDhandler.editRow(edited, index); }"
                     @edit="(index) => { CRUDhandler.updateMsg(edited, queryData, index); isSelected[index] = !isSelected[index]; clearPara = false; }"
                     @cancel="(index) => { isSelected[index] = !isSelected[index]; clearPara = false; unwritableBar[0] = false; searchBar[0] = false; }"
@@ -67,7 +67,7 @@
                     @create-confirm="(index) => { CRUDhandler.createRow(edited[index]); unwritableBar[0] = false; }"
                     @search="(index) => { CRUDhandler.clear(edited[index]); isSelected[index] = true; clearPara = false; searchBar[0] = true; }"
                     @search-confirm="(index) => { CRUDhandler.search(edited[index]); searchBar[0] = false; back = true; }"
-                    @back="fetchProblemSets(); back = false;" />
+                    @back="fetchProblemSets(); back = false;" /> -->
             </el-table>
         </div>
         <div class="pagination-block">
@@ -199,7 +199,7 @@ async function fetchProblemSets(pageNum?: number, pageLimit?: number, msg?: Obje
         currPageNo: pageNum || 1,
         limit: pageLimit || 20
     }
-    console.log('request', request);
+    // console.log('request', request);
     try {
         const response = await queryProblemSet(request || undefined);
         if (response && response.data && response.data.datas) {

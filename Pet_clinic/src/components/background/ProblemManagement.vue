@@ -103,7 +103,7 @@ class problemRowCRUD implements rowCRUD {
     (Msg[index] as Problem).gradingPoints = data[index].gradingPoints;
     (Msg[index] as Problem).subjectId = data[index].subjectId;
     (Msg[index] as Problem).background = data[index].background;
-    console.log('editedProblem', Msg);
+    // console.log('editedProblem', Msg);
   }//更新buffer
   deleteRow(Msg: Object[], index: number): void {
     var request: ProblemUpdateRequest = {
@@ -119,10 +119,10 @@ class problemRowCRUD implements rowCRUD {
       },
       delete: true
     }
-    console.log('delete request', request);
+    // console.log('delete request', request);
     var response = update(request);
     setTimeout(() => { fetchProblems(); }, 500);
-    console.log('delete response', response);
+    // console.log('delete response', response);
   }//删除
   editRow(Msg: Object[], index: number): void {
     var request: ProblemUpdateRequest = {
@@ -138,10 +138,10 @@ class problemRowCRUD implements rowCRUD {
       },
       delete: false
     }
-    console.log('update request', request);
+    // console.log('update request', request);
     var response = update(request);
     setTimeout(() => { fetchProblems(); }, 500);
-    console.log('update response', response);
+    // console.log('update response', response);
   }//修改
   clear(edited: Problem) {
     edited.problemId = '';
@@ -166,13 +166,13 @@ class problemRowCRUD implements rowCRUD {
       },
       delete: false
     }
-    console.log('create request', request);
+    // console.log('create request', request);
     var response = update(request);
     setTimeout(() => { fetchProblems(); }, 500);
-    console.log('create response', response);
+    // console.log('create response', response);
   }//创建
   search(msg: Object): void {
-    console.log('msg', msg)
+    // console.log('msg', msg)
     fetchProblems(undefined, 999, msg, true);
   }//查询
   constructor() {
@@ -203,7 +203,7 @@ async function fetchProblems(pageNum?: number, pageLimit?: number, msg?: Object,
     currPageNo: pageNum || 1,
     limit: pageLimit || 20
   }
-  console.log('request', request);
+  // console.log('request', request);
   try {
     const response = await pageQuery(request || undefined);
     if (response && response.data && response.data.datas) {
@@ -218,7 +218,7 @@ async function fetchProblems(pageNum?: number, pageLimit?: number, msg?: Object,
       isSelected = isSelectGen(tabLength.value);
       edited.value = EditedGen(tabLength.value, new Problem()) as Problem[];
       // selectPage(currentPage - 1, tableData, queryData);
-      console.log('Fetched problems:', ProblemPage.value.datas);
+      // console.log('Fetched problems:', ProblemPage.value.datas);
     } else {
       console.error('No data returned from the API');
     }
