@@ -18,6 +18,49 @@
       <p>{{ selectedCase.desc }}</p>
       <el-divider />
       <p>病例列表：(点击条目展开详情)</p>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <el-button type="primary" @click="showDialog = true">上传病例</el-button>
+      </div>
+      <el-dialog title="上传新病例" v-model="showDialog">
+        <el-form ref="uploadForm" :model="form">
+          <el-form-item label="病例详情">
+            <el-input type="textarea" v-model="form.details"></el-input>
+          </el-form-item>
+          <el-form-item label="上传图片">
+            <el-upload
+                class="upload-demo"
+                action="https://your-upload-url.com/upload"
+                drag
+                multiple
+                :on-preview="handlePreview"
+                :on-remove="handleRemove"
+                :file-list="form.fileList">
+              <i class="el-icon-upload"></i>
+              <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+            </el-upload>
+          </el-form-item>
+          <el-form-item label="上传视频">
+            <el-upload
+                class="upload-demo"
+                action="https://your-upload-url.com/upload"
+                drag
+                multiple
+                :on-preview="handlePreview"
+                :on-remove="handleRemove"
+                :file-list="form.videoList">
+              <i class="el-icon-upload"></i>
+              <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+            </el-upload>
+          </el-form-item>
+        </el-form>
+        <template v-slot:footer>
+        <span class="dialog-footer">
+          <el-button @click="showDialog = false">取消</el-button>
+          <el-button type="primary" @click="submitForm">提交</el-button>
+        </span>
+        </template>
+      </el-dialog>
+
       <el-collapse v-model="activeInstance" accordion class="collapse-area">
         <el-collapse-item
             v-for="instance in selectedCaseInstance"
@@ -54,8 +97,8 @@
 </template>
 
 <script setup lang="ts">
-import {defineComponent, onMounted, ref} from 'vue';
-import { ElMenu, ElMenuItem } from 'element-plus';
+import {defineComponent, onMounted, ref, reactive, watch} from 'vue';
+import {ElForm, ElMenu, ElMenuItem, ElDialog} from 'element-plus';
 import { pageQuery as DiseasePageQuery } from "@/apis/disease/disease";
 import type { DiseaseBO, DiseaseInstanceBO } from "@/apis/schemas";
 import type { DiseasePageResponse } from "@/apis/disease/disease-interface";
@@ -87,10 +130,10 @@ const selectedCaseInstance = ref<DiseaseInstanceBO[] | null>(null);
 async function fetchDiseaseInstance() {
   try {
     const response = await pageQuery();
-    console.log('response:', response)
+    // console.log('response:', response)
     diseaseInstance.value = response.data;
   } catch (error) {
-    console.error('Failed to fetch diseaseInstance:', error);
+    // console.error('Failed to fetch diseaseInstance:', error);
   }
 }
 
@@ -98,7 +141,7 @@ async function fetchDiseaseInstance() {
 function showCaseDetails(disease: DiseaseBO) {
   selectedCase.value = disease;
   selectedCaseInstance.value = diseaseInstance.value.datas.filter(item => item.diseaseId === disease.diseaseId);
-  console.log('selectedCaseInstance:', selectedCaseInstance.value)
+  // console.log('selectedCaseInstance:', selectedCaseInstance.value)
 }
 
 // 组件挂载后获取疾病数据
@@ -106,6 +149,38 @@ function showCaseDetails(disease: DiseaseBO) {
 onMounted(() => {
   fetchDisease();
   fetchDiseaseInstance();
+});
+
+const showDialog = ref(false);
+const uploadForm = ref<InstanceType<typeof ElForm>>();
+
+const form = reactive({
+  details: '',
+  fileList: [] as Array<any>,
+  videoList: [] as Array<any>
+});
+
+function handlePreview(file: any) {
+  console.log('Preview file:', file);
+}
+
+function handleRemove(file: any, fileList: Array<any>) {
+  console.log('Remove file:', file, fileList);
+}
+
+function submitForm() {
+  uploadForm.value?.validate((valid: boolean) => {
+    if (valid) {
+      console.log('提交数据:', form);
+      // 这里应该调用API来提交表单和文件
+      showDialog.value = false; // 关闭对话框
+    } else {
+      console.log('表单验证失败');
+    }
+  });
+}
+watch(showDialog, (newValue) => {
+  console.log('Dialog visible state:', newValue);
 });
 </script>
 
@@ -121,7 +196,7 @@ onMounted(() => {
 .el-menu-vertical-demo {
   background-color: #fff; // 菜单背景色
   width: 20%; // 根据需要调整宽度
-  max-height: 85vh; // 最大高度占视口的80%
+  max-height: 90vh; // 最大高度占视口的80%
   overflow-y: auto; // 内容超出时垂直滚动
   border-radius: 20px;
   border: #3d3a3a 1px solid;
@@ -132,7 +207,7 @@ onMounted(() => {
   margin-left: 10px; // 与菜单的间隔
   padding: 20px; // 内边距
   width: 60%; // 根据需要调整宽度
-  max-height: 80vh; // 最大高度占视口的80%
+  max-height: 85vh; // 最大高度占视口的80%
   border-radius: 20px;
   border: #2a1f1f 1px solid;
 }
@@ -147,5 +222,24 @@ onMounted(() => {
   padding: 10px;
   border: #2a1f1f 1px solid;
 }
+.case-images, .case-videos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.case-image {
+  width: 48%; /* 每张图片占行宽的48%，留下一些空间以避免精确到100%导致换行 */
+  margin-bottom: 10px; /* 添加底部间隔 */
+}
+
+.case-video {
+  width: 100%; /* 视频宽度占满整个容器宽度 */
+  margin-bottom: 10px; /* 添加底部间隔 */
+}
+.el-dialog {
+  z-index: 2000; /* 或更高，取决于其他元素的z-index */
+}
+
 </style>
 
