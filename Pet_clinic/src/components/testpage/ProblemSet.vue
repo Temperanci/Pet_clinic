@@ -136,7 +136,7 @@ const handleEnterTest = (id: string, title: string, startTime: Date, endTime: Da
     var current = new Date();
     var start = new Date(startTime);
     var end = new Date(endTime);
-    console.log('当前时间:', current, '\n开始时间:', start, '\n截止时间:', end);
+    // console.log('当前时间:', current, '\n开始时间:', start, '\n截止时间:', end);
     if (current.getTime() < start.getTime()) {
         failMsg.value = '未到测试开始时间,';
         failureDialog.value = true;
@@ -163,8 +163,9 @@ const emit = defineEmits(['content', 'id', 'time'])
 const enterTest = () => {
     emit('content', 'Test');
     emit('id', selectedTest.value.id);
-    emit('time', new Date());
-    console.log('进入测试:', selectedTest.value);
+    var enterTime = new Date();
+    emit('time', enterTime);
+    console.log('进入测试时间:', enterTime);
 }
 
 // 前端分页处理
@@ -172,7 +173,7 @@ var current = ref(1);
 var size = ref(10);
 function handleCurrentChange(n: number) {
     current.value = n;
-    console.log('当前页号:', n);
+    // console.log('当前页号:', n);
 }
 function handleSizeChange(n: number) {
     size.value = n;

@@ -4,7 +4,7 @@
       </p> -->
     <div style="height: 100%;display: flex;flex-flow: column;">
         <div style="height: 90%;" class="table">
-            <el-table :data="queryData" height="100%">
+            <el-table :data="queryData" height="100%" empty-text="来到了没有数据的荒原...">
                 <el-table-column prop="problemSetId" label="试卷编号">
                     <template #default="scope">
                         <el-input v-if="searchBar[scope.$index]" v-model="edited[0].problemSetId"></el-input>
@@ -199,7 +199,7 @@ async function fetchProblemSets(pageNum?: number, pageLimit?: number, msg?: Obje
         currPageNo: pageNum || 1,
         limit: pageLimit || 20
     }
-    // console.log('request', request);
+    console.log('request', request);
     try {
         const response = await queryProblemSet(request || undefined);
         if (response && response.data && response.data.datas) {

@@ -23,3 +23,7 @@ export interface TestRecordUpdateRequest {
     delete?: boolean;
     submitted?: boolean;
 }
+
+export interface TestRecordUpdateResponse {
+    data: TestRecordBO;
+}

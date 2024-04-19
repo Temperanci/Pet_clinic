@@ -1,6 +1,7 @@
 <template>
     <div>
-        用户id:{{ userId }}
+        用户名:{{ userInfo.name }}<br>
+        用户id:{{ userInfo.personnelId }}
     </div>
 </template>
 
@@ -25,8 +26,9 @@ import { TestRecord, ProblemSet, Problem, Disease } from "@/apis/class";
 defineComponent({
     name: "TestRecord",
 })
+//加载用户信息
+const userInfo = ref(store.state.token);
 
-// const userId = ref(store.state.token.id);
 const problemList = ref<ProblemBO[]>([]);
 const diseaseList = ref<DiseaseBO[]>([]);
 async function fetchProblems() {
@@ -49,15 +51,15 @@ async function fetchProblems() {
         }
         console.log("获取problemList:", problemList.value);
         setTimeout(() => {
-            resultList.value = JSON.parse(JSON.stringify(problemList.value));
-            for (var pro of resultList.value) {
-                pro.subjectName = diseaseList.value.find(dis => dis.diseaseId === pro.subjectId)?.name;
-                if (pro.type === 'subjective') {
-                    pro.typeName = '简答';
-                } else if (pro.type === 'objective') {
-                    pro.typeName = '单选';
-                }
-            }
+            // resultList.value = JSON.parse(JSON.stringify(problemList.value));
+            // for (var pro of resultList.value) {
+            //     pro.subjectName = diseaseList.value.find(dis => dis.diseaseId === pro.subjectId)?.name;
+            //     if (pro.type === 'subjective') {
+            //         pro.typeName = '简答';
+            //     } else if (pro.type === 'objective') {
+            //         pro.typeName = '单选';
+            //     }
+            // }
         }, 50);
 
     } catch (error) {
