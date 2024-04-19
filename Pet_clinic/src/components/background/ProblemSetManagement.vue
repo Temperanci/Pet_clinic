@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/require-v-for-key -->
 <template>
     <!-- <p>
         {{ component.name }}
@@ -49,13 +50,16 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="problemIdList" label="题目列表">
+                <el-table-column prop="problemIdList" label="" width="150px">
                     <template #default="scope">
-                        <el-input v-if="isSelected[scope.$index] === true"
-                            v-model="edited[scope.$index].problemIdList"></el-input>
-                        <span v-else>{{ }}</span>
+                        <el-button type="primary" @click="editProblemSet(scope.row.problemId)">编辑试卷</el-button>
                     </template>
                 </el-table-column>
+                <!-- <el-table-column prop="problemIdList" label="" width="100px">
+                    <template #default="scope">
+                        <el-button type="danger" @click="">删除</el-button>
+                    </template>
+                </el-table-column> -->
 
                 <!-- <tableOption :clear=clearPara :num=tabLength :back=back
                     @edit-confirm="(index) => { CRUDhandler.editRow(edited, index); }"
@@ -75,6 +79,73 @@
                 :total="getPagination(entryNum, tabLength)" />
         </div>
     </div>
+
+    <el-dialog v-model="dialogVisible" title="编辑试卷" width="1000" draggable overflow :close-on-click-modal="false"
+        :close-on-press-escape="false">
+        <div class="edit-content">
+            <el-container>
+                <el-aside width="40%">
+                    试卷名称
+                    <el-input type="textarea" placeholder="" v-model="editName" />
+                    描述
+                    <el-input type="textarea" placeholder="" v-model="editDesc" />
+                </el-aside>
+                <el-container width="40%">
+                    <el-header>
+
+                    </el-header>
+
+                    <el-main>
+                        选择题目
+                        <div class="problemlist-content">
+                            <el-table :data="loadCurrentList()" :row-class-name="rowClassName">
+                                <el-table-column prop="title" label="题目" width="" />
+                                <el-table-column prop="subjectName" label="知识点" width="" />
+                                <el-table-column prop="typeName" label="题型" width="" />
+                                <el-table-column label="" width="80px">
+                                    <template #default="scope">
+                                        <el-button size="small" @click="">选择</el-button>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </div>
+                    </el-main>
+                    <el-footer>
+                        <div class="problemlist-pagination">
+                            <el-pagination background @current-change="handleCurrentChange"
+                                @size-change="handleSizeChange" :current-page="current" :page-size="size"
+                                :total=resultList.length layout="prev, pager, next" />
+                        </div>
+                    </el-footer>
+                </el-container>
+                <el-aside width="20%">
+                    <div class="problerm-search">
+                        <h4>筛选题目</h4>
+                        <el-input type="textarea" placeholder="在此输入题目标题" v-model="searchTitle" />
+                        <p>题目类型</p>
+                        <el-cascader placeholder="题目类型" :options="typeOptions" filterable v-model="chosenType" />
+                        <p>病种知识点</p>
+                        <el-cascader placeholder="病种知识点" :options="subjectOptions" filterable v-model="chosenSubject" />
+                        <div class="button" style="margin-top: 50px;">
+                            <el-button style="background-color: antiquewhite; width:100px;"
+                                @click="clearConditions()">清空筛选条件</el-button>
+                            <el-button style="background-color: paleturquoise; width:100px;"
+                                @click="searchProblems()">查找相关题目</el-button>
+                        </div>
+
+                    </div>
+                </el-aside>
+            </el-container>
+        </div>
+
+        <el-button type="success" size="small" @click="  ; dialogVisible = false;">
+            确认
+        </el-button>
+        <el-button type="info" size="small" @click="dialogVisible = false;">
+            取消
+        </el-button>
+    </el-dialog>
+
 </template>
 
 <script setup lang="ts">
@@ -88,10 +159,13 @@ import tableOption from "../subComponents/tableOption.vue";
 import { isSelectGen, EditedGen, clearIsSelected } from "../subComponents/tableOption.vue";
 import { onMounted } from "vue";
 import type { Ref } from "vue";
-import { pageQuery as queryProblemSet, update as updateProblemSet } from "../../apis/problemSet/problemSet"
-import { pageQuery as queryProblem } from '@/apis/problem/problem';
+import { pageQuery as problemSetQuery, update as problemSetUpdate } from "../../apis/problemSet/problemSet"
+import { pageQuery as problemQuery } from '@/apis/problem/problem';
+import { pageQuery as diseaseQuery } from '@/apis/disease/disease';
 import type { ProblemSetPageRequest, ProblemSetPageResponse, ProblemSetUpdateRequest } from "@/apis/problemSet/problemSet-interface"
 import type { ProblemPageRequest, ProblemPageResponse, ProblemUpdateRequest } from "@/apis/problem/problem-interface"
+import type { DiseasePageRequest, DiseasePageResponse, DiseaseUpdateRequest } from '@/apis/disease/disease-interface';
+import type { ProblemBO, DiseaseBO } from '@/apis/schemas';
 import { ProblemSet, Problem } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt'
 
@@ -125,7 +199,7 @@ class problemSetRowCRUD implements rowCRUD {
             delete: true
         }
         // console.log('delete request', request);
-        var response = updateProblemSet(request);
+        var response = problemSetUpdate(request);
         setTimeout(() => { fetchProblemSets(); }, 500);
         // console.log('delete response', response);
     }//删除
@@ -144,7 +218,7 @@ class problemSetRowCRUD implements rowCRUD {
             delete: false
         }
         // console.log('update request', request);
-        var response = updateProblemSet(request);
+        var response = problemSetUpdate(request);
         setTimeout(() => { fetchProblemSets(); }, 500);
         // console.log('update response', response);
     }//修改
@@ -167,7 +241,7 @@ class problemSetRowCRUD implements rowCRUD {
             delete: false
         }
         // console.log('create request', request);
-        var response = updateProblemSet(request);
+        var response = problemSetUpdate(request);
         setTimeout(() => { fetchProblemSets(); }, 500);
         // console.log('create response', response);
     }//创建
@@ -201,16 +275,16 @@ async function fetchProblemSets(pageNum?: number, pageLimit?: number, msg?: Obje
     }
     console.log('request', request);
     try {
-        const response = await queryProblemSet(request || undefined);
+        const response = await problemSetQuery(request || undefined);
         if (response && response.data && response.data.datas) {
             ProblemSetPage.value = response.data; // 假设响应中有data属性，且包含datas数组
             queryData.value = ProblemSetPage.value.datas;
 
             for (var item of queryData.value) { //处理起止时间和时限的显示格式
-                if(item.startTime){
+                if (item.startTime) {
                     item.startTime = item.startTime.toString().slice(0, 10) + " " + item.startTime.toString().slice(11, 16);
                 }
-                if(item.endTime){
+                if (item.endTime) {
                     item.endTime = item.endTime.toString().slice(0, 10) + " " + item.endTime.toString().slice(11, 16);
                 }
                 if (item.duration) {
@@ -263,9 +337,198 @@ function pagination(val: number) {
 const component = defineComponent({
     name: "ProblemSetManagement"
 })
+
+interface ProblemInfo {
+    problemId?: string;
+    type?: string;
+    typeName?: string;
+    subjectId?: string;
+    subjectName?: string;
+    title?: string;
+    content?: string;
+    answer?: string;
+    background?: string;
+    gradingPoints?: string;
+}
+
+//编辑试卷题目
+const editId = ref('');
+const dialogVisible = ref(false);
+const input = ref('');
+const editName = ref('');
+const editDesc = ref('');
+const editHour = ref('');
+const editMin = ref('');
+const selectedIndex = ref(0);
+const selectedProblem = ref<ProblemBO>({});
+const problemList = ref<ProblemBO[]>([]);
+const diseaseList = ref<DiseaseBO[]>([]);
+const searchTitle = ref('');
+const chosenType = ref('');
+const chosenSubject = ref('');
+const resultList = ref<ProblemInfo[]>([]);
+let typeOptions = ref([{
+    value: 'objective',
+    label: '单选题'
+}, {
+    value: 'subjective',
+    label: '简答题'
+}]);
+let subjectOptions = ref([{
+    value: '',
+    label: ''
+}]);
+const rowClassName = ({ rowIndex }: { rowIndex: number }) => {
+    // if () {
+    //     return '';
+    // } else {
+    //     return '';
+    // }
+};
+function editProblemSet(id: string) {
+    editId.value = id;
+    dialogVisible.value = true;
+}
+async function fetchProblems() {
+    try {
+        const request: ProblemPageRequest = { currPageNo: 1 };
+        const response = await problemQuery(request);
+        const pages = Math.ceil(response.data.total / response.data.limit); //总页数
+        console.log("total=", response.data.total, " limit=", response.data.limit);
+        for (var i = 1; i <= pages; i++) {
+            request.currPageNo = i;
+            const response = await problemQuery(request);
+            if (response && response.data && response.data.datas) {
+                for (var j in response.data.datas) { //单选题内容换行
+                    response.data.datas[j].content = (response.data.datas[j].content ?? '').replace(/(A\.|B\.|C\.|D\.)/g, '\n$1');
+                }
+                problemList.value = problemList.value.concat(response.data.datas);
+            } else {
+                console.error('No data returned from the API');
+            }
+        }
+        // console.log("获取problemList:", problemList.value);
+        setTimeout(() => {
+            resultList.value = JSON.parse(JSON.stringify(problemList.value));
+            for (var pro of resultList.value) {
+                pro.subjectName = diseaseList.value.find(dis => dis.diseaseId === pro.subjectId)?.name;
+                if (pro.type === 'subjective') {
+                    pro.typeName = '简答';
+                } else if (pro.type === 'objective') {
+                    pro.typeName = '单选';
+                }
+            }
+            selectedProblem.value = resultList.value[0];
+            selectedIndex.value = 0;
+        }, 50);
+
+    } catch (error) {
+        console.error('Error fetching problems:', error);
+    }
+}
+async function fetchDiseases() {
+    try {
+        const request: DiseasePageRequest = { currPageNo: 1 };
+        const response = await diseaseQuery(request);
+        const pages = Math.ceil(response.data.total / response.data.limit); //总页数
+        console.log("total=", response.data.total, " limit=", response.data.limit);
+        for (var i = 1; i <= pages; i++) {
+            request.currPageNo = i;
+            const response = await diseaseQuery(request);
+            if (response && response.data && response.data.datas) {
+                diseaseList.value = diseaseList.value.concat(response.data.datas);
+            } else {
+                console.error('No data returned from the API');
+            }
+        }
+        console.log("获取diseaseList:", diseaseList.value);
+        setTimeout(() => {
+            subjectOptions.value = diseaseList.value.map(disease => {
+                return {
+                    value: disease.diseaseId,
+                    label: disease.name
+                };
+            })
+            console.log('病种选项:', subjectOptions.value);
+        }, 50);
+    } catch (error) {
+        console.error('Error fetching diseases:', error);
+    }
+}
+onMounted(async () => {
+    await fetchDiseases();
+    await fetchProblems();
+})
+function searchProblems() {
+    resultList.value.splice(0, resultList.value.length);
+    for (var i in problemList.value) {
+        var pro = problemList.value[i];
+        if (pro.type == chosenType.value[0] && pro.subjectId == chosenSubject.value[0] || pro.type == chosenType.value[0] && !chosenSubject.value[0] || !chosenType.value[0] && pro.subjectId == chosenSubject.value[0] || !chosenType.value[0] && !chosenSubject.value[0]) {
+            resultList.value.push(problemList.value[i]);
+        }
+    }
+    for (var res of resultList.value) {
+        res.subjectName = diseaseList.value.find(dis => dis.diseaseId === res.subjectId)?.name;
+        if (res.type === 'subjective') {
+            res.typeName = '简答';
+        } else if (res.type === 'objective') {
+            res.typeName = '单选';
+        }
+    }
+    if (resultList.value[0]) {
+        selectedProblem.value = resultList.value[0];
+        selectedIndex.value = 0;
+    }
+    console.log('筛选结果:', resultList.value);
+}
+
+function clearConditions() {
+    // searchTitle.value='';
+    chosenType.value = '';
+    chosenSubject.value = '';
+    searchProblems();
+}
+function loadProblemList() {
+
+}
+function loadCurrentList() {
+    var currentList: ProblemInfo[] = [];
+    for (var i in resultList.value) {
+        var index = resultList.value.indexOf(resultList.value[i])
+        if (index >= current.value * 10 - 10 && index < current.value * 10) {
+            currentList.push(resultList.value[i]);
+        }
+    }
+    console.log(currentList.length);
+    return currentList;
+}
+
+//前端分页处理
+var current = ref(1);
+var size = ref(10);
+function handleCurrentChange(n: number) {
+    current.value = n;
+    console.log('当前页号:', n);
+}
+function handleSizeChange(n: number) {
+    size.value = n;
+}
 </script>
 
 <style scoped lang="scss">
+.edit-content {
+    min-height: 500px;
+    max-height: 500px;
+    overflow: auto;
+}
+.problemlist-content{
+    max-height: 300px;
+}
+.problemlist-pagination {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+}
 // .el-table__body, .el-table__header{
 //     width: 100%;
 //   }</style>
