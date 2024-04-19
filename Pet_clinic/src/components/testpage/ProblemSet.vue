@@ -66,7 +66,7 @@ async function fetchProblemSets() {
     try {
         const response = await pageNoQuery(1);
         const pages = Math.ceil(response.data.total / response.data.limit); //总页数
-        console.log("total=", response.data.total, " limit=", response.data.limit);
+        // console.log("total=", response.data.total, " limit=", response.data.limit);
         for (var i = 1; i <= pages; i++) {
             const response = await pageNoQuery(i);
             if (response && response.data && response.data.datas) {
@@ -77,7 +77,7 @@ async function fetchProblemSets() {
                 console.error('No data returned from the API');
             }
         }
-        console.log("获取problemSetList:", problemSetList.value);
+        // console.log("获取problemSetList:", problemSetList.value);
     } catch (error) {
         console.error('Error fetching problemSets:', error);
     }
@@ -102,7 +102,7 @@ function loadCurrentList() {
                 endTimeStr: "",
                 endTime: new Date('9999-12-31T23:59:59'),
                 durationStr: "",
-                duration: 999999999
+                duration: 0
             };
             temp.problemSetId = problemSetList.value[i].problemSetId ?? "";
             temp.title = problemSetList.value[i].title ?? "";
@@ -136,7 +136,7 @@ const handleEnterTest = (id: string, title: string, startTime: Date, endTime: Da
     var current = new Date();
     var start = new Date(startTime);
     var end = new Date(endTime);
-    console.log('当前时间:', current, '\n开始时间:', start, '\n截止时间:', end);
+    // console.log('当前时间:', current, '\n开始时间:', start, '\n截止时间:', end);
     if (current.getTime() < start.getTime()) {
         failMsg.value = '未到测试开始时间,';
         failureDialog.value = true;
@@ -163,8 +163,9 @@ const emit = defineEmits(['content', 'id', 'time'])
 const enterTest = () => {
     emit('content', 'Test');
     emit('id', selectedTest.value.id);
-    emit('time', new Date());
-    console.log('进入测试:', selectedTest.value);
+    var enterTime = new Date();
+    emit('time', enterTime);
+    console.log('进入测试时间:', enterTime);
 }
 
 // 前端分页处理
@@ -172,7 +173,7 @@ var current = ref(1);
 var size = ref(10);
 function handleCurrentChange(n: number) {
     current.value = n;
-    console.log('当前页号:', n);
+    // console.log('当前页号:', n);
 }
 function handleSizeChange(n: number) {
     size.value = n;

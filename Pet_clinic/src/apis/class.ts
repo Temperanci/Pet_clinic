@@ -145,6 +145,23 @@ export class Personnel implements schemas.PersonnelBO{
     }
 }
 
+export class Disease implements schemas.DiseaseBO{
+    desc: string;
+    name: string;
+    diseaseId: string;
+    fileUrlList: string[];
+    departmentId: string;
+    pictureUrlList: string[];
+    constructor(){
+        this.desc='';
+        this.name='';
+        this.diseaseId='';
+        this.fileUrlList=[];
+        this.departmentId='';
+        this.pictureUrlList=[];
+    }
+}
+
 export class Problem implements schemas.ProblemBO{
     type: string;
     title: string;
