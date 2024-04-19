@@ -13,12 +13,6 @@
                                 {{ choice }}
                             </el-radio>
                         </el-radio-group>
-                        <!-- <el-checkbox-group v-else-if="currentProblemRef.type === '多选'" v-model="chosenAnswers">
-                            <el-checkbox v-for="(choice, index) in currentProblemRef.choices" :key="index"
-                                :label="index + 1">
-                                {{ choice }}
-                            </el-checkbox>
-                        </el-checkbox-group> -->
                         <el-input v-else-if="selectedProblem.type === 'subjective'" type="textarea" placeholder="在此输入答案"
                             v-model="answer[selectedIndex]" />
                     </div>
@@ -42,8 +36,8 @@
                     <div class="result-content">
                         <el-table :data="loadCurrentList()" :row-class-name="rowClassName">
                             <el-table-column prop="title" label="题目" width="120px" />
-                            <el-table-column prop="subjectId" label="知识点" />
-                            <el-table-column prop="type" label="题型" />
+                            <el-table-column prop="subjectName" label="知识点" width="100px" />
+                            <el-table-column prop="typeName" label="题型" width="60px"/>
                             <el-table-column label="" width="80px">
                                 <template #default="scope">
                                     <el-button size="small"
@@ -69,7 +63,11 @@
                     <el-cascader placeholder="题目类型" :options="typeOptions" filterable v-model="chosenType" />
                     <p>病种知识点</p>
                     <el-cascader placeholder="病种知识点" :options="subjectOptions" filterable v-model="chosenSubject" />
-                    <el-button style="margin-top: 50px;" @click="searchProblems()">查找相关题目</el-button>
+                    <div class="button" style="margin-top: 50px;">
+                        <el-button style="background-color: antiquewhite; width:100px;" @click="clearConditions()">清空筛选条件</el-button>
+                        <el-button style="background-color: paleturquoise; width:100px;" @click="searchProblems()">查找相关题目</el-button>
+                    </div>
+
                 </div>
             </el-aside>
         </el-container>
@@ -106,8 +104,8 @@ function changeShowOrHide() {
 
 const selectedIndex = ref(0);
 const selectedProblem = ref<ProblemBO>({});
-
 const problemList = ref<ProblemBO[]>([]);
+const diseaseList = ref<DiseaseBO[]>([]);
 async function fetchProblems() {
     try {
         const request: ProblemPageRequest = { currPageNo: 1 };
@@ -122,67 +120,60 @@ async function fetchProblems() {
                     response.data.datas[j].content = (response.data.datas[j].content ?? '').replace(/(A\.|B\.|C\.|D\.)/g, '\n$1');
                 }
                 problemList.value = problemList.value.concat(response.data.datas);
-                // selectedProblem.value = problemList.value[selectedIndex.value];
             } else {
                 console.error('No data returned from the API');
             }
         }
+        console.log("获取problemList:", problemList.value);
         setTimeout(() => {
             resultList.value = JSON.parse(JSON.stringify(problemList.value));
             for (var pro of resultList.value) {
+                pro.subjectName = diseaseList.value.find(dis => dis.diseaseId === pro.subjectId)?.name;
                 if (pro.type === 'subjective') {
-                    pro.typeName = '简答题';
+                    pro.typeName = '简答';
                 } else if (pro.type === 'objective') {
-                    pro.typeName = '单选题';
+                    pro.typeName = '单选';
                 }
-                
             }
             selectedProblem.value = resultList.value[0];
             selectedIndex.value = 0;
-        }, 100);
-        console.log("获取problemList:", problemList.value);
+        }, 50);
+
     } catch (error) {
         console.error('Error fetching problems:', error);
     }
 }
 async function fetchDiseases() {
     try {
-        const request: ProblemPageRequest = { currPageNo: 1 };
-        const response = await problemQuery(request);
+        const request: DiseasePageRequest = { currPageNo: 1 };
+        const response = await diseaseQuery(request);
         const pages = Math.ceil(response.data.total / response.data.limit); //总页数
         console.log("total=", response.data.total, " limit=", response.data.limit);
         for (var i = 1; i <= pages; i++) {
             request.currPageNo = i;
-            const response = await problemQuery(request);
+            const response = await diseaseQuery(request);
             if (response && response.data && response.data.datas) {
-                for (var j in response.data.datas) { //单选题内容换行
-                    response.data.datas[j].content = (response.data.datas[j].content ?? '').replace(/(A\.|B\.|C\.|D\.)/g, '\n$1');
-                }
-                problemList.value = problemList.value.concat(response.data.datas);
-                // selectedProblem.value = problemList.value[selectedIndex.value];
+                diseaseList.value = diseaseList.value.concat(response.data.datas);
             } else {
                 console.error('No data returned from the API');
             }
         }
+        console.log("获取diseaseList:", diseaseList.value);
         setTimeout(() => {
-            resultList.value = JSON.parse(JSON.stringify(problemList.value));
-            for (var pro of resultList.value) {
-                if (pro.type === 'subjective') {
-                    pro.typeName = '简答题';
-                } else if (pro.type === 'objective') {
-                    pro.typeName = '单选题';
-                }
-                
-            }
-            selectedProblem.value = resultList.value[0];
-            selectedIndex.value = 0;
-        }, 100);
-        console.log("获取problemList:", problemList.value);
+            subjectOptions.value = diseaseList.value.map(disease => {
+                return {
+                    value: disease.diseaseId,
+                    label: disease.name
+                };
+            })
+            console.log('病种选项:', subjectOptions.value);
+        }, 50);
     } catch (error) {
-        console.error('Error fetching problems:', error);
+        console.error('Error fetching diseases:', error);
     }
 }
 onMounted(async () => {
+    await fetchDiseases();
     await fetchProblems();
 })
 
@@ -212,54 +203,18 @@ function loadCurrentList() {
 }
 
 //题目筛选
-const typeOptions = [{
+let typeOptions = ref([{
     value: 'objective',
     label: '单选题'
 }, {
     value: 'subjective',
     label: '简答题'
-}
-]
-const subjectOptions = [
-    {
-        value: '01',
-        label: '大类一',
-        children: [
-            {
-                value: '0101',
-                label: '病种一'
-            },
-            {
-                value: '0102',
-                label: '病种二'
-            },
-            {
-                value: '0103',
-                label: '病种三'
-            }
-        ]
-    },
-    {
-        value: '02',
-        label: '大类二',
-        children: [
-            {
-                value: '0201',
-                label: '病种四'
-            }
-        ]
-    },
-    {
-        value: '03',
-        label: '大类三',
-        children: [
-            {
-                value: '',
-                label: ''
-            }
-        ]
-    }
-]
+}]);
+let subjectOptions = ref([{
+    value: '',
+    label: ''
+}]);
+
 const searchTitle = ref('');
 const chosenType = ref('');
 const chosenSubject = ref('');
@@ -269,13 +224,23 @@ function searchProblems() {
     resultList.value.splice(0, resultList.value.length);
     for (var i in problemList.value) {
         var pro = problemList.value[i];
-        if (pro.type == chosenType.value[0]) {
+        if (pro.type == chosenType.value[0] && pro.subjectId == chosenSubject.value[0] || pro.type == chosenType.value[0] && !chosenSubject.value[0] || !chosenType.value[0] && pro.subjectId == chosenSubject.value[0] || !chosenType.value[0] && !chosenSubject.value[0]) {
             resultList.value.push(problemList.value[i]);
         }
     }
-    selectedProblem.value = resultList.value[0];
-    selectedIndex.value = 0;
-    console.log('筛选结果:', resultList);
+    for (var res of resultList.value) {
+        res.subjectName = diseaseList.value.find(dis => dis.diseaseId === res.subjectId)?.name;
+        if (res.type === 'subjective') {
+            res.typeName = '简答';
+        } else if (res.type === 'objective') {
+            res.typeName = '单选';
+        }
+    }
+    if (resultList.value[0]) {
+        selectedProblem.value = resultList.value[0];
+        selectedIndex.value = 0;
+    }
+    console.log('筛选结果:', resultList.value);
 }
 
 
@@ -288,18 +253,24 @@ function selectProblemWithId(id: string) {
     console.log("选择题目:", selectedProblem.value.title);
 }
 
-const rowClassName = ({rowIndex}:{rowIndex:number}) => {
-    console.log('rowIndex=',rowIndex,' selectedIndex=',selectedIndex.value);
+const rowClassName = ({ rowIndex }: { rowIndex: number }) => {
     if (rowIndex === selectedIndex.value) {
         return 'current-row';
     } else {
         return '';
-    } 
+    }
 };
 
+function clearConditions() {
+    // searchTitle.value='';
+    chosenType.value = '';
+    chosenSubject.value = '';
+    searchProblems();
+}
 
 //题目跳转
 function jumpProblem(i: number) {
+
     var pro = resultList.value[i];
     if (pro != null) {
         selectedProblem.value = pro;
@@ -330,7 +301,6 @@ function handleSizeChange(n: number) {
     size.value = n;
 }
 
-const url = ''
 </script>
 
 <style scoped lang="scss">

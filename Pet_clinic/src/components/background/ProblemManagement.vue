@@ -13,43 +13,43 @@
             <span v-else>{{ scope.row.problemId }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="departmentId" label="题目名称">
+        <el-table-column prop="title" label="名称">
           <template #default="scope">
             <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].title"></el-input>
             <span v-else>{{ scope.row.title }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="location" label="题目类型">
+        <el-table-column prop="type" label="题型">
           <template #default="scope">
             <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].type"></el-input>
             <span v-else>{{ scope.row.type }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="location" label="题目内容" >
+        <el-table-column prop="content" label="内容" >
           <template #default="scope">
             <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].content"></el-input>
             <span v-else>{{ scope.row.content }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="location" label="答案" width="200px">
+        <el-table-column prop="answer" label="答案" width="200px">
           <template #default="scope">
             <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].answer"></el-input>
             <span v-else>{{ scope.row.answer }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="location" label="得分点">
+        <el-table-column prop="gradingPoints" label="得分点">
           <template #default="scope">
             <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].gradingPoints"></el-input>
             <span v-else>{{ scope.row.gradingPoints }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="location" label="病种知识点">
+        <el-table-column prop="subjectId" label="病种知识点">
           <template #default="scope">
             <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].subjectId"></el-input>
             <span v-else>{{ scope.row.subjectId }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="location" label="出题背景">
+        <el-table-column prop="background" label="出题背景">
           <template #default="scope">
             <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].background"></el-input>
             <span v-else>{{ scope.row.background }}</span>
@@ -103,7 +103,7 @@ class problemRowCRUD implements rowCRUD {
     (Msg[index] as Problem).gradingPoints = data[index].gradingPoints;
     (Msg[index] as Problem).subjectId = data[index].subjectId;
     (Msg[index] as Problem).background = data[index].background;
-    console.log('editedProblem', Msg);
+    // console.log('editedProblem', Msg);
   }//更新buffer
   deleteRow(Msg: Object[], index: number): void {
     var request: ProblemUpdateRequest = {
@@ -119,10 +119,10 @@ class problemRowCRUD implements rowCRUD {
       },
       delete: true
     }
-    console.log('delete request', request);
+    // console.log('delete request', request);
     var response = update(request);
     setTimeout(() => { fetchProblems(); }, 500);
-    console.log('delete response', response);
+    // console.log('delete response', response);
   }//删除
   editRow(Msg: Object[], index: number): void {
     var request: ProblemUpdateRequest = {
@@ -138,10 +138,10 @@ class problemRowCRUD implements rowCRUD {
       },
       delete: false
     }
-    console.log('update request', request);
+    // console.log('update request', request);
     var response = update(request);
     setTimeout(() => { fetchProblems(); }, 500);
-    console.log('update response', response);
+    // console.log('update response', response);
   }//修改
   clear(edited: Problem) {
     edited.problemId = '';
@@ -166,13 +166,13 @@ class problemRowCRUD implements rowCRUD {
       },
       delete: false
     }
-    console.log('create request', request);
+    // console.log('create request', request);
     var response = update(request);
     setTimeout(() => { fetchProblems(); }, 500);
-    console.log('create response', response);
+    // console.log('create response', response);
   }//创建
   search(msg: Object): void {
-    console.log('msg', msg)
+    // console.log('msg', msg)
     fetchProblems(undefined, 999, msg, true);
   }//查询
   constructor() {
@@ -203,7 +203,7 @@ async function fetchProblems(pageNum?: number, pageLimit?: number, msg?: Object,
     currPageNo: pageNum || 1,
     limit: pageLimit || 20
   }
-  console.log('request', request);
+  // console.log('request', request);
   try {
     const response = await pageQuery(request || undefined);
     if (response && response.data && response.data.datas) {
@@ -218,7 +218,7 @@ async function fetchProblems(pageNum?: number, pageLimit?: number, msg?: Object,
       isSelected = isSelectGen(tabLength.value);
       edited.value = EditedGen(tabLength.value, new Problem()) as Problem[];
       // selectPage(currentPage - 1, tableData, queryData);
-      console.log('Fetched problems:', ProblemPage.value.datas);
+      // console.log('Fetched problems:', ProblemPage.value.datas);
     } else {
       console.error('No data returned from the API');
     }

@@ -77,10 +77,11 @@ import { pageQuery as problemQuery } from '@/apis/problem/problem';
 import { update } from '@/apis/testRecord/testRecord';
 import type { ProblemSetPageRequest, ProblemSetPageResponse, ProblemSetUpdateRequest } from '@/apis/problemSet/problemSet-interface';
 import type { ProblemPageRequest, ProblemPageResponse, ProblemUpdateRequest } from '@/apis/problem/problem-interface';
-import type { TestRecordPageRequest, TestRecordPageResponse, TestRecordUpdateRequest } from '@/apis/testRecord/testRecord-interface';
+import type { TestRecordPageRequest, TestRecordPageResponse, TestRecordUpdateRequest, TestRecordUpdateResponse } from '@/apis/testRecord/testRecord-interface';
 import type { ProblemBO, ProblemSetBO, TestRecordBO } from '@/apis/schemas';
 
 defineComponent({
+    // eslint-disable-next-line vue/multi-word-component-names
     name: "Test",
 })
 
@@ -121,8 +122,9 @@ async function fetchProblems() {
         const idList = problemSetResponse.data.datas[0].problemIdList;
         const scoreList = problemSetResponse.data.datas[0].problemScoreMap;
         clock.value = problemSetResponse.data.datas[0].duration;
-        // clock.value = 2000;
-        console.log('获取测试:', problemSetResponse.data.datas[0]);
+        // clock.value = 3000;
+
+        // console.log('获取测试:', problemSetResponse.data.datas[0]);
         idList.forEach(async (id: string) => {
             const problemRequest: ProblemPageRequest = { problemId: id };
             const problemResponse = await problemQuery(problemRequest);
@@ -131,11 +133,11 @@ async function fetchProblems() {
                 score: scoreList[id]
             };
             temp.problem.content = (temp.problem.content ?? '').replace(/(A\.|B\.|C\.|D\.)/g, '\n$1'); //单选题选项换行
-            console.log('获取题目:', temp);
+            // console.log('获取题目:', temp);
             problemList.value.push(temp);
         })
-        console.log("获取problemList:", problemList.value);
-        setTimeout(() => { jumpProblem(selectedIndex.value); }, 100);
+        // console.log("获取problemList:", problemList.value);
+        setTimeout(() => { jumpProblem(selectedIndex.value); }, 1000);
 
     } catch (error) {
         console.error('Error fetching problems:', error);
@@ -152,7 +154,7 @@ const count = setInterval(() => {
         clock.value -= 1000;
     } else if (clock.value == 0) {
         clearInterval(count);
-        warningMsg.value='考试时间已结束！';
+        warningMsg.value = '考试时间已结束！';
         submitDialog.value = true;
     }
 }, 1000);
@@ -162,7 +164,7 @@ function jumpProblem(i: number) {
     var pro = problemList.value[i];
     if (pro != null) {
         saveAnswer();
-        console.log(answer.value[i]);
+        // console.log(answer.value[i]);
         selectedProblem.value = pro;
         selectedIndex.value = i;
         // console.log('跳转至题', i + 1, ':', selectedProblem.value.problem.title);
@@ -182,10 +184,8 @@ function saveAnswer() {
     var pro = selectedProblem.value;
     var temp = answer.value[selectedIndex.value];
     if (pro.problem.type == 'objective') {
-        // console.log("单选:", temp);
         answerMap.set(pro.problem.problemId ?? '', temp);
     } else if (pro.problem.type == 'subjective') {
-        // console.log("简答:", temp);
         answerMap.set(pro.problem.problemId ?? '', temp);
     }
 }
@@ -195,22 +195,20 @@ function checkAnswerMap() {
     saveAnswer();
     problemList.value.forEach(pro => {
         if (pro.problem.problemId && !answerMap.has(pro.problem.problemId)) {
-            console.log('未答题:', problemList.value.indexOf(pro));
+            // console.log('未答题:', problemList.value.indexOf(pro));
             warningMsg.value = '有题目未作答，确认提交？';
         }
     })
 }
 
 //提交试卷
-function submit() {
+async function submit() {
     saveAnswer();
     const testRecord: TestRecordBO = {
         problemSetId: '',
         candidateId: '',
-        startTime: new Date(),
+        startTime: new Date(0),
         answerMap: {}
-        // graded: false,
-        // gradeMap: {},
     };
     testRecord.problemSetId = props.testId;
     testRecord.candidateId = 'testUser'; //考生id
@@ -220,8 +218,20 @@ function submit() {
         testRecord: testRecord,
         submitted: false
     };
-    var temp = update(submitContent);
-    console.log("提交测试记录:", temp);
+    const updateResponse = await update(submitContent);
+    if (updateResponse && updateResponse.data) {
+        const id = updateResponse.data.testRecordId;
+        console.log("更新测试记录:", updateResponse.data);
+        const confirmSubmission: TestRecordUpdateRequest = {
+            testRecord: {
+                testRecordId: id,
+            },
+            submitted: true
+        };
+        const submitResponse = await update(confirmSubmission);
+        console.log("提交测试记录:", submitResponse.data);
+        console.log(props.enterTime);
+    }
     emit('content', 'ProblemSet'); //返回试卷列表
 }
 var submitDialog = ref(false)
@@ -253,7 +263,8 @@ var submitDialog = ref(false)
     display: flex;
     justify-content: center;
 }
-.countdown{
+
+.countdown {
     color: crimson;
 }
 </style>

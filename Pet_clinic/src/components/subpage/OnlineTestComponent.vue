@@ -63,6 +63,8 @@
         @content="(c: string) => content = c"
         :testId="testId"
         :enterTime="enterTime" />
+        <TestRecord v-if="content === 'TestRecord'"
+        @content="(c: string) => content = c" />
     </div>
   </div>
 </template>
@@ -72,13 +74,15 @@ import { defineComponent, ref } from "vue";
 import ProblemSet from '../testpage/ProblemSet.vue';
 import SingleProblem from '../testpage/SingleProblem.vue';
 import Test from "../testpage/Test.vue";
+import TestRecord from "../testpage/TestRecord.vue";
 
 defineComponent({
   name: "OnlineTestComponent",
   components: {
     SingleProblem,
     ProblemSet,
-    Test
+    Test,
+    TestRecord
   }
 })
 
