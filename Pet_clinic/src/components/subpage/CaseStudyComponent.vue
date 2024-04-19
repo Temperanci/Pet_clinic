@@ -98,7 +98,7 @@
 
 <script setup lang="ts">
 import {defineComponent, onMounted, ref, reactive, watch} from 'vue';
-import {ElForm, ElMenu, ElMenuItem, ElDialog} from 'element-plus';
+import {ElForm, ElMenu, ElMenuItem, ElDialog, ElMessageBox} from 'element-plus';
 import { pageQuery as DiseasePageQuery } from "@/apis/disease/disease";
 import type { DiseaseBO, DiseaseInstanceBO } from "@/apis/schemas";
 import type { DiseasePageResponse } from "@/apis/disease/disease-interface";
@@ -169,19 +169,29 @@ function handleRemove(file: any, fileList: Array<any>) {
 }
 
 function submitForm() {
-  uploadForm.value?.validate((valid: boolean) => {
-    if (valid) {
-      console.log('提交数据:', form);
-      // 这里应该调用API来提交表单和文件
-      showDialog.value = false; // 关闭对话框
-    } else {
-      console.log('表单验证失败');
-    }
+  ElMessageBox.confirm(
+      '确定要提交这个病例吗？',
+      '提交确认',
+      {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+  ).then(() => {
+    uploadForm.value?.validate((valid: boolean) => {
+      if (valid) {
+        console.log('提交数据:', form);
+        // 这里应该调用API来提交表单和文件
+        showDialog.value = false; // 关闭对话框
+      } else {
+        console.log('表单验证失败');
+      }
+    });
+  }).catch(() => {
+    console.log('取消提交');
   });
 }
-watch(showDialog, (newValue) => {
-  console.log('Dialog visible state:', newValue);
-});
+
 </script>
 
 
