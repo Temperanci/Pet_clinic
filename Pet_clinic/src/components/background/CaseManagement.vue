@@ -35,9 +35,9 @@
         <el-table-column prop="time" label="时间">
           <template #default="scope">
             <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].time"></el-input> -->
-            <el-input v-if="searchBar[scope.$index]" v-model="edited[0].time"></el-input>
+            <el-input v-if="searchBar[scope.$index]" disabled></el-input>
             <el-input v-else-if="unwritableBar[scope.$index]" disabled v-model="edited[scope.$index].time"></el-input>
-            <span v-else>{{ scope.row.time }}</span>
+            <span v-else>{{ stringToDate(scope.row.time) }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="fileUrlList" label="文件列表">
@@ -237,6 +237,7 @@ function backToHome(){
 //filter && view
 import { pageQuery as diseasePageQuery } from "@/apis/disease/disease";
 import { type DiseasePageRequest } from '@/apis/disease/disease-interface';
+import {stringToDate} from '@/scripts/display'
 var diseaseOptions:Ref<any[]> = ref<any[]>([]);
 let diseaseMap:Ref<Map<any,any>>=ref<Map<any,any>>(new Map());
 const DiseasePage = ref<DiseasePageResponse>({ datas: [], total: 0, limit: 0 });
