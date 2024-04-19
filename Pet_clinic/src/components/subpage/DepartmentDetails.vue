@@ -4,7 +4,7 @@
       <div class="grid-content ep-bg-purple" >
         <el-dropdown>
           <span>
-              <el-button type="primary" color="#f4eded"  class="full-width-button">
+              <el-button type="primary" class="full-width-button">
                 所有科室<el-icon class="el-icon--right"><arrow-down /></el-icon>
               </el-button>
           </span>
@@ -198,6 +198,8 @@ onMounted(async () => {
 }
 .full-width-button{
   width: 15vw;
+  background-color: #888888;
+  color: #ffffff;
 }
 .grid-content {
   border-radius: 4px;
