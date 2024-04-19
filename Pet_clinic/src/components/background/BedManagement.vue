@@ -71,6 +71,7 @@ import { pageQuery ,update} from "../../apis/bed/bed"
 import type { BedPageRequest, BedPageResponse,BedUpdateRequest } from "@/apis/bed/bed-interface"
 import { Bed } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt'
+import { throwMessage } from "@/scripts/display";
 const BedPage = ref<BedPageResponse>({ datas: [], total: 0, limit: 0 });
 var searchBar = ref([false]);
 var unwritableBar = ref([false]);
@@ -81,7 +82,7 @@ class bedRowCRUD implements rowCRUD {
     (Msg[index] as Bed).departmentId = data[index].departmentId;
     console.log('editedBed',Msg);
   }//更新buffer
-  deleteRow(Msg: Object[],index:number): void {
+  async deleteRow(Msg: Object[],index:number){
     var request:BedUpdateRequest = {
       bed:{
         bedId:(Msg[index] as Bed).bedId,
@@ -90,11 +91,18 @@ class bedRowCRUD implements rowCRUD {
       },
     delete:true}
     console.log('delete request',request);
-    var response= update(request);
+    const bedDelResponse= await update(request);
+    if(bedDelResponse){//更改成功
+      throwMessage('delete fail');
+    }
+    else{
+      throwMessage('delete success');
+      setTimeout(()=>{backToHome();},500);
+    }
     setTimeout(()=>{backToHome();},500);
-    console.log('delete response',response); 
+    console.log('delete response',bedDelResponse); 
   }//删除
-  editRow(Msg: Object[],index:number): void {
+  async editRow(Msg: Object[],index:number) {
     var request:BedUpdateRequest = {
       bed:{
         bedId:(Msg[index] as Bed).bedId,
@@ -103,16 +111,22 @@ class bedRowCRUD implements rowCRUD {
       },
     delete:false}
     console.log('update request',request);
-    var response= update(request);
-    setTimeout(()=>{backToHome();},500);
-    console.log('update response',response);
+    const bedUpdateResponse= await update(request);
+    if(bedUpdateResponse){//更改成功
+      throwMessage('update success');
+      setTimeout(()=>{backToHome();},500);
+    }
+    else{
+      throwMessage('update fail');
+    }
+    console.log('update response',bedUpdateResponse);
   }//修改
   clear(edited:Bed){
     edited.bedId='';
     edited.departmentId='';
     edited.location='';
   }
-  createRow(msg:Object):void{
+  async createRow(msg:Object){
     var request:BedUpdateRequest = {
       bed:{
         location:(msg as Bed).location, 
@@ -120,9 +134,16 @@ class bedRowCRUD implements rowCRUD {
       },
     delete:false}
     console.log('create request',request);
-    var response= update(request);
+    const bedCreateResponse= await update(request);
+    if(bedCreateResponse){//更改成功
+      throwMessage('create success');
+      setTimeout(()=>{backToHome();},500);
+    }
+    else{
+      throwMessage('create fail');
+    }
     setTimeout(()=>{backToHome();},500);
-    console.log('create response',response); 
+    console.log('create response',bedCreateResponse); 
   }//创建
   search(msg:Object):void{
     console.log('msg',msg)

@@ -29,7 +29,7 @@
             <el-button class="loginBtn" @click="()=>{loginVisible=!loginVisible;registerVisible=false;}">登录</el-button>
           </template>
           <div style="width: 100%;">
-            <el-input v-model="userName" class="input" placeholder="用户名" />
+            <el-input v-model="userPhone" class="input" placeholder="用户号码" />
           </div>
           <div style="width: 100%;">
             <el-input v-model="userPwdLogin" type="password" show-password class="input" placeholder="密码" />
@@ -47,7 +47,7 @@
             <el-button class="registerBtn" @click="()=>{registerVisible=!registerVisible;loginVisible=false;}">注册</el-button>
           </template>
           <div >
-            <el-input v-model="userName" class="input" placeholder="用户名" />
+            <el-input v-model="userPhone" class="input" placeholder="号码" />
           </div>
           <div>
             <el-input v-model="userPwdRegister" type="password" show-password class="input" placeholder="密码" />
@@ -141,25 +141,26 @@ const handleSelect = (index: string) => {
   currentComponent.value = componentsMap[index]
 }
 // TODO:登录注册的详细逻辑
-
+const userPhone = ref('')
 const userName = ref('')
 const userPwdLogin = ref('')
 const userPwdRegister = ref('')
 const userPwdConfirm = ref('')
 
 async function Login(){
-  await LoginRequest(userName.value,userPwdLogin.value);
+  await LoginRequest(userPhone.value,userPwdLogin.value);
   if(PersonnelPage.value.datas.length>0){
+    let token = PersonnelPage.value.datas[0];
+    store.commit('setToken',token)
+    userName.value = token.name;
     ifLogined.value = true;
     userStatus.value = 1;//路人
     if(PersonnelPage.value.datas[0].role==="管理员"){
       userStatus.value = 0;
     }
-    let token = new Personnel();
-    token.name = userName.value;
-    token.password = userPwdLogin.value;
-    store.commit('setToken',token)
+    
     console.log('Login.userName',store.state.token.name)
+    console.log('Login.userPhone',store.state.token.phoneNumber)
   }
 }
 // function Register(){
@@ -167,6 +168,7 @@ async function Login(){
 // }
 function Logout(){
   userName.value='';
+  userPhone.value='';
   userPwdLogin.value='';
   userStatus.value=1;
   ifLogined.value=false;
@@ -183,9 +185,9 @@ function refreshLogin(){
   console.log('refreshLogin.StrorageToken',StorageToken.get('token'))
 }
 const PersonnelPage = ref<PersonnelPageResponse>({ datas: [], total: 0, limit: 0 });
-async function LoginRequest(name:string,pwd:string){
+async function LoginRequest(phone:string,pwd:string){
   let request:PersonnelPageRequest={
-    name:name,
+    phoneNumber:phone,
     password:pwd
   }
   console.log('LoginRequest.request',request);
