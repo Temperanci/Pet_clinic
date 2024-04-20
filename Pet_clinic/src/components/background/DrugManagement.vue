@@ -99,6 +99,7 @@ import { pageQuery as drugPageQuery,update} from "../../apis/drug/drug"
 import type { DrugPageRequest, DrugPageResponse,DrugUpdateRequest } from "@/apis/drug/drug-interface.ts"
 import { BOTools, Drug } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt'
+import { throwMessage } from "@/scripts/display";
 const DrugPage = ref<DrugPageResponse>({ datas: [], total: 0, limit: 0 });
 var searchBar = ref([false]);
 var unwritableBar = ref([false]);
@@ -114,7 +115,7 @@ class drugRowCRUD implements rowCRUD {
     (Msg[index] as Drug).diseaseIdList = data[index].diseaseIdList;
     console.log('editedDrug',Msg);
   }//更新buffer
-  deleteRow(Msg: Object[],index:number): void {
+  async deleteRow(Msg: Object[],index:number) {
     var request:DrugUpdateRequest = {
       drug:{
         drugId:(Msg[index] as Drug).drugId,
@@ -126,11 +127,17 @@ class drugRowCRUD implements rowCRUD {
       },
     delete:true}
     console.log('delete request',request);
-    var response= update(request);
-    setTimeout(()=>{backToHome()},500);
-    console.log('delete response',response); 
+    var drugDelResponse=await update(request);
+    if(drugDelResponse){//更改成功
+      throwMessage('delete fail');
+    }
+    else{
+      throwMessage('delete success');
+      setTimeout(()=>{backToHome();},500);
+    }
+    console.log('delete response',drugDelResponse); 
   }//删除
-  editRow(Msg: Object[],index:number): void {
+  async editRow(Msg: Object[],index:number) {
     var request:DrugUpdateRequest = {
       drug:{
         drugId:(Msg[index] as Drug).drugId,
@@ -142,9 +149,16 @@ class drugRowCRUD implements rowCRUD {
       },
     delete:false}
     console.log('update request',request);
-    var response= update(request);
+    var drugUpdateResponse=await update(request);
+    if(drugUpdateResponse){//更改成功
+      throwMessage('update success');
+      setTimeout(()=>{backToHome();},500);
+    }
+    else{
+      throwMessage('update fail');
+    }
     setTimeout(()=>{backToHome();},500);
-    console.log('update response',response);
+    console.log('update response',drugUpdateResponse);
   }//修改
   clear(edited:Drug){
     edited.drugId='';
@@ -154,7 +168,7 @@ class drugRowCRUD implements rowCRUD {
     edited.desc='';
     edited.diseaseIdList=[];
   }
-  createRow(msg:Object):void{
+async  createRow(msg:Object){
     var request:DrugUpdateRequest = {
       drug:{
         name:(msg as Drug).name, 
@@ -165,9 +179,15 @@ class drugRowCRUD implements rowCRUD {
       },
     delete:false}
     console.log('create request',request);
-    var response= update(request);
-    setTimeout(()=>{backToHome();},500);
-    console.log('create response',response); 
+    var drugCreateResponse=await update(request);
+    if(drugCreateResponse){//更改成功
+      throwMessage('create success');
+      setTimeout(()=>{backToHome();},500);
+    }
+    else{
+      throwMessage('create fail');
+    }
+    console.log('create response',drugCreateResponse); 
   }//创建
   search(msg:Object):void{
     console.log('msg',msg)

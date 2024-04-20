@@ -5,7 +5,7 @@
       </p> -->
     <div style="height: 100%;display: flex;flex-flow: column;">
         <div style="height: 90%;" class="table">
-            <el-table :data="queryData" height="100%" empty-text="来到了没有数据的荒原...">
+            <el-table :data="handleProblemSetList()" height="100%" empty-text="来到了没有数据的荒原...">
                 <el-table-column prop="problemSetId" label="试卷编号">
                     <template #default="scope">
                         <el-input v-if="searchBar[scope.$index]" v-model="edited[0].problemSetId"></el-input>
@@ -28,31 +28,43 @@
                         <span v-else>{{ scope.row.desc }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="startTime" label="开始时间">
+                <el-table-column prop="startTimeStr" label="开始时间">
                     <template #default="scope">
-                        <el-input v-if="isSelected[scope.$index] === true"
+                        <!-- 
+                        <span v-else>{{ scope.row.startTime }}</span> -->
+                        <el-input v-if="searchBar[scope.$index]" disabled></el-input>
+                        <!-- <el-input v-else-if="unwritableBar[scope.$index]" disabled
+                            v-model="edited[scope.$index].startTime"></el-input> -->
+                        <el-input v-else-if="isSelected[scope.$index] === true"
                             v-model="edited[scope.$index].startTime"></el-input>
-                        <span v-else>{{ scope.row.startTime }}</span>
+                        <span v-else>{{ scope.row.startTimeStr }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="endTime" label="截止时间">
+                <el-table-column prop="endTimeStr" label="截止时间">
                     <template #default="scope">
-                        <el-input v-if="isSelected[scope.$index] === true"
+                        <!-- <el-input v-if="isSelected[scope.$index] === true"
                             v-model="edited[scope.$index].endTime"></el-input>
-                        <span v-else>{{ scope.row.endTime }}</span>
+                        <span v-else>{{ scope.row.endTime }}</span> -->
+                        <el-input v-if="searchBar[scope.$index]" disabled></el-input>
+                        <el-input v-else-if="isSelected[scope.$index] === true"
+                            v-model="edited[scope.$index].endTime"></el-input>
+                        <span v-else>{{ scope.row.endTimeStr }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="duration" label="限时">
+                <el-table-column prop="durationStr" label="限时">
                     <template #default="scope">
                         <el-input v-if="isSelected[scope.$index] === true"
                             v-model="edited[scope.$index].duration"></el-input>
-                        <span v-else>{{ scope.row.duration }}</span>
+                        <span v-else>{{ scope.row.durationStr }}</span>
                     </template>
                 </el-table-column>
 
                 <el-table-column prop="problemIdList" label="" width="150px">
+                    <template #header>
+                        <el-button type="primary">创建</el-button>
+                    </template>
                     <template #default="scope">
-                        <el-button type="primary" @click="editProblemSet(scope.row.problemId)">编辑试卷</el-button>
+                        <el-button type="primary" @click="editProblemSet(scope.row.problemSetId)">编辑试卷</el-button>
                     </template>
                 </el-table-column>
                 <!-- <el-table-column prop="problemIdList" label="" width="100px">
@@ -71,7 +83,7 @@
                     @create-confirm="(index) => { CRUDhandler.createRow(edited[index]); unwritableBar[0] = false; }"
                     @search="(index) => { CRUDhandler.clear(edited[index]); isSelected[index] = true; clearPara = false; searchBar[0] = true; }"
                     @search-confirm="(index) => { CRUDhandler.search(edited[index]); searchBar[0] = false; back = true; }"
-                    @back="fetchProblemSets(); back = false;" /> -->
+                    @back="backToHome(); back = false;" /> -->
             </el-table>
         </div>
         <div class="pagination-block">
@@ -80,31 +92,61 @@
         </div>
     </div>
 
-    <el-dialog v-model="dialogVisible" title="编辑试卷" width="1000" draggable overflow :close-on-click-modal="false"
+    <el-dialog v-model="dialogVisible" title="编辑试卷" width="1100" draggable overflow :close-on-click-modal="false"
         :close-on-press-escape="false">
         <div class="edit-content">
             <el-container>
-                <el-aside width="40%">
-                    试卷名称
-                    <el-input type="textarea" placeholder="" v-model="editName" />
-                    描述
-                    <el-input type="textarea" placeholder="" v-model="editDesc" />
+                <el-aside width="30%">
+                    <div class="problemset-info">
+                        <div class="name">
+                            <span><b>名称：</b></span>
+                            <el-input type="input" placeholder="" v-model="editName" :rows="1" style="width:60%;" />
+                        </div>
+                        <div class="desc">
+                            <span><b>描述：</b></span>
+                            <el-input type="textarea" placeholder="" v-model="editDesc" :rows="5" style="width: 80%;" />
+                        </div>
+                        <div class="duration">
+                            <b>时限：</b>
+                            <el-input type="input" placeholder="" v-model="editHour" :rows="1" style="width: 40px;" />
+                            <span> 时 </span>
+                            <el-input type="input" placeholder="" v-model="editMin" :rows="1" style="width: 40px;" />
+                            <span> 分 </span>
+                        </div>
+                    </div>
+
+                    <div class="datetime-picker">
+                        <div class="block">
+                            <span class="demonstration"><b>开始时间：</b></span>
+                            <el-date-picker v-model="editStartTime" type="datetime" placeholder=""
+                                style="width: 200px;" />
+                        </div>
+                        <div class="block">
+                            <span class="demonstration"><b>截止时间：</b></span>
+                            <el-date-picker v-model="editEndTime" type="datetime" placeholder=""
+                                style="width: 200px;" />
+                        </div>
+                    </div>
+
                 </el-aside>
                 <el-container width="40%">
-                    <el-header>
-
-                    </el-header>
-
+                    <!-- <el-header>
+                    </el-header> -->
+                    <div class="problem-content">
+                        <pre style="white-space:pre;white-space:pre-wrap;">{{ selectedProblem.content }}</pre>
+                    </div>
                     <el-main>
-                        选择题目
+
                         <div class="problemlist-content">
-                            <el-table :data="loadCurrentList()" :row-class-name="rowClassName">
-                                <el-table-column prop="title" label="题目" width="" />
-                                <el-table-column prop="subjectName" label="知识点" width="" />
-                                <el-table-column prop="typeName" label="题型" width="" />
-                                <el-table-column label="" width="80px">
+                            <el-table :data="loadCurrentProblemList()" :row-class-name="rowClassName">
+                                <el-table-column prop="title" label="题目" width="120px" />
+                                <el-table-column prop="subjectName" label="知识点" width="100px" />
+                                <el-table-column prop="typeName" label="题型" width="60px" />
+                                <el-table-column prop="" label="分值" width="60px" />
+                                <el-table-column label="" width="60px">
                                     <template #default="scope">
-                                        <el-button size="small" @click="">选择</el-button>
+                                        <el-button size="small"
+                                            @click="selectProblemWithId(scope.row.problemId)">选择</el-button>
                                     </template>
                                 </el-table-column>
                             </el-table>
@@ -118,32 +160,37 @@
                         </div>
                     </el-footer>
                 </el-container>
-                <el-aside width="20%">
+                <el-aside width="25%">
                     <div class="problerm-search">
-                        <h4>筛选题目</h4>
                         <el-input type="textarea" placeholder="在此输入题目标题" v-model="searchTitle" />
                         <p>题目类型</p>
                         <el-cascader placeholder="题目类型" :options="typeOptions" filterable v-model="chosenType" />
                         <p>病种知识点</p>
                         <el-cascader placeholder="病种知识点" :options="subjectOptions" filterable v-model="chosenSubject" />
-                        <div class="button" style="margin-top: 50px;">
-                            <el-button style="background-color: antiquewhite; width:100px;"
-                                @click="clearConditions()">清空筛选条件</el-button>
-                            <el-button style="background-color: paleturquoise; width:100px;"
-                                @click="searchProblems()">查找相关题目</el-button>
+                        <div class="button">
+                            <el-button size="" style="background-color: antiquewhite; width:100px;"
+                                @click="clearConditions()">清空</el-button>
+                            <el-button size="" style="background-color: paleturquoise; width:100px;"
+                                @click="searchProblems()">查找</el-button>
                         </div>
 
+                    </div>
+                    <div class="switch">
+                        <span>只显示已选题目 </span>
+                        <el-switch v-model="selected" />
+                    </div>
+
+                    <div class="edit-confirm">
+                        <el-button type="success" size="large" @click="clearEdit(); dialogVisible = false;">
+                            确认
+                        </el-button>
+                        <el-button type="info" size="large" @click="clearEdit(); dialogVisible = false;">
+                            取消
+                        </el-button>
                     </div>
                 </el-aside>
             </el-container>
         </div>
-
-        <el-button type="success" size="small" @click="  ; dialogVisible = false;">
-            确认
-        </el-button>
-        <el-button type="info" size="small" @click="dialogVisible = false;">
-            取消
-        </el-button>
     </el-dialog>
 
 </template>
@@ -159,7 +206,7 @@ import tableOption from "../subComponents/tableOption.vue";
 import { isSelectGen, EditedGen, clearIsSelected } from "../subComponents/tableOption.vue";
 import { onMounted } from "vue";
 import type { Ref } from "vue";
-import { pageQuery as problemSetQuery, update as problemSetUpdate } from "../../apis/problemSet/problemSet"
+import { pageQuery as problemSetQuery, update as updateProblemSet } from "../../apis/problemSet/problemSet"
 import { pageQuery as problemQuery } from '@/apis/problem/problem';
 import { pageQuery as diseaseQuery } from '@/apis/disease/disease';
 import type { ProblemSetPageRequest, ProblemSetPageResponse, ProblemSetUpdateRequest } from "@/apis/problemSet/problemSet-interface"
@@ -168,6 +215,7 @@ import type { DiseasePageRequest, DiseasePageResponse, DiseaseUpdateRequest } fr
 import type { ProblemBO, DiseaseBO } from '@/apis/schemas';
 import { ProblemSet, Problem } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt'
+import { throwMessage } from "@/scripts/display";
 
 const ProblemSetPage = ref<ProblemSetPageResponse>({ datas: [], total: 0, limit: 0 });
 var searchBar = ref([false]);
@@ -184,7 +232,7 @@ class problemSetRowCRUD implements rowCRUD {
         (Msg[index] as ProblemSet).problemScoreMap = data[index].problemScoreMap;
         // console.log('editedProblemSet', Msg);
     }//更新buffer
-    deleteRow(Msg: Object[], index: number): void {
+    async deleteRow(Msg: Object[], index: number) {
         var request: ProblemSetUpdateRequest = {
             problemSet: {
                 problemSetId: (Msg[index] as ProblemSet).problemSetId,
@@ -199,11 +247,17 @@ class problemSetRowCRUD implements rowCRUD {
             delete: true
         }
         // console.log('delete request', request);
-        var response = problemSetUpdate(request);
-        setTimeout(() => { fetchProblemSets(); }, 500);
+        var ProSetDelresponse = await updateProblemSet(request);
+        if (ProSetDelresponse) {//更改成功
+            throwMessage('delete fail');
+        }
+        else {
+            throwMessage('delete success');
+            setTimeout(() => { backToHome(); }, 500);
+        }
         // console.log('delete response', response);
     }//删除
-    editRow(Msg: Object[], index: number): void {
+    async editRow(Msg: Object[], index: number) {
         var request: ProblemSetUpdateRequest = {
             problemSet: {
                 problemSetId: (Msg[index] as ProblemSet).problemSetId,
@@ -218,8 +272,14 @@ class problemSetRowCRUD implements rowCRUD {
             delete: false
         }
         // console.log('update request', request);
-        var response = problemSetUpdate(request);
-        setTimeout(() => { fetchProblemSets(); }, 500);
+        var ProSetUpdateResponse = await updateProblemSet(request);
+        if (ProSetUpdateResponse) {//更改成功
+            throwMessage('update success');
+            setTimeout(() => { backToHome(); }, 500);
+        }
+        else {
+            throwMessage('update fail');
+        }
         // console.log('update response', response);
     }//修改
     clear(edited: ProblemSet) {
@@ -227,7 +287,7 @@ class problemSetRowCRUD implements rowCRUD {
         edited.title = '';
 
     }
-    createRow(msg: Object): void {
+    async createRow(msg: Object) {
         var request: ProblemSetUpdateRequest = {
             problemSet: {
                 title: (msg as ProblemSet).title,
@@ -241,8 +301,14 @@ class problemSetRowCRUD implements rowCRUD {
             delete: false
         }
         // console.log('create request', request);
-        var response = problemSetUpdate(request);
-        setTimeout(() => { fetchProblemSets(); }, 500);
+        var ProSetCreateResponse = await updateProblemSet(request);
+        if (ProSetCreateResponse) {//更改成功
+            throwMessage('create success');
+            setTimeout(() => { backToHome(); }, 500);
+        }
+        else {
+            throwMessage('create fail');
+        }
         // console.log('create response', response);
     }//创建
     search(msg: Object): void {
@@ -280,19 +346,19 @@ async function fetchProblemSets(pageNum?: number, pageLimit?: number, msg?: Obje
             ProblemSetPage.value = response.data; // 假设响应中有data属性，且包含datas数组
             queryData.value = ProblemSetPage.value.datas;
 
-            for (var item of queryData.value) { //处理起止时间和时限的显示格式
-                if (item.startTime) {
-                    item.startTime = item.startTime.toString().slice(0, 10) + " " + item.startTime.toString().slice(11, 16);
-                }
-                if (item.endTime) {
-                    item.endTime = item.endTime.toString().slice(0, 10) + " " + item.endTime.toString().slice(11, 16);
-                }
-                if (item.duration) {
-                    var hour = Math.floor(item.duration / (1000 * 60 * 60));
-                    var min = Math.floor(item.duration / (1000 * 60) - hour * 60);
-                    item.duration = hour + "h" + min + "min";
-                }
-            }
+            // for (var item of queryData.value) { //处理起止时间和时限的显示格式
+            //     if (item.startTime) {
+            //         item.startTime = item.startTime.toString().slice(0, 10) + " " + item.startTime.toString().slice(11, 16);
+            //     }
+            //     if (item.endTime) {
+            //         item.endTime = item.endTime.toString().slice(0, 10) + " " + item.endTime.toString().slice(11, 16);
+            //     }
+            //     if (item.duration) {
+            //         var hour = Math.floor(item.duration / (1000 * 60 * 60));
+            //         var min = Math.floor(item.duration / (1000 * 60) - hour * 60);
+            //         item.duration = hour + "h" + min + "min";
+            //     }
+            // }
 
             if (search || false) {
                 tabLength.value = ProblemSetPage.value.total;
@@ -323,9 +389,12 @@ var isSelected: Ref<boolean[]> = ref<boolean[]>([]);
 var edited: Ref<ProblemSet[]> = ref<ProblemSet[]>([]);
 var queryData = ref<any[]>([]);
 var currentPage = 1;
+function backToHome() {
+    fetchProblemSets(currentPage);
+}
 function pagination(val: number) {
     currentPage = val
-    fetchProblemSets(currentPage);
+    backToHome();
     //恢复初始值
     // eslint-disable-next-line vue/no-ref-as-operand
     isSelected = clearIsSelected(isSelected);
@@ -337,6 +406,18 @@ function pagination(val: number) {
 const component = defineComponent({
     name: "ProblemSetManagement"
 })
+
+interface ProblemSetInfo {
+    problemSetId?: string;
+    title?: string;
+    desc?: string;
+    startTimeStr?: string;
+    startTime?: Date;
+    endTimeStr?: string;
+    endTime?: Date;
+    durationStr?: string;
+    duration?: number
+}
 
 interface ProblemInfo {
     problemId?: string;
@@ -354,19 +435,27 @@ interface ProblemInfo {
 //编辑试卷题目
 const editId = ref('');
 const dialogVisible = ref(false);
-const input = ref('');
+
 const editName = ref('');
 const editDesc = ref('');
-const editHour = ref('');
-const editMin = ref('');
+const editHour = ref(0);
+const editMin = ref(0);
+const editStartTime = ref('');
+const editEndTime = ref('');
+
 const selectedIndex = ref(0);
 const selectedProblem = ref<ProblemBO>({});
+const showAnswer = ref(false);
+const showOrHide = ref('显示答案');
 const problemList = ref<ProblemBO[]>([]);
 const diseaseList = ref<DiseaseBO[]>([]);
+
 const searchTitle = ref('');
 const chosenType = ref('');
 const chosenSubject = ref('');
+const selected = ref(true);
 const resultList = ref<ProblemInfo[]>([]);
+
 let typeOptions = ref([{
     value: 'objective',
     label: '单选题'
@@ -385,16 +474,43 @@ const rowClassName = ({ rowIndex }: { rowIndex: number }) => {
     //     return '';
     // }
 };
-function editProblemSet(id: string) {
+function editProblemSet(id: string) { //打开修改试卷弹窗
     editId.value = id;
+    const currentSet = queryData.value.find(set => set.problemSetId === id);
+    // console.log("编辑试卷:",currentSet);
+    editName.value = currentSet.title;
+    editDesc.value = currentSet.desc;
+    if (currentSet.duration) {
+        const hour = Math.floor(currentSet.duration / (1000 * 60 * 60));
+        const min = Math.floor(currentSet.duration / (1000 * 60) - hour * 60);
+        // console.log("时间:", currentSet.duration);
+        editHour.value = hour ?? 0;
+        editMin.value = min ?? 0;
+    }
+    if (currentSet.startTime) {
+        editStartTime.value = currentSet.startTime;
+    }
+    if (currentSet.endTime) {
+        editEndTime.value = currentSet.endTime;
+    }
+
     dialogVisible.value = true;
 }
+function clearEdit() {
+    editName.value = '';
+    editDesc.value = '';
+    editHour.value = 0;
+    editMin.value = 0;
+    editStartTime.value = '';
+    editEndTime.value = '';
+}
+
 async function fetchProblems() {
     try {
         const request: ProblemPageRequest = { currPageNo: 1 };
         const response = await problemQuery(request);
         const pages = Math.ceil(response.data.total / response.data.limit); //总页数
-        console.log("total=", response.data.total, " limit=", response.data.limit);
+        // console.log("total=", response.data.total, " limit=", response.data.limit);
         for (var i = 1; i <= pages; i++) {
             request.currPageNo = i;
             const response = await problemQuery(request);
@@ -407,7 +523,6 @@ async function fetchProblems() {
                 console.error('No data returned from the API');
             }
         }
-        // console.log("获取problemList:", problemList.value);
         setTimeout(() => {
             resultList.value = JSON.parse(JSON.stringify(problemList.value));
             for (var pro of resultList.value) {
@@ -420,7 +535,7 @@ async function fetchProblems() {
             }
             selectedProblem.value = resultList.value[0];
             selectedIndex.value = 0;
-        }, 50);
+        }, 100);
 
     } catch (error) {
         console.error('Error fetching problems:', error);
@@ -441,7 +556,6 @@ async function fetchDiseases() {
                 console.error('No data returned from the API');
             }
         }
-        console.log("获取diseaseList:", diseaseList.value);
         setTimeout(() => {
             subjectOptions.value = diseaseList.value.map(disease => {
                 return {
@@ -449,7 +563,6 @@ async function fetchDiseases() {
                     label: disease.name
                 };
             })
-            console.log('病种选项:', subjectOptions.value);
         }, 50);
     } catch (error) {
         console.error('Error fetching diseases:', error);
@@ -479,7 +592,6 @@ function searchProblems() {
         selectedProblem.value = resultList.value[0];
         selectedIndex.value = 0;
     }
-    console.log('筛选结果:', resultList.value);
 }
 
 function clearConditions() {
@@ -488,10 +600,44 @@ function clearConditions() {
     chosenSubject.value = '';
     searchProblems();
 }
-function loadProblemList() {
+function handleProblemSetList() { //处理起止时间和时限的显示格式
+    const problemList: ProblemSetInfo[] = [];
+    for (let i in queryData.value) {
+        const temp: ProblemSetInfo = {
+            problemSetId: "",
+            title: "",
+            desc: "",
+            startTimeStr: "",
+            startTime: new Date(0),
+            endTimeStr: "",
+            endTime: new Date('9999-12-31T23:59:59'),
+            durationStr: "",
+            duration: 0
+        };
+        temp.problemSetId = queryData.value[i].problemSetId ?? "";
+        temp.title = queryData.value[i].title ?? "";
+        temp.desc = queryData.value[i].desc ?? "";
+        if (queryData.value[i].startTime != null) {
+            temp.startTimeStr = queryData.value[i].startTime?.toString().slice(0, 10) + ' ' + queryData.value[i].startTime?.toString().slice(11, 16);
+            temp.startTime = queryData.value[i].startTime ?? new Date();
+        }
+        if (queryData.value[i].endTime != null) {
+            temp.endTimeStr = queryData.value[i].endTime?.toString().slice(0, 10) + ' ' + queryData.value[i].endTime?.toString().slice(11, 16);;
+            temp.endTime = queryData.value[i].endTime ?? new Date();
+        }
+        if (queryData.value[i].duration != null) {
+            var hour = Math.floor((queryData.value[i].duration ?? 0) / (1000 * 60 * 60));
+            var min = Math.floor((queryData.value[i].duration ?? 0) / (1000 * 60) - hour * 60);
+            temp.durationStr = hour + "h" + min + "min";
+            temp.duration = queryData.value[i].duration ?? 0;
+        }
+        problemList.push(temp);
 
+    }
+
+    return problemList;
 }
-function loadCurrentList() {
+function loadCurrentProblemList() {
     var currentList: ProblemInfo[] = [];
     for (var i in resultList.value) {
         var index = resultList.value.indexOf(resultList.value[i])
@@ -499,8 +645,24 @@ function loadCurrentList() {
             currentList.push(resultList.value[i]);
         }
     }
-    console.log(currentList.length);
     return currentList;
+}
+
+function selectProblemWithId(id: string) {
+    var temp = resultList.value.find(pro => pro.problemId === id);
+    if (temp != null) {
+        selectedProblem.value = temp;
+        selectedIndex.value = resultList.value.indexOf(temp);
+    }
+}
+function changeShowOrHide() {
+    if (showAnswer.value == true) {
+        showAnswer.value = false;
+        showOrHide.value = '显示答案';
+    } else {
+        showAnswer.value = true;
+        showOrHide.value = '隐藏答案';
+    }
 }
 
 //前端分页处理
@@ -517,18 +679,108 @@ function handleSizeChange(n: number) {
 
 <style scoped lang="scss">
 .edit-content {
-    min-height: 500px;
-    max-height: 500px;
+    min-height: 510px;
+    max-height: 510px;
     overflow: auto;
 }
-.problemlist-content{
-    max-height: 300px;
+
+.problemset-info {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 10px 0;
+    padding: 15px 20px;
+    border: solid 1px rgb(215, 215, 215);
+    border-radius: 10px;
 }
+
+.problemset-info .name {
+    height: 30px;
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.problemset-info .desc {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.problemset-info .duration {
+    height: 30px;
+    display: flex;
+}
+
+.datetime-picker {
+    display: flex;
+    position: relative;
+    top: 10px;
+    padding: 5px 0;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    border: solid 1px rgb(215, 215, 215);
+    border-radius: 10px;
+}
+
+.datetime-picker .block {
+    padding: 10px 5px;
+    text-align: center;
+    border-right: solid 1px var(--el-border-color);
+    flex: 1;
+}
+
+.datetime-picker .demonstration {
+    font-size: 14px;
+}
+
+.problem-content {
+    min-height: 100px;
+    max-height: 100px;
+    background-color: rgb(240, 240, 240);
+    border-radius: 20px;
+    margin: 10px 30px;
+    padding: 1px 15px;
+    font-size: small;
+    text-align: left;
+    white-space: normal;
+    // overflow-wrap: break-word;
+    // margin-top:-50px;
+}
+
+.problemlist-content {
+    padding: 0 5px;
+    max-height: 280px;
+    min-height: 280px;
+}
+
 .problemlist-pagination {
     text-align: center;
     display: flex;
     justify-content: center;
 }
+
+.problerm-search {
+    display: block;
+    margin: 20px 10px;
+    padding: 10px 15px;
+    border: solid 1px rgb(215, 215, 215);
+    border-radius: 10px;
+}
+
+.problerm-search .button {
+    display: flex;
+    margin-top: 30px;
+}
+
+.switch {
+    margin-top: 10px;
+}
+
+.edit-confirm {
+    display: flex;
+    float: right;
+    position: relative;
+    bottom: -90px;
+}
+
 // .el-table__body, .el-table__header{
 //     width: 100%;
 //   }</style>

@@ -50,7 +50,7 @@
 
         </div>
       </div>
-      <div style="align-items:center;display: flex">
+      <div style="align-items:center;display: flex;width:0%;">
         <span class="asideBtn" @click="() => aside = !aside">
           <el-icon v-if="!aside">
             <ArrowRight />
@@ -168,7 +168,7 @@ onMounted(()=>{
   border-left-style: hidden;
   align-items: center;
   display: flex;
-  z-index: 1;
+  z-index: 3;
 }
 
 .mainPage {

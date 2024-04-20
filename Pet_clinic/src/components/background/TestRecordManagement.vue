@@ -17,30 +17,44 @@
         <el-table-column prop="problemSetId" label="试卷">
           <template #default="scope">
             <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].problemSetId"></el-input>
-            <span v-else>{{ scope.row.problemSetId }}</span>
+            <span v-else>{{ problemsetMap.get(scope.row.problemSetId) }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="candidateId" label="考生">
           <template #default="scope">
-            <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].candidateId"></el-input>
-            <span v-else>{{ scope.row.candidateId }}</span>
+            <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].candidateId"></el-input>
+            <span v-else>{{ personnelMap.get(scope.row.candidateId) }}</span> -->
+            <el-input v-if="searchBar[scope.$index]"></el-input>
+            <el-input v-else-if="unwritableBar[scope.$index]" disabled v-model="edited[scope.$index].candidateId"></el-input>
+            <span v-else>{{ personnelMap.get(scope.row.candidateId) }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="graded" label="分数">
           <template #default="scope">
-            <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].graded"></el-input>
-            <span v-else>{{ scope.row.graded }}</span>
+            <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].graded"></el-input> -->
+            <el-select v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].graded" placeholder="Select" style="width: 100%">
+    <el-option
+      v-for="item in gradeOptions"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value"
+    />
+  </el-select>
+            <span v-else>{{ gradeMap.get(scope.row.graded) }}</span>
           </template>
         </el-table-column>
 
         <el-table-column prop="submitTime" label="提交时间">
           <template #default="scope">
-            <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].submitTime"></el-input>
+            <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].submitTime"></el-input>
+            <span v-else>{{ scope.row.submitTime }}</span> -->
+            <el-input v-if="searchBar[scope.$index]" disabled></el-input>
+            <el-input v-else-if="unwritableBar[scope.$index]" disabled v-model="edited[scope.$index].submitTime"></el-input>
             <span v-else>{{ scope.row.submitTime }}</span>
           </template>
         </el-table-column>
 
-        <!-- <tableOption :clear=clearPara :num=tabLength :back=back
+        <tableOption :clear=clearPara :num=tabLength :back=back
           @edit-confirm="(index) => { CRUDhandler.editRow(edited, index); }"
           @edit="(index) => { CRUDhandler.updateMsg(edited, queryData, index); isSelected[index] = !isSelected[index]; clearPara = false; }"
           @cancel="(index) => { isSelected[index] = !isSelected[index]; clearPara = false; unwritableBar[0] = false; searchBar[0] = false; }"
@@ -50,7 +64,7 @@
           @create-confirm="(index) => { CRUDhandler.createRow(edited[index]); unwritableBar[0] = false; }"
           @search="(index) => { CRUDhandler.clear(edited[index]); isSelected[index] = true; clearPara = false; searchBar[0] = true; }"
           @search-confirm="(index) => { CRUDhandler.search(edited[index]); searchBar[0] = false; back = true; }"
-          @back="fetchTestRecords(); back = false;" /> -->
+          @back="fetchTestRecords(); back = false;" />
       </el-table>
     </div>
     <div class="pagination-block">
@@ -79,6 +93,7 @@ import { pageQuery, update } from "../../apis/testRecord/testRecord"
 import type { TestRecordPageRequest, TestRecordPageResponse, TestRecordUpdateRequest } from "@/apis/testRecord/testRecord-interface"
 import { TestRecord } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt'
+import type { PersonnelPageRequest } from "@/apis/personnel/personnel-interface";
 const TestRecordPage = ref<TestRecordPageResponse>({ datas: [], total: 0, limit: 0 });
 var searchBar = ref([false]);
 var unwritableBar = ref([false]);
@@ -220,6 +235,8 @@ async function fetchTestRecords(pageNum?: number, pageLimit?: number, msg?: Obje
   }
 }
 onMounted(() => {
+  getPersonnelInfo();
+  getProblemsetInfo();
   fetchTestRecords();
 });
 //request
@@ -231,9 +248,12 @@ var isSelected: Ref<boolean[]> = ref<boolean[]>([]);
 var edited: Ref<TestRecord[]> = ref<TestRecord[]>([]);
 var queryData = ref<any[]>([]);
 var currentPage = 1;
+function backToHome(){
+  fetchTestRecords(currentPage);
+}
 function pagination(val: number) {
   currentPage = val
-  fetchTestRecords(currentPage);
+  backToHome();
   //恢复初始值
   // eslint-disable-next-line vue/no-ref-as-operand
   isSelected = clearIsSelected(isSelected);
@@ -242,6 +262,66 @@ function pagination(val: number) {
   unwritableBar.value[0] = false;
 }
 //分页
+//filter && view
+import { pageQuery as personnelPageQuery} from "@/apis/personnel/personnel";
+import { pageQuery as problemsetPageQuery } from "@/apis/problemSet/problemSet";
+import type { ProblemSetPageRequest } from "@/apis/problemSet/problemSet-interface";
+const problemsetMap:Ref<Map<any,any>> = ref<Map<any,any>>(new Map());
+async function getProblemsetInfo() {
+  var request: ProblemSetPageRequest = {
+    limit: 999
+  }
+  try {
+    var problemsetResponse = await problemsetPageQuery(request);
+    if (problemsetResponse && problemsetResponse.data && problemsetResponse.data.datas) {
+      console.log('Fetched personnels:', problemsetResponse.data.datas);
+      for (var i = 0; i < problemsetResponse.data.datas.length; i++) {
+        problemsetMap.value.set(problemsetResponse.data.datas[i].problemSetId, problemsetResponse.data.datas[i].title);
+      }
+      console.log('problemsetMap', problemsetMap)
+    } else {
+      console.error('No data returned from the API');
+    }
+
+  } catch (error) {
+    console.error('Error fetching problemsets:', error);
+  }
+}
+const personnelMap:Ref<Map<any,any>> = ref<Map<any,any>>(new Map());
+async function getPersonnelInfo() {
+  var request: PersonnelPageRequest = {
+    limit: 999
+  }
+  try {
+    var personnelResponse = await personnelPageQuery(request);
+    if (personnelResponse && personnelResponse.data && personnelResponse.data.datas) {
+      console.log('Fetched personnels:', personnelResponse.data.datas);
+      for (var i = 0; i < personnelResponse.data.datas.length; i++) {
+        personnelMap.value.set(personnelResponse.data.datas[i].personnelId, personnelResponse.data.datas[i].name);
+      }
+      console.log('personnelMap', personnelMap)
+    } else {
+      console.error('No data returned from the API');
+    }
+
+  } catch (error) {
+    console.error('Error fetching personnels:', error);
+  }
+}
+const gradeOptions = [
+  {
+    label:"已完成",
+    value:true
+  },
+  {
+    label:"未完成",
+    value:false
+  }
+]
+const gradeMap = new Map([
+  [false,'未完成'],
+  [true,"已完成"]
+])
 const component = defineComponent({
   name: "TestRecordManagement"
 })

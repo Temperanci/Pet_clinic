@@ -21,8 +21,16 @@
         </el-table-column>
         <el-table-column prop="type" label="题型">
           <template #default="scope">
-            <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].type"></el-input>
-            <span v-else>{{ scope.row.type }}</span>
+            <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].type"></el-input> -->
+            <el-select v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].type" placeholder="Select" style="width: 100%">
+    <el-option
+      v-for="item in typeOptions"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value"
+    />
+  </el-select>
+            <span v-else>{{ typeMap.get(scope.row.type) }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="content" label="内容" >
@@ -45,8 +53,18 @@
         </el-table-column>
         <el-table-column prop="subjectId" label="病种知识点">
           <template #default="scope">
-            <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].subjectId"></el-input>
-            <span v-else>{{ scope.row.subjectId }}</span>
+            <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].subjectId"></el-input>
+            <span v-else>{{ scope.row.subjectId }}</span> -->
+            <el-select v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].subjectId" placeholder="Select" style="width: 100%">
+    <el-option
+      v-for="item in diseaseOptions"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value"
+      :disabled="item.disabled"
+    />
+  </el-select>
+            <span v-else>{{ diseaseMap.get(scope.row.subjectId) }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="background" label="出题背景">
@@ -65,7 +83,7 @@
           @create-confirm="(index) => { CRUDhandler.createRow(edited[index]); unwritableBar[0] = false; }"
           @search="(index) => { CRUDhandler.clear(edited[index]); isSelected[index] = true; clearPara = false; searchBar[0] = true; }"
           @search-confirm="(index) => { CRUDhandler.search(edited[index]); searchBar[0] = false; back = true; }"
-          @back="fetchProblems(); back = false;" />
+          @back="backToHome(); back = false;" />
       </el-table>
     </div>
     <div class="pagination-block">
@@ -90,6 +108,7 @@ import { pageQuery, update } from "../../apis/problem/problem"
 import type { ProblemPageRequest, ProblemPageResponse, ProblemUpdateRequest } from "@/apis/problem/problem-interface"
 import { Problem } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt'
+import { throwMessage } from "@/scripts/display";
 const ProblemPage = ref<ProblemPageResponse>({ datas: [], total: 0, limit: 0 });
 var searchBar = ref([false]);
 var unwritableBar = ref([false]);
@@ -105,7 +124,7 @@ class problemRowCRUD implements rowCRUD {
     (Msg[index] as Problem).background = data[index].background;
     // console.log('editedProblem', Msg);
   }//更新buffer
-  deleteRow(Msg: Object[], index: number): void {
+ async deleteRow(Msg: Object[], index: number){
     var request: ProblemUpdateRequest = {
       problem: {
         problemId: (Msg[index] as Problem).problemId,
@@ -120,11 +139,17 @@ class problemRowCRUD implements rowCRUD {
       delete: true
     }
     // console.log('delete request', request);
-    var response = update(request);
-    setTimeout(() => { fetchProblems(); }, 500);
+    var ProDelResponse =await update(request);
+    if(ProDelResponse){//更改成功
+      throwMessage('delete fail');
+    }
+    else{
+      throwMessage('delete success');
+      setTimeout(() => { backToHome(); }, 500);
+    }
     // console.log('delete response', response);
   }//删除
-  editRow(Msg: Object[], index: number): void {
+ async editRow(Msg: Object[], index: number) {
     var request: ProblemUpdateRequest = {
       problem: {
         problemId: (Msg[index] as Problem).problemId,
@@ -139,8 +164,14 @@ class problemRowCRUD implements rowCRUD {
       delete: false
     }
     // console.log('update request', request);
-    var response = update(request);
-    setTimeout(() => { fetchProblems(); }, 500);
+    var ProUpdateresponse =await update(request);
+    if(ProUpdateresponse){//更改成功
+      throwMessage('update success');
+      setTimeout(() => { backToHome(); }, 500);
+    }
+    else{
+      throwMessage('update fail');
+    }
     // console.log('update response', response);
   }//修改
   clear(edited: Problem) {
@@ -153,7 +184,7 @@ class problemRowCRUD implements rowCRUD {
     edited.subjectId = '';
     edited.background = '';
   }
-  createRow(msg: Object): void {
+ async createRow(msg: Object) {
     var request: ProblemUpdateRequest = {
       problem: {
         title: (msg as Problem).title,
@@ -167,8 +198,14 @@ class problemRowCRUD implements rowCRUD {
       delete: false
     }
     // console.log('create request', request);
-    var response = update(request);
-    setTimeout(() => { fetchProblems(); }, 500);
+    var ProCreateResponse =await update(request);
+    if(ProCreateResponse){//更改成功
+      throwMessage('create success');
+      setTimeout(() => { backToHome(); }, 500);
+    }
+    else{
+      throwMessage('create fail');
+    }
     // console.log('create response', response);
   }//创建
   search(msg: Object): void {
@@ -227,9 +264,10 @@ async function fetchProblems(pageNum?: number, pageLimit?: number, msg?: Object,
   }
 }
 onMounted(() => {
+  getDiseaseInfo();
   fetchProblems();
 });
-//request
+//paginate
 var entryNum = ref(0);
 var tabLength = ref(0);//每页展示的条目数
 const clearPara = ref(false);//让子组件复位
@@ -238,9 +276,12 @@ var isSelected: Ref<boolean[]> = ref<boolean[]>([]);
 var edited: Ref<Problem[]> = ref<Problem[]>([]);
 var queryData = ref<any[]>([]);
 var currentPage = 1;
+function backToHome(){
+  fetchProblems(currentPage);
+}
 function pagination(val: number) {
   currentPage = val
-  fetchProblems(currentPage);
+  backToHome();
   //恢复初始值
   // eslint-disable-next-line vue/no-ref-as-operand
   isSelected = clearIsSelected(isSelected);
@@ -252,6 +293,50 @@ function pagination(val: number) {
 const component = defineComponent({
   name: "ProblemManagement"
 })
+//filter && view
+import { pageQuery as diseasePageQuery } from "@/apis/disease/disease";
+import { type DiseasePageRequest,type DiseasePageResponse } from '@/apis/disease/disease-interface';
+var diseaseOptions:Ref<any[]> = ref<any[]>([]);
+let diseaseMap:Ref<Map<any,any>>=ref<Map<any,any>>(new Map());
+const DiseasePage = ref<DiseasePageResponse>({ datas: [], total: 0, limit: 0 });
+async function getDiseaseInfo() {
+  var request: DiseasePageRequest = {
+    limit: 999
+  }
+  try {
+    var deptResponse = await diseasePageQuery(request);
+    if (deptResponse && deptResponse.data && deptResponse.data.datas) {
+      console.log('Fetched diseases:', deptResponse.data.datas);
+      for (var i = 0; i < deptResponse.data.datas.length; i++) {
+        diseaseOptions.value.push({
+          value: deptResponse.data.datas[i].diseaseId,
+          label: deptResponse.data.datas[i].name
+        });
+        diseaseMap.value.set(deptResponse.data.datas[i].diseaseId, deptResponse.data.datas[i].name);
+      }
+      console.log('deptMap', diseaseMap)
+    } else {
+      console.error('No data returned from the API');
+    }
+
+  } catch (error) {
+    console.error('Error fetching diseases:', error);
+  }
+}
+const typeOptions =[
+  {
+    label:'客观题',
+    value:'objective'
+  },
+  {
+    label:'主观题',
+    value:'subjective'
+  }
+]
+const typeMap = new Map([
+  ["subjective","主观题"],
+  ["objective","客观题"],  
+])
 </script>
 
 <style scoped lang="scss">

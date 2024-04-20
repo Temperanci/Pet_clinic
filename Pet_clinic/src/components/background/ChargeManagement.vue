@@ -52,7 +52,15 @@
         </el-table-column>
         <el-table-column prop="type" label="服务类型">
           <template #default="scope">
-            <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].type"></el-input>
+            <el-select v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].type" placeholder="Select" style="width: 100%">
+    <el-option
+      v-for="item in typeOptions"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value"
+    />
+  </el-select>
+            <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].type"></el-input> -->
             <span v-else>{{ scope.row.type }}</span>
           </template>
         </el-table-column>
@@ -94,6 +102,7 @@ import { pageQuery ,update} from "../../apis/price/price"
 import type { PricePageRequest, PricePageResponse,PriceUpdateRequest } from "@/apis/price/price-interface.ts"
 import { Price } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt'
+import { throwMessage } from "@/scripts/display";
 const PricePage = ref<PricePageResponse>({ datas: [], total: 0, limit: 0 });
 var searchBar = ref([false]);
 var unwritableBar = ref([false]);
@@ -108,7 +117,7 @@ class priceRowCRUD implements rowCRUD {
     (Msg[index] as Price).desc = data[index].desc;
     console.log('editedPrice',Msg);
   }//更新buffer
-  deleteRow(Msg: Object[],index:number): void {
+async  deleteRow(Msg: Object[],index:number) {
     var request:PriceUpdateRequest = {
       price:{
         priceId:(Msg[index] as Price).priceId,
@@ -121,11 +130,17 @@ class priceRowCRUD implements rowCRUD {
       },
     delete:true}
     console.log('delete request',request);
-    var response= update(request);
-    setTimeout(()=>{backToHome();},500);
-    console.log('delete response',response); 
+    var chargeDelResponse= await update(request);
+    if(chargeDelResponse){//更改成功
+      throwMessage('delete fail');
+    }
+    else{
+      throwMessage('delete success');
+      setTimeout(()=>{backToHome();},500);
+    }
+    console.log('delete response',chargeDelResponse); 
   }//删除
-  editRow(Msg: Object[],index:number): void {
+async  editRow(Msg: Object[],index:number) {
     var request:PriceUpdateRequest = {
       price:{
         priceId:(Msg[index] as Price).priceId,
@@ -138,9 +153,15 @@ class priceRowCRUD implements rowCRUD {
       },
     delete:false}
     console.log('update request',request);
-    var response= update(request);
-    setTimeout(()=>{backToHome();},500);
-    console.log('update response',response);
+    var chargeUpdateResponse= await update(request);
+    if(chargeUpdateResponse){//更改成功
+      throwMessage('update success');
+      setTimeout(()=>{backToHome();},500);
+    }
+    else{
+      throwMessage('update fail');
+    }
+    console.log('update response',chargeUpdateResponse);
   }//修改
   clear(edited:Price){
     edited.priceId='';
@@ -151,7 +172,7 @@ class priceRowCRUD implements rowCRUD {
     edited.serviceId='';
     edited.title='';
   }
-  createRow(msg:Object):void{
+ async createRow(msg:Object){
     var request:PriceUpdateRequest = {
       price:{
         type:(msg as Price).type, 
@@ -162,9 +183,15 @@ class priceRowCRUD implements rowCRUD {
       },
     delete:false}
     console.log('create request',request);
-    var response= update(request);
-    setTimeout(()=>{backToHome();},500);
-    console.log('create response',response); 
+    var chargeCreateResponse=await update(request);
+    if(chargeCreateResponse){//更改成功
+      throwMessage('create success');
+      setTimeout(()=>{backToHome();},500);
+    }
+    else{
+      throwMessage('create fail');
+    }
+    console.log('create response',chargeCreateResponse); 
   }//创建
   search(msg:Object):void{
     console.log('msg',msg)
@@ -273,6 +300,16 @@ async function getDeptInfo() {
     console.error('Error fetching departments:', error);
   }
 }
+const typeOptions = [
+  {
+    label:'药品',
+    value:'药品'
+  },
+  {
+    label:'服务',
+    value:'服务'
+  }
+]
 const component = defineComponent({
   name: "ChargeManagement"
 })

@@ -137,7 +137,7 @@ async function fetchProblems() {
             }
             selectedProblem.value = resultList.value[0];
             selectedIndex.value = 0;
-        }, 50);
+        }, 100);
 
     } catch (error) {
         console.error('Error fetching problems:', error);
@@ -158,7 +158,6 @@ async function fetchDiseases() {
                 console.error('No data returned from the API');
             }
         }
-        console.log("获取diseaseList:", diseaseList.value);
         setTimeout(() => {
             subjectOptions.value = diseaseList.value.map(disease => {
                 return {
@@ -166,7 +165,7 @@ async function fetchDiseases() {
                     label: disease.name
                 };
             })
-            console.log('病种选项:', subjectOptions.value);
+            // console.log('病种选项:', subjectOptions.value);
         }, 50);
     } catch (error) {
         console.error('Error fetching diseases:', error);
@@ -198,7 +197,7 @@ function loadCurrentList() {
             currentList.push(resultList.value[i]);
         }
     }
-    console.log(currentList.length);
+    // console.log(currentList.length);
     return currentList;
 }
 
@@ -240,7 +239,7 @@ function searchProblems() {
         selectedProblem.value = resultList.value[0];
         selectedIndex.value = 0;
     }
-    console.log('筛选结果:', resultList.value);
+    // console.log('筛选结果:', resultList.value);
 }
 
 
@@ -250,7 +249,6 @@ function selectProblemWithId(id: string) {
         selectedProblem.value = temp;
         selectedIndex.value = resultList.value.indexOf(temp);
     }
-    console.log("选择题目:", selectedProblem.value.title);
 }
 
 const rowClassName = ({ rowIndex }: { rowIndex: number }) => {
