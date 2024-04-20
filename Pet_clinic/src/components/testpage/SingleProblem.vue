@@ -30,7 +30,7 @@
                 </el-footer>
             </el-container>
             <el-aside width="30%">
-                <h4>搜索结果 <el-button @click="randomProblem()">随机选题</el-button></h4>
+                <!-- <h4>搜索结果 <el-button @click="randomProblem()">随机选题</el-button></h4> -->
 
                 <el-main>
                     <div class="result-content">

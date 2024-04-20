@@ -61,10 +61,10 @@
 
                 <el-table-column prop="problemIdList" label="" width="150px">
                     <template #header>
-                        <el-button type="primary">创建</el-button>
+                        <el-button type="success" @click="editProblemSet('');">创建试卷</el-button>
                     </template>
                     <template #default="scope">
-                        <el-button type="primary" @click="editProblemSet(scope.row.problemSetId)">编辑试卷</el-button>
+                        <el-button type="primary" @click="editProblemSet(scope.row.problemSetId);">编辑试卷</el-button>
                     </template>
                 </el-table-column>
                 <!-- <el-table-column prop="problemIdList" label="" width="100px">
@@ -100,7 +100,7 @@
                     <div class="problemset-info">
                         <div class="name">
                             <span><b>名称：</b></span>
-                            <el-input type="input" placeholder="" v-model="editName" :rows="1" style="width:60%;" />
+                            <el-input type="input" placeholder="" v-model="editTitle" :rows="1" style="width:60%;" />
                         </div>
                         <div class="desc">
                             <span><b>描述：</b></span>
@@ -138,8 +138,8 @@
                     <el-main>
 
                         <div class="problemlist-content">
-                            <el-table :data="loadCurrentProblemList()" :row-class-name="rowClassName">
-                                <el-table-column prop="title" label="题目" width="120px" />
+                            <el-table :data="loadCurrentProblemList()" :row-class-name="rowClassName" height=290px>
+                                <el-table-column fixed prop="title" label="题目" width="120px" />
                                 <el-table-column prop="subjectName" label="知识点" width="100px" />
                                 <el-table-column prop="typeName" label="题型" width="60px" />
                                 <el-table-column prop="" label="分值" width="60px" />
@@ -164,9 +164,17 @@
                     <div class="problerm-search">
                         <el-input type="textarea" placeholder="在此输入题目标题" v-model="searchTitle" />
                         <p>题目类型</p>
-                        <el-cascader placeholder="题目类型" :options="typeOptions" filterable v-model="chosenType" />
+                        <el-select v-model="chosenType" placeholder="">
+                            <el-option v-for="item in typeOptions" :key="item.value" :label="item.label"
+                                :value="item.value" />
+                        </el-select>
+                        <!-- <el-cascader placeholder="题目类型" :options="typeOptions" filterable v-model="chosenType" /> -->
                         <p>病种知识点</p>
-                        <el-cascader placeholder="病种知识点" :options="subjectOptions" filterable v-model="chosenSubject" />
+                        <el-select v-model="chosenSubject" placeholder="">
+                            <el-option v-for="item in subjectOptions" :key="item.value" :label="item.label"
+                                :value="item.value" />
+                        </el-select>
+                        <!-- <el-cascader placeholder="病种知识点" :options="subjectOptions" filterable v-model="chosenSubject" /> -->
                         <div class="button">
                             <el-button size="" style="background-color: antiquewhite; width:100px;"
                                 @click="clearConditions()">清空</el-button>
@@ -175,13 +183,13 @@
                         </div>
 
                     </div>
-                    <div class="switch">
+                    <div class="selected">
                         <span>只显示已选题目 </span>
                         <el-switch v-model="selected" />
                     </div>
 
                     <div class="edit-confirm">
-                        <el-button type="success" size="large" @click="clearEdit(); dialogVisible = false;">
+                        <el-button type="success" size="large" @click="submitEdit(); clearEdit(); dialogVisible = false;">
                             确认
                         </el-button>
                         <el-button type="info" size="large" @click="clearEdit(); dialogVisible = false;">
@@ -346,20 +354,6 @@ async function fetchProblemSets(pageNum?: number, pageLimit?: number, msg?: Obje
             ProblemSetPage.value = response.data; // 假设响应中有data属性，且包含datas数组
             queryData.value = ProblemSetPage.value.datas;
 
-            // for (var item of queryData.value) { //处理起止时间和时限的显示格式
-            //     if (item.startTime) {
-            //         item.startTime = item.startTime.toString().slice(0, 10) + " " + item.startTime.toString().slice(11, 16);
-            //     }
-            //     if (item.endTime) {
-            //         item.endTime = item.endTime.toString().slice(0, 10) + " " + item.endTime.toString().slice(11, 16);
-            //     }
-            //     if (item.duration) {
-            //         var hour = Math.floor(item.duration / (1000 * 60 * 60));
-            //         var min = Math.floor(item.duration / (1000 * 60) - hour * 60);
-            //         item.duration = hour + "h" + min + "min";
-            //     }
-            // }
-
             if (search || false) {
                 tabLength.value = ProblemSetPage.value.total;
             }
@@ -436,12 +430,14 @@ interface ProblemInfo {
 const editId = ref('');
 const dialogVisible = ref(false);
 
-const editName = ref('');
+const editTitle = ref('');
 const editDesc = ref('');
 const editHour = ref(0);
 const editMin = ref(0);
-const editStartTime = ref('');
-const editEndTime = ref('');
+const editStartTime = ref();
+const editEndTime = ref();
+const selectedProblemIdList = ref<string[]>([]);
+// const selectedProblemScoreMap = ref<ProblemBO>();
 
 const selectedIndex = ref(0);
 const selectedProblem = ref<ProblemBO>({});
@@ -453,7 +449,7 @@ const diseaseList = ref<DiseaseBO[]>([]);
 const searchTitle = ref('');
 const chosenType = ref('');
 const chosenSubject = ref('');
-const selected = ref(true);
+const selected = ref(false);
 const resultList = ref<ProblemInfo[]>([]);
 
 let typeOptions = ref([{
@@ -467,42 +463,83 @@ let subjectOptions = ref([{
     value: '',
     label: ''
 }]);
-const rowClassName = ({ rowIndex }: { rowIndex: number }) => {
-    // if () {
-    //     return '';
-    // } else {
-    //     return '';
-    // }
+const rowClassName = ({ rowIndex }: { rowIndex: number }) => { //题目的行样式随选择情况更改
+    var currentList = loadCurrentProblemList();
+    if (selectedProblemIdList.value && currentList[rowIndex] && selectedProblemIdList.value.includes(currentList[rowIndex].problemId??'')) {
+        return 'selected-row';
+    } else {
+        return 'unselected-row';
+    }
 };
 function editProblemSet(id: string) { //打开修改试卷弹窗
+    clearEdit();
     editId.value = id;
     const currentSet = queryData.value.find(set => set.problemSetId === id);
-    // console.log("编辑试卷:",currentSet);
-    editName.value = currentSet.title;
-    editDesc.value = currentSet.desc;
-    if (currentSet.duration) {
-        const hour = Math.floor(currentSet.duration / (1000 * 60 * 60));
-        const min = Math.floor(currentSet.duration / (1000 * 60) - hour * 60);
-        // console.log("时间:", currentSet.duration);
-        editHour.value = hour ?? 0;
-        editMin.value = min ?? 0;
+    console.log("编辑试卷:", currentSet);
+    if (currentSet) {
+        editTitle.value = currentSet.title ?? '';
+        editDesc.value = currentSet.desc ?? '';
+        if (currentSet.duration) {
+            const hour = Math.floor(currentSet.duration / (1000 * 60 * 60));
+            const min = Math.floor(currentSet.duration / (1000 * 60) - hour * 60);
+            // console.log("时间:", currentSet.duration);
+            editHour.value = hour ?? 0;
+            editMin.value = min ?? 0;
+        }
+        if (currentSet.startTime) {
+            editStartTime.value = currentSet.startTime;
+        }
+        if (currentSet.endTime) {
+            editEndTime.value = currentSet.endTime;
+        }
+        selectedProblemIdList.value = currentSet.problemIdList;
+        currentSet.problemScoreMap;
     }
-    if (currentSet.startTime) {
-        editStartTime.value = currentSet.startTime;
-    }
-    if (currentSet.endTime) {
-        editEndTime.value = currentSet.endTime;
-    }
+
 
     dialogVisible.value = true;
 }
-function clearEdit() {
-    editName.value = '';
+function clearEdit() { //清除修改项数据
+    editTitle.value = '';
     editDesc.value = '';
     editHour.value = 0;
     editMin.value = 0;
     editStartTime.value = '';
     editEndTime.value = '';
+    selectedProblemIdList.value = [];
+    searchTitle.value = '';
+    chosenType.value = '';
+    chosenSubject.value = '';
+    selected.value = false;
+    searchProblems();
+}
+async function submitEdit() { //提交修改
+    try {
+        const request: ProblemSetUpdateRequest = {
+            problemSet: {
+                problemSetId: editId.value,
+                title: editTitle.value,
+                desc: editDesc.value,
+                startTime: editStartTime.value,
+                endTime: editEndTime.value,
+                duration: (editHour.value * 60 + editMin.value) * 60 * 1000,
+                problemIdList: selectedProblemIdList.value,
+                // problemScoreMap:
+            },
+            delete: false
+        }
+        var response = await updateProblemSet(request);
+        if (response) {//更改成功
+            throwMessage('update success');
+            console.log(response.data);
+            setTimeout(() => { backToHome(); }, 500);
+        }
+        else {
+            throwMessage('update fail');
+        }
+    } catch (error) {
+        console.error('Error updating problemSet:', error);
+    }
 }
 
 async function fetchProblems() {
@@ -525,14 +562,15 @@ async function fetchProblems() {
         }
         setTimeout(() => {
             resultList.value = JSON.parse(JSON.stringify(problemList.value));
-            for (var pro of resultList.value) {
-                pro.subjectName = diseaseList.value.find(dis => dis.diseaseId === pro.subjectId)?.name;
-                if (pro.type === 'subjective') {
-                    pro.typeName = '简答';
-                } else if (pro.type === 'objective') {
-                    pro.typeName = '单选';
-                }
-            }
+            searchProblems();
+            // for (var pro of resultList.value) {
+            //     pro.subjectName = diseaseList.value.find(dis => dis.diseaseId === pro.subjectId)?.name;
+            //     if (pro.type === 'subjective') {
+            //         pro.typeName = '简答';
+            //     } else if (pro.type === 'objective') {
+            //         pro.typeName = '单选';
+            //     }
+            // }
             selectedProblem.value = resultList.value[0];
             selectedIndex.value = 0;
         }, 100);
@@ -546,7 +584,7 @@ async function fetchDiseases() {
         const request: DiseasePageRequest = { currPageNo: 1 };
         const response = await diseaseQuery(request);
         const pages = Math.ceil(response.data.total / response.data.limit); //总页数
-        console.log("total=", response.data.total, " limit=", response.data.limit);
+        // console.log("total=", response.data.total, " limit=", response.data.limit);
         for (var i = 1; i <= pages; i++) {
             request.currPageNo = i;
             const response = await diseaseQuery(request);
@@ -574,12 +612,17 @@ onMounted(async () => {
 })
 function searchProblems() {
     resultList.value.splice(0, resultList.value.length);
+    // console.log("problemList:",problemList.value);
+    // console.log("当前试卷选题:",selectedProblemIdList);
     for (var i in problemList.value) {
         var pro = problemList.value[i];
-        if (pro.type == chosenType.value[0] && pro.subjectId == chosenSubject.value[0] || pro.type == chosenType.value[0] && !chosenSubject.value[0] || !chosenType.value[0] && pro.subjectId == chosenSubject.value[0] || !chosenType.value[0] && !chosenSubject.value[0]) {
-            resultList.value.push(problemList.value[i]);
+        if (pro.type == chosenType.value && pro.subjectId == chosenSubject.value || pro.type == chosenType.value && !chosenSubject.value || !chosenType.value && pro.subjectId == chosenSubject.value || !chosenType.value && !chosenSubject.value) {
+            if (!selected.value || selectedProblemIdList.value && pro.problemId && selectedProblemIdList.value && selectedProblemIdList.value.includes(pro.problemId)) {
+                resultList.value.push(problemList.value[i]);
+            }
         }
     }
+    // console.log("resultList:", resultList.value);
     for (var res of resultList.value) {
         res.subjectName = diseaseList.value.find(dis => dis.diseaseId === res.subjectId)?.name;
         if (res.type === 'subjective') {
@@ -595,7 +638,7 @@ function searchProblems() {
 }
 
 function clearConditions() {
-    // searchTitle.value='';
+    searchTitle.value = '';
     chosenType.value = '';
     chosenSubject.value = '';
     searchProblems();
@@ -620,10 +663,12 @@ function handleProblemSetList() { //处理起止时间和时限的显示格式
         if (queryData.value[i].startTime != null) {
             temp.startTimeStr = queryData.value[i].startTime?.toString().slice(0, 10) + ' ' + queryData.value[i].startTime?.toString().slice(11, 16);
             temp.startTime = queryData.value[i].startTime ?? new Date();
+            console.log('startTimeStr:', temp.startTimeStr);
         }
         if (queryData.value[i].endTime != null) {
             temp.endTimeStr = queryData.value[i].endTime?.toString().slice(0, 10) + ' ' + queryData.value[i].endTime?.toString().slice(11, 16);;
             temp.endTime = queryData.value[i].endTime ?? new Date();
+            console.log('endTimeStr:', temp.endTimeStr);
         }
         if (queryData.value[i].duration != null) {
             var hour = Math.floor((queryData.value[i].duration ?? 0) / (1000 * 60 * 60));
@@ -654,6 +699,15 @@ function selectProblemWithId(id: string) {
         selectedProblem.value = temp;
         selectedIndex.value = resultList.value.indexOf(temp);
     }
+
+    if (!selectedProblemIdList.value.includes(id)) { //添加题目
+        selectedProblemIdList.value.push(id);
+    } else {
+        selectedProblemIdList.value.filter(function (proId) { //移除题目
+            return proId !== id;
+        });
+    }
+
 }
 function changeShowOrHide() {
     if (showAnswer.value == true) {
@@ -670,7 +724,6 @@ var current = ref(1);
 var size = ref(10);
 function handleCurrentChange(n: number) {
     current.value = n;
-    console.log('当前页号:', n);
 }
 function handleSizeChange(n: number) {
     size.value = n;
@@ -750,7 +803,12 @@ function handleSizeChange(n: number) {
     max-height: 280px;
     min-height: 280px;
 }
+.selected-row{
+    background-color: #94dbbc !important;
+}
+.unselected-row{
 
+}
 .problemlist-pagination {
     text-align: center;
     display: flex;
@@ -770,7 +828,7 @@ function handleSizeChange(n: number) {
     margin-top: 30px;
 }
 
-.switch {
+.selected {
     margin-top: 10px;
 }
 
