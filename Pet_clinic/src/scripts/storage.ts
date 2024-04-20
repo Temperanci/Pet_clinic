@@ -1,3 +1,5 @@
+import { Personnel } from "@/apis/class";
+
 export class StorageToken {
     static set(key: string, value: any) {
         if(value!==null){
