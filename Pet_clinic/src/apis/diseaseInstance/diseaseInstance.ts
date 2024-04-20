@@ -24,7 +24,7 @@ export async function pageQuery(request?:DiseaseInstancePageRequest){
         console.error('page query diseaseInstance error', error);
         throw error;
     }
-};
+}
 
 // Function to update disease instance information
 export async function update(request: DiseaseInstanceUpdateRequest) : Promise<Result<DiseaseInstanceBO>> {
@@ -35,4 +35,4 @@ export async function update(request: DiseaseInstanceUpdateRequest) : Promise<Re
         console.error('update diseaseInstance error', error);
         throw error;
     }
-};
+}
