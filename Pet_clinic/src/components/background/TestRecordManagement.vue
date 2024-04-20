@@ -54,7 +54,7 @@
           </template>
         </el-table-column>
 
-        <tableOption :clear=clearPara :num=tabLength :back=back
+        <tableOption :clear=clearPara :num=tabLength :back=back :type=true
           @edit-confirm="(index) => { CRUDhandler.editRow(edited, index); }"
           @edit="(index) => { CRUDhandler.updateMsg(edited, queryData, index); isSelected[index] = !isSelected[index]; clearPara = false; }"
           @cancel="(index) => { isSelected[index] = !isSelected[index]; clearPara = false; unwritableBar[0] = false; searchBar[0] = false; }"

@@ -5,10 +5,10 @@
     >
       <!-- 遍历疾病列表，为每个疾病创建菜单项 -->
       <el-menu-item
-          v-for="disease in diseasePage.datas"
-          :key="disease.diseaseId"
-          :index="disease.diseaseId"
-          @click="showCaseDetails(disease)"
+        v-for="disease in diseasePage.datas"
+        :key="disease.diseaseId"
+        :index="disease.diseaseId"
+        @click="showCaseDetails(disease)"
       >
         {{ disease.name }}
       </el-menu-item>
@@ -28,45 +28,45 @@
           </el-form-item>
           <el-form-item label="上传图片">
             <el-upload
-                class="upload-demo"
-                action="https://your-upload-url.com/upload"
-                drag
-                multiple
-                :on-preview="handlePreview"
-                :on-remove="handleRemove"
-                :file-list="form.fileList">
+              class="upload-demo"
+              drag
+              multiple
+              :on-change="handleFileChange"
+              :on-preview="handlePreview"
+              :auto-upload="false"
+              v-model:file-list="form.fileList"
+              list-type="picture">
               <i class="el-icon-upload"></i>
               <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
             </el-upload>
           </el-form-item>
           <el-form-item label="上传视频">
             <el-upload
-                class="upload-demo"
-                action="https://your-upload-url.com/upload"
-                drag
-                multiple
-                :on-preview="handlePreview"
-                :on-remove="handleRemove"
-                :file-list="form.videoList">
+              class="upload-demo"
+              drag
+              multiple
+              :on-change="handleFileChange"
+              :auto-upload="false"
+              v-model:file-list="form.videoList">
               <i class="el-icon-upload"></i>
               <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
             </el-upload>
           </el-form-item>
         </el-form>
         <template v-slot:footer>
-        <span class="dialog-footer">
-          <el-button @click="showDialog = false">取消</el-button>
-          <el-button type="primary" @click="submitForm">提交</el-button>
-        </span>
+          <span class="dialog-footer">
+            <el-button @click="showDialog = false">取消</el-button>
+            <el-button type="primary" @click="submitForm">提交</el-button>
+          </span>
         </template>
       </el-dialog>
 
       <el-collapse v-model="activeInstance" accordion class="collapse-area">
         <el-collapse-item
-            v-for="instance in selectedCaseInstance"
-            :key="instance.instanceId"
-            :name="instance.instanceId"
-            class="instance-item"
+          v-for="instance in selectedCaseInstance"
+          :key="instance.instanceId"
+          :name="instance.instanceId"
+          class="instance-item"
         >
           <template #title>
             <h2>病情描述：{{ instance.desc }}</h2>
@@ -75,19 +75,19 @@
             <!-- 在这里可以放置病例的详细内容，如图片、视频等 -->
             <p>病例ID：{{ instance.instanceId }}</p>
             <img
-                v-for="(picUrl, index) in instance.pictureUrlList"
-                :key="index"
-                :src="picUrl"
-                alt="病例图片"
-                class="case-image"
+              v-for="(picUrl, index) in instance.pictureUrlList"
+              :key="index"
+              :src="picUrl"
+              alt="病例图片"
+              class="case-image"
             >
             <!-- 如果有视频URL列表，展示所有视频 -->
             <video
-                v-for="(videoUrl, index) in instance.fileUrlList"
-                :key="index"
-                :src="videoUrl"
-                controls
-                class="case-video"
+              v-for="(videoUrl, index) in instance.fileUrlList"
+              :key="index"
+              :src="videoUrl"
+              controls
+              class="case-video"
             ></video>
           </div>
         </el-collapse-item>
@@ -97,41 +97,46 @@
 </template>
 
 <script setup lang="ts">
-import {defineComponent, onMounted, ref, reactive, watch} from 'vue';
-import {ElForm, ElMenu, ElMenuItem, ElDialog, ElMessageBox} from 'element-plus';
-import { pageQuery as DiseasePageQuery } from "@/apis/disease/disease";
-import type { DiseaseBO, DiseaseInstanceBO } from "@/apis/schemas";
-import type { DiseasePageResponse } from "@/apis/disease/disease-interface";
-import type {DiseaseInstancePageResponse} from "@/apis/diseaseInstance/diseaseInstance-interface";
-import { pageQuery } from "@/apis/diseaseInstance/diseaseInstance";
+import {defineComponent, onMounted, ref, reactive, watch} from 'vue'
+import {ElForm, ElMenu, ElMenuItem, ElDialog, ElMessageBox, ElMessage} from 'element-plus'
+import type { UploadProps, UploadFile} from 'element-plus'
+import { pageQuery as DiseasePageQuery } from '@/apis/disease/disease'
+import type { DiseaseBO, DiseaseInstanceBO } from '@/apis/schemas'
+import type { DiseasePageResponse } from '@/apis/disease/disease-interface'
+import type { DiseaseInstancePageResponse } from '@/apis/diseaseInstance/diseaseInstance-interface'
+import { pageQuery } from '@/apis/diseaseInstance/diseaseInstance'
+import { update } from '@/apis/diseaseInstance/diseaseInstance'
+import type { DiseaseInstanceUpdateRequest } from "@/apis/diseaseInstance/diseaseInstance-interface";
+import axios from "axios";
+import {requestUploadLink} from "@/apis/fileStore/fileStore";
 
 // 声明组件名称
 defineComponent({
-  name: "CaseStudyComponent"
+  name: 'CaseStudyComponent'
 })
 
 // 定义疾病页面的响应式数据
-const diseasePage = ref<DiseasePageResponse>({ datas: [], total: 0, limit: 0 });
+const diseasePage = ref<DiseasePageResponse>({ datas: [], total: 0, limit: 0 })
 // 定义选中的疾病详情
-const selectedCase = ref<DiseaseBO | null>(null);
-const activeInstance = ref(null);
+const selectedCase = ref<DiseaseBO | null>(null)
+const activeInstance = ref(null)
 
 // 定义获取疾病列表的函数
 async function fetchDisease() {
   try {
-    const response = await DiseasePageQuery();
-    diseasePage.value = response.data;
+    const response = await DiseasePageQuery()
+    diseasePage.value = response.data
   } catch (error) {
-    console.error('Failed to fetch disease:', error);
+    console.error('Failed to fetch disease:', error)
   }
 }
-const diseaseInstance = ref<DiseaseInstancePageResponse>({ datas: [], total: 0, limit: 0 });
-const selectedCaseInstance = ref<DiseaseInstanceBO[] | null>(null);
+const diseaseInstance = ref<DiseaseInstancePageResponse>({ datas: [], total: 0, limit: 0 })
+const selectedCaseInstance = ref<DiseaseInstanceBO[] | null>(null)
 async function fetchDiseaseInstance() {
   try {
-    const response = await pageQuery();
+    const response = await pageQuery()
     // console.log('response:', response)
-    diseaseInstance.value = response.data;
+    diseaseInstance.value = response.data
   } catch (error) {
     // console.error('Failed to fetch diseaseInstance:', error);
   }
@@ -139,61 +144,111 @@ async function fetchDiseaseInstance() {
 
 // 定义展示疾病详情的函数
 function showCaseDetails(disease: DiseaseBO) {
-  selectedCase.value = disease;
-  selectedCaseInstance.value = diseaseInstance.value.datas.filter(item => item.diseaseId === disease.diseaseId);
-  // console.log('selectedCaseInstance:', selectedCaseInstance.value)
+  selectedCase.value = disease
+  selectedCaseInstance.value = diseaseInstance.value.datas.filter(
+    (item) => item.diseaseId === disease.diseaseId
+  )
 }
 
 // 组件挂载后获取疾病数据
 
 onMounted(() => {
-  fetchDisease();
-  fetchDiseaseInstance();
-});
+  fetchDisease()
+  fetchDiseaseInstance()
+})
 
-const showDialog = ref(false);
-const uploadForm = ref<InstanceType<typeof ElForm>>();
+const showDialog = ref(false)
+const uploadForm = ref<InstanceType<typeof ElForm>>()
 
 const form = reactive({
   details: '',
-  fileList: [] as Array<any>,
-  videoList: [] as Array<any>
+  fileList: [], // 这里假设 fileList 是 File 类型的数组
+  videoList: [], // 同上，videoList 是 File 类型的数组
 });
 
-function handlePreview(file: any) {
-  console.log('Preview file:', file);
-}
+// 监控 form 对象中所有属性的变化
+watch(() => form, (newForm) => {
+  console.log('Form changed:', newForm);
+}, {
+  deep: true  // 设置 deep 为 true 来侦听嵌套属性
+});
 
-function handleRemove(file: any, fileList: Array<any>) {
-  console.log('Remove file:', file, fileList);
+function handleFileChange(file: any) {
+  console.log('File changed:', file)
 }
 
 function submitForm() {
-  ElMessageBox.confirm(
-      '确定要提交这个病例吗？',
-      '提交确认',
-      {
-        confirmButtonText: '确认',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }
-  ).then(() => {
-    uploadForm.value?.validate((valid: boolean) => {
+  ElMessageBox.confirm('确定要提交这个病例吗？', '提交确认', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    uploadForm.value?.validate(async (valid: boolean) => {
       if (valid) {
-        console.log('提交数据:', form);
-        // 这里应该调用API来提交表单和文件
-        showDialog.value = false; // 关闭对话框
+        try {
+          // 上传图片和视频
+          const pictureUrls = await uploadFiles(form.fileList);
+          const videoUrls = await uploadFiles(form.videoList);
+          console.log('上传成功', pictureUrls, videoUrls, selectedCase.value?.diseaseId);
+
+          // 提交表单和文件
+          const request:DiseaseInstanceUpdateRequest = {
+            diseaseInstance: {
+              desc: form.details,
+              time: Date.now(),
+              diseaseId: selectedCase.value?.diseaseId,
+              pictureUrlList: pictureUrls,
+              fileUrlList: videoUrls,
+              // ...其他表单数据
+            }
+          };
+          const updateResponse = await update(request);
+          console.log('病例更新成功', updateResponse);
+          ElMessage({
+            message: '病例提交成功',
+            type: 'success',
+            duration: 3000 // 显示3秒后消失
+          });
+          await refreshCurrentCase(); // 刷新当前病例
+          showDialog.value = false; // 关闭对话框
+        } catch (error) {
+          console.error('提交数据失败', error);
+          ElMessage.error('病例提交失败');
+        }
       } else {
         console.log('表单验证失败');
+        ElMessage.error('表单验证失败');
       }
     });
   }).catch(() => {
     console.log('取消提交');
+    ElMessage.info('取消提交');
   });
 }
-
+async function uploadFiles(files: UploadFile[]) {
+  const urls = [];
+  for (const file of files) {
+    const extension = file.name.slice(file.name.lastIndexOf(".")); // 获取扩展名，包括点
+    console.log('Extension:', extension)
+    const { uploadUrl, downloadUrl } = await requestUploadLink({ extension });
+    await axios.put(uploadUrl, file.raw, {
+      headers: { 'Content-Type': file.raw?.type }
+    });
+    urls.push(downloadUrl);
+  }
+  return urls;
+}
+async function refreshCurrentCase() {
+  if (selectedCase.value) {
+    await fetchDisease();  // 重新获取疾病列表
+    await fetchDiseaseInstance();  // 重新获取疾病实例
+    showCaseDetails(selectedCase.value);  // 刷新显示的疾病详情
+  }
+}
+const handlePreview: UploadProps['onPreview'] = (file) => {
+  console.log(file)
+}
 </script>
-
 
 <style scoped lang="scss">
 .study-panel {
@@ -221,18 +276,19 @@ function submitForm() {
   border-radius: 20px;
   border: #2a1f1f 1px solid;
 }
-.collapse-area{
+.collapse-area {
   height: 60vh;
   overflow: scroll;
 }
-.instance-item{
+.instance-item {
   justify-content: space-around;
   border-radius: 10px;
   margin: 10px;
   padding: 10px;
   border: #2a1f1f 1px solid;
 }
-.case-images, .case-videos {
+.case-images,
+.case-videos {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
@@ -250,6 +306,4 @@ function submitForm() {
 .el-dialog {
   z-index: 2000; /* 或更高，取决于其他元素的z-index */
 }
-
 </style>
-

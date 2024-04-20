@@ -9,12 +9,12 @@
           <div class="card-container">
             <div class="card-left">
               <el-avatar :size="45" />
-              <el-text>{{userName}}</el-text>
+              <el-text>{{ userName }}</el-text>
 
             </div>
             <div class="card-right">
               <el-button @click="Switch(1)">前台页面</el-button>
-               <el-divider />
+              <el-divider />
               <el-button>注销</el-button>
             </div>
           </div>
@@ -25,9 +25,16 @@
     <div class="mainPage">
       <div class="aside" v-if="aside">
         <div class="console">
-          <div class="consoleBtn" v-for="guidance in guidanceMap" :key="guidance[0]" @click="handleSelect(guidance[0])">
-            <p>{{ guidance[1] }}</p>
+          <el-menu style="height: 100%;background: rgb(233, 233, 235);">
+            <div class="consoleBtn" v-for="guidance in guidanceMap" :key="guidance[0]" @click="handleSelect(guidance[0])">
+            <!-- <p></p>
+            <span>{{ guidance[1] }}</span> -->
+            <el-menu-item :index=guidance[0] style="height: 100%;display: flex;">
+          <span style="margin: auto;">{{ guidance[1] }}</span>
+        </el-menu-item>
           </div>
+          </el-menu>
+          
           <!-- <div class="studyCollapse">
             <p style="width: 100%;">学习管理</p>
             <div style="align-items:center;display: flex;height:0%">
@@ -43,9 +50,9 @@
             </div>
           </div> -->
 
-          <div class="consoleBtn" v-for="study in studyMap" :key="study[0]" @click="handleSelect(study[0])">
+          <!-- <div class="consoleBtn" v-for="study in studyMap" :key="study[0]" @click="handleSelect(study[0])">
             <p>{{ study[1] }}</p>
-          </div>
+          </div> -->
 
 
         </div>
@@ -120,21 +127,24 @@ const guidanceMap = new Map([
   ['3', '收费管理'],
   ['4', '科室管理'],
   ['5', '药品管理'],
-  ['6', '人员管理']
-])//导航名称
-const studyMap = new Map([
+  ['6', '人员管理'],
   ['8', '题库管理'],
   ['9', '套题管理'],
   ['10', '测试记录']
-])
+])//导航名称
+// const studyMap = new Map([
+//   ['8', '题库管理'],
+//   ['9', '套题管理'],
+//   ['10', '测试记录']
+// ])
 function handleSelect(n: string) {
   activeIndex.value = n;
   currentComponent.value = componentsMap[activeIndex.value];
 }
 const activeIndex = ref('1')
 const currentComponent = ref(componentsMap['1']);
-onMounted(()=>{
-  if(store.state.token.name!==''){
+onMounted(() => {
+  if (store.state.token.name !== '') {
     userName.value = store.state.token.name;
   }
 })
@@ -191,10 +201,12 @@ onMounted(()=>{
   font-weight: bold;
   color: #be9367;
   align-items: center;
-  .h1{
+
+  .h1 {
     width: 90%;
     font-size: xx-large;
   }
+
   .el-card {
     width: 15vw;
     height: 10vh;
@@ -204,8 +216,10 @@ onMounted(()=>{
 
   .card-container {
     display: flex;
-    justify-content: space-between; /* 根据需要选择 space-between 或其他 */
-    align-items: center; /* 垂直居中 */
+    justify-content: space-between;
+    /* 根据需要选择 space-between 或其他 */
+    align-items: center;
+    /* 垂直居中 */
     margin-top: -1.5vh;
     height: 8vh;
   }
@@ -217,10 +231,12 @@ onMounted(()=>{
     border-right: #DCDFE6 solid 2px;
     width: 40%;
     height: 5vh;
+
     .el-avatar {
       margin-right: 0.5vw;
       margin-left: -0.5vw;
     }
+
     .el-text {
       font-size: medium;
     }
@@ -236,11 +252,15 @@ onMounted(()=>{
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* 如果你想要垂直居中里面的元素 */
-    align-items: center; /* 水平居中 */
+    justify-content: center;
+    /* 如果你想要垂直居中里面的元素 */
+    align-items: center;
+
+    /* 水平居中 */
     .el-divider {
       margin: 0.5vh 0;
     }
+
     .el-button {
       width: 5vw;
     }
