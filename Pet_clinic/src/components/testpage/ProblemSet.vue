@@ -21,7 +21,8 @@
         <el-footer>
             <div class="problemset-pagination">
                 <el-pagination background @current-change="handleCurrentChange" @size-change="handleSizeChange"
-                    :current-page="current" :page-size="size" :total=problemSetList.length layout="prev, pager, next, jumper" />
+                    :current-page="current" :page-size="size" :total=problemSetList.length
+                    layout="prev, pager, next, jumper" />
             </div>
         </el-footer>
     </el-container>
@@ -108,12 +109,16 @@ function loadCurrentList() {
             temp.title = problemSetList.value[i].title ?? "";
             temp.desc = problemSetList.value[i].desc ?? "";
             if (problemSetList.value[i].startTime != null) {
-                temp.startTimeStr = problemSetList.value[i].startTime?.toString().slice(0, 10) + ' ' + problemSetList.value[i].startTime?.toString().slice(11, 16);
-                temp.startTime = problemSetList.value[i].startTime ?? new Date();
+                console.log('startTime',problemSetList.value[i].startTime);
+                temp.startTime = new Date(problemSetList.value[i].startTime);
+                temp.startTimeStr = temp.startTime.getFullYear() + '-' + (temp.startTime.getMonth() + 1) + '-' + temp.startTime.getDate() + ' ' + temp.startTime.getHours().toString().padStart(2, '0') + ':' + temp.startTime.getMinutes().toString().padStart(2, '0');
+                // temp.startTimeStr = problemSetList.value[i].startTime?.toString().slice(0, 10) + ' ' + problemSetList.value[i].startTime?.toString().slice(11, 16);
             }
             if (problemSetList.value[i].endTime != null) {
-                temp.endTimeStr = problemSetList.value[i].endTime?.toString().slice(0, 10) + ' ' + problemSetList.value[i].endTime?.toString().slice(11, 16);;
-                temp.endTime = problemSetList.value[i].endTime ?? new Date();
+                temp.endTime = new Date(problemSetList.value[i].endTime);
+                temp.endTimeStr = temp.endTime.getFullYear() + '-' + (temp.endTime.getMonth() + 1) + '-' + temp.endTime.getDate() + ' ' + temp.endTime.getHours().toString().padStart(2, '0') + ':' + temp.endTime.getMinutes().toString().padStart(2, '0');
+                // temp.endTimeStr = problemSetList.value[i].endTime?.toString().slice(0, 10) + ' ' + problemSetList.value[i].endTime?.toString().slice(11, 16);;
+
             }
             if (problemSetList.value[i].duration != null) {
                 var hour = Math.floor((problemSetList.value[i].duration ?? 0) / (1000 * 60 * 60));
@@ -144,11 +149,11 @@ const handleEnterTest = (id: string, title: string, startTime: Date, endTime: Da
         failMsg.value = '已过测试截止时间,';
         failureDialog.value = true;
     } else {
-        selectedTest.value.id=id;
-        selectedTest.value.title=title;
-        selectedTest.value.start=start;
-        selectedTest.value.end=end;
-        selectedTest.value.duration=duration;
+        selectedTest.value.id = id;
+        selectedTest.value.title = title;
+        selectedTest.value.start = start;
+        selectedTest.value.end = end;
+        selectedTest.value.duration = duration;
         confirmDialog.value = true;
     }
 }
