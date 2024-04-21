@@ -25,21 +25,18 @@
             <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].candidateId"></el-input>
             <span v-else>{{ personnelMap.get(scope.row.candidateId) }}</span> -->
             <el-input v-if="searchBar[scope.$index]"></el-input>
-            <el-input v-else-if="unwritableBar[scope.$index]" disabled v-model="edited[scope.$index].candidateId"></el-input>
+            <el-input v-else-if="unwritableBar[scope.$index]" disabled
+              v-model="edited[scope.$index].candidateId"></el-input>
             <span v-else>{{ personnelMap.get(scope.row.candidateId) }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="graded" label="分数">
+        <el-table-column prop="graded" label="批卷情况">
           <template #default="scope">
             <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].graded"></el-input> -->
-            <el-select v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].graded" placeholder="Select" style="width: 100%">
-    <el-option
-      v-for="item in gradeOptions"
-      :key="item.value"
-      :label="item.label"
-      :value="item.value"
-    />
-  </el-select>
+            <el-select v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].graded"
+              placeholder="Select" style="width: 100%">
+              <el-option v-for="item in gradeOptions" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
             <span v-else>{{ gradeMap.get(scope.row.graded) }}</span>
           </template>
         </el-table-column>
@@ -49,7 +46,8 @@
             <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].submitTime"></el-input>
             <span v-else>{{ scope.row.submitTime }}</span> -->
             <el-input v-if="searchBar[scope.$index]" disabled></el-input>
-            <el-input v-else-if="unwritableBar[scope.$index]" disabled v-model="edited[scope.$index].submitTime"></el-input>
+            <el-input v-else-if="unwritableBar[scope.$index]" disabled
+              v-model="edited[scope.$index].submitTime"></el-input>
             <span v-else>{{ scope.row.submitTime }}</span>
           </template>
         </el-table-column>
@@ -210,11 +208,16 @@ async function fetchTestRecords(pageNum?: number, pageLimit?: number, msg?: Obje
       TestRecordPage.value = response.data; // 假设响应中有data属性，且包含datas数组
       queryData.value = TestRecordPage.value.datas;
 
-      for (var item of queryData.value) { //处理时间显示格式
-
-        if (item.submitTime) {
-          item.submitTime = item.submitTime.toString().slice(0, 10) + " " + item.submitTime.toString().slice(11, 16);
+      for (var rec of queryData.value) { //处理时间显示格式
+        console.log('提交时间:',rec.submitTime);
+        if (rec.submitTime) {
+          var time = new Date(rec.submitTime);
+          rec.submitTime = time.getFullYear() + '-' + (time.getMonth() + 1) + '-' + time.getDate() + ' ' + time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0');
         }
+        
+        // if (time) {
+        //   time = time.toString().slice(0, 10) + " " + time.toString().slice(11, 16);
+        // }
       }
 
       if (search || false) {
@@ -248,7 +251,7 @@ var isSelected: Ref<boolean[]> = ref<boolean[]>([]);
 var edited: Ref<TestRecord[]> = ref<TestRecord[]>([]);
 var queryData = ref<any[]>([]);
 var currentPage = 1;
-function backToHome(){
+function backToHome() {
   fetchTestRecords(currentPage);
 }
 function pagination(val: number) {
@@ -263,10 +266,10 @@ function pagination(val: number) {
 }
 //分页
 //filter && view
-import { pageQuery as personnelPageQuery} from "@/apis/personnel/personnel";
+import { pageQuery as personnelPageQuery } from "@/apis/personnel/personnel";
 import { pageQuery as problemsetPageQuery } from "@/apis/problemSet/problemSet";
 import type { ProblemSetPageRequest } from "@/apis/problemSet/problemSet-interface";
-const problemsetMap:Ref<Map<any,any>> = ref<Map<any,any>>(new Map());
+const problemsetMap: Ref<Map<any, any>> = ref<Map<any, any>>(new Map());
 async function getProblemsetInfo() {
   var request: ProblemSetPageRequest = {
     limit: 999
@@ -287,7 +290,7 @@ async function getProblemsetInfo() {
     console.error('Error fetching problemsets:', error);
   }
 }
-const personnelMap:Ref<Map<any,any>> = ref<Map<any,any>>(new Map());
+const personnelMap: Ref<Map<any, any>> = ref<Map<any, any>>(new Map());
 async function getPersonnelInfo() {
   var request: PersonnelPageRequest = {
     limit: 999
@@ -310,17 +313,17 @@ async function getPersonnelInfo() {
 }
 const gradeOptions = [
   {
-    label:"已完成",
-    value:true
+    label: "已完成",
+    value: true
   },
   {
-    label:"未完成",
-    value:false
+    label: "未完成",
+    value: false
   }
 ]
 const gradeMap = new Map([
-  [false,'未完成'],
-  [true,"已完成"]
+  [false, '未完成'],
+  [true, "已完成"]
 ])
 const component = defineComponent({
   name: "TestRecordManagement"
