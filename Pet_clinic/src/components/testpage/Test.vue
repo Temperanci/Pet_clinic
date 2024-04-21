@@ -3,8 +3,9 @@
     <div class="onlineTestLayout">
         <el-container>
             <el-container width="60%">
-                <el-header>
-                    <h3>题{{ selectedIndex + 1 }}:（{{ selectedProblem.score }}分）</h3>
+                <el-header>                 
+                    <h3 v-if="selectedProblem.score">题{{ selectedIndex + 1 }}:（{{ selectedProblem.score }}分）</h3>
+                    <h3 v-else>题{{ selectedIndex + 1 }}:</h3>
                     <h4>{{ selectedProblem.problem.title }}</h4>
                 </el-header>
                 <el-main>
