@@ -1,7 +1,7 @@
 import {store} from '@/main'
 import {Personnel} from '@/apis/class'
 export function userVerify():boolean{
-    if(store.state.token.phoneNumber){
+    if(store.state.token.phoneNumber!=''){
         return true;
     }
     return false;
