@@ -109,7 +109,7 @@ function loadCurrentList() {
             temp.title = problemSetList.value[i].title ?? "";
             temp.desc = problemSetList.value[i].desc ?? "";
             if (problemSetList.value[i].startTime != null) {
-                console.log('startTime',problemSetList.value[i].startTime);
+                console.log('startTime', problemSetList.value[i].startTime);
                 temp.startTime = new Date(problemSetList.value[i].startTime);
                 temp.startTimeStr = temp.startTime.getFullYear() + '-' + (temp.startTime.getMonth() + 1) + '-' + temp.startTime.getDate() + ' ' + temp.startTime.getHours().toString().padStart(2, '0') + ':' + temp.startTime.getMinutes().toString().padStart(2, '0');
                 // temp.startTimeStr = problemSetList.value[i].startTime?.toString().slice(0, 10) + ' ' + problemSetList.value[i].startTime?.toString().slice(11, 16);
@@ -123,7 +123,13 @@ function loadCurrentList() {
             if (problemSetList.value[i].duration != null) {
                 var hour = Math.floor((problemSetList.value[i].duration ?? 0) / (1000 * 60 * 60));
                 var min = Math.floor((problemSetList.value[i].duration ?? 0) / (1000 * 60) - hour * 60);
-                temp.durationStr = hour + "h" + min + "min";
+                if (hour > 0) {
+                    temp.durationStr = hour + "h" + min + "min";
+                } else if (min > 0) {
+                    temp.durationStr = min + "min";
+                } else {
+                    temp.durationStr = "";
+                }
                 temp.duration = problemSetList.value[i].duration ?? 0;
             }
             currentList.push(temp);

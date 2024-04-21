@@ -8,36 +8,40 @@
             <el-table :data="handleProblemSetList()" height="100%" empty-text="来到了没有数据的荒原...">
                 <el-table-column prop="problemSetId" label="试卷编号">
                     <template #default="scope">
-                        <el-input v-if="searchBar[scope.$index]" v-model="edited[0].problemSetId"></el-input>
+                        <!-- <el-input v-if="searchBar[scope.$index]" v-model="edited[0].problemSetId"></el-input>
                         <el-input v-else-if="unwritableBar[scope.$index]" disabled
                             v-model="edited[scope.$index].problemSetId"></el-input>
-                        <span v-else>{{ scope.row.problemSetId }}</span>
+                        <span v-else>{{ scope.row.problemSetId }}</span> -->
+                        <span>{{ scope.row.problemSetId }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="title" label="名称">
                     <template #default="scope">
-                        <el-input v-if="isSelected[scope.$index] === true"
+                        <!-- <el-input v-if="isSelected[scope.$index] === true"
                             v-model="edited[scope.$index].title"></el-input>
-                        <span v-else>{{ scope.row.title }}</span>
+                        <span v-else>{{ scope.row.title }}</span> -->
+                        <span>{{ scope.row.title }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="desc" label="描述" width="200px">
                     <template #default="scope">
-                        <el-input v-if="isSelected[scope.$index] === true"
+                        <!-- <el-input v-if="isSelected[scope.$index] === true"
                             v-model="edited[scope.$index].desc"></el-input>
-                        <span v-else>{{ scope.row.desc }}</span>
+                        <span v-else>{{ scope.row.desc }}</span> -->
+                        <span>{{ scope.row.desc }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="startTimeStr" label="开始时间">
                     <template #default="scope">
                         <!-- 
                         <span v-else>{{ scope.row.startTime }}</span> -->
-                        <el-input v-if="searchBar[scope.$index]" disabled></el-input>
+                        <!-- <el-input v-if="searchBar[scope.$index]" disabled></el-input> -->
                         <!-- <el-input v-else-if="unwritableBar[scope.$index]" disabled
                             v-model="edited[scope.$index].startTime"></el-input> -->
-                        <el-input v-else-if="isSelected[scope.$index] === true"
+                        <!-- <el-input v-else-if="isSelected[scope.$index] === true"
                             v-model="edited[scope.$index].startTime"></el-input>
-                        <span v-else>{{ scope.row.startTimeStr }}</span>
+                        <span v-else>{{ scope.row.startTimeStr }}</span> -->
+                        <span>{{ scope.row.startTimeStr }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="endTimeStr" label="截止时间">
@@ -45,23 +49,25 @@
                         <!-- <el-input v-if="isSelected[scope.$index] === true"
                             v-model="edited[scope.$index].endTime"></el-input>
                         <span v-else>{{ scope.row.endTime }}</span> -->
-                        <el-input v-if="searchBar[scope.$index]" disabled></el-input>
+                        <!-- <el-input v-if="searchBar[scope.$index]" disabled></el-input>
                         <el-input v-else-if="isSelected[scope.$index] === true"
                             v-model="edited[scope.$index].endTime"></el-input>
-                        <span v-else>{{ scope.row.endTimeStr }}</span>
+                        <span v-else>{{ scope.row.endTimeStr }}</span> -->
+                        <span>{{ scope.row.endTimeStr }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="durationStr" label="限时">
                     <template #default="scope">
-                        <el-input v-if="isSelected[scope.$index] === true"
+                        <!-- <el-input v-if="isSelected[scope.$index] === true"
                             v-model="edited[scope.$index].duration"></el-input>
-                        <span v-else>{{ scope.row.durationStr }}</span>
+                        <span v-else>{{ scope.row.durationStr }}</span> -->
+                        <span>{{ scope.row.durationStr }}</span>
                     </template>
                 </el-table-column>
 
                 <el-table-column prop="problemIdList" label="" width="150px">
                     <template #header>
-                        <el-button type="success" @click="editProblemSet('');">创建试卷</el-button>
+                        <el-button type="success" @click="createProblemSet();">创建试卷</el-button>
                     </template>
                     <template #default="scope">
                         <el-button type="primary" @click="editProblemSet(scope.row.problemSetId);">编辑试卷</el-button>
@@ -92,8 +98,8 @@
         </div>
     </div>
 
-    <el-dialog v-model="dialogVisible" title="编辑试卷" width="1100" draggable overflow :close-on-click-modal="false"
-        :close-on-press-escape="false">
+    <el-dialog v-model="dialogVisible" :title="createNew ? '创建试卷' : '编辑试卷'" width="1100" draggable overflow
+        :close-on-click-modal="false" :close-on-press-escape="false">
         <div class="edit-content">
             <el-container>
                 <el-aside width="30%">
@@ -107,7 +113,7 @@
                             <el-input type="textarea" placeholder="" v-model="editDesc" :rows="5" style="width: 80%;" />
                         </div>
                         <div class="duration">
-                            <b>时限：</b>
+                            <b>限时：</b>
                             <el-input type="input" placeholder="" v-model="editHour" :rows="1" style="width: 40px;" />
                             <span> 时 </span>
                             <el-input type="input" placeholder="" v-model="editMin" :rows="1" style="width: 40px;" />
@@ -188,9 +194,9 @@
                     </div>
 
                     <div class="edit-confirm">
-                        <el-button type="success" size="large"
-                            @click="submitEdit(); clearEdit(); dialogVisible = false;">
-                            确认
+                        <el-button :type="createNew ? 'success' : 'primary'" size="large"
+                            @click="if (createNew) { submitCreate(); } else { submitEdit(); }; clearEdit(); dialogVisible = false;">
+                            {{ createNew ? '新建' : '确认' }}
                         </el-button>
                         <el-button type="info" size="large" @click="clearEdit(); dialogVisible = false;">
                             取消
@@ -429,6 +435,7 @@ interface ProblemInfo {
 //编辑试卷题目
 const editId = ref('');
 const dialogVisible = ref(false);
+const createNew = ref(false);
 
 const editTitle = ref('');
 const editDesc = ref('');
@@ -472,12 +479,18 @@ const rowClassName = ({ rowIndex }: { rowIndex: number }) => { //题目的行样
         return 'unselected-row';
     }
 };
-function editProblemSet(id: string) { //打开修改试卷弹窗
+function createProblemSet() { //创建新试卷
     clearEdit();
-    editId.value = id;
+    createNew.value = true;
+    dialogVisible.value = true;
+}
+function editProblemSet(id: string) { //修改试卷
+    clearEdit();
+    createNew.value = false;
     const currentSet = queryData.value.find(set => set.problemSetId === id);
     // console.log("编辑试卷:", currentSet);
     if (currentSet) {
+        editId.value = id;
         editTitle.value = currentSet.title ?? '';
         editDesc.value = currentSet.desc ?? '';
         if (currentSet.duration) {
@@ -495,11 +508,10 @@ function editProblemSet(id: string) { //打开修改试卷弹窗
         selectedProblemIdList.value = currentSet.problemIdList ?? [];
         selectedProblemScoreMap.value = currentSet.problemScoreMap ?? {};
     }
-
-
     dialogVisible.value = true;
 }
 function clearEdit() { //清除修改项数据
+    editId.value = '';
     editTitle.value = '';
     editDesc.value = '';
     editHour.value = undefined;
@@ -514,6 +526,33 @@ function clearEdit() { //清除修改项数据
     selected.value = false;
     searchProblems();
 }
+async function submitCreate() { //提交创建
+    try {
+        const request: ProblemSetUpdateRequest = {
+            problemSet: {
+                title: editTitle.value,
+                desc: editDesc.value,
+                startTime: editStartTime.value,
+                endTime: editEndTime.value,
+                duration: ((editHour.value ?? 0) * 60 + (editMin.value ?? 0)) * 60 * 1000,
+                problemIdList: selectedProblemIdList.value,
+                problemScoreMap: selectedProblemScoreMap.value
+            },
+            delete: false
+        }
+        var response = await updateProblemSet(request);
+        if (response) {//更改成功
+            throwMessage('create success');
+            console.log('创建试卷成功:', response);
+            setTimeout(() => { backToHome(); }, 500);
+        }
+        else {
+            throwMessage('create fail');
+        }
+    } catch (error) {
+        console.error('Error creating problemSet:', error);
+    }
+}
 async function submitEdit() { //提交修改
     try {
         const request: ProblemSetUpdateRequest = {
@@ -523,7 +562,7 @@ async function submitEdit() { //提交修改
                 desc: editDesc.value,
                 startTime: editStartTime.value,
                 endTime: editEndTime.value,
-                duration: (editHour.value * 60 + editMin.value) * 60 * 1000,
+                duration: ((editHour.value ?? 0) * 60 + (editMin.value ?? 0)) * 60 * 1000,
                 problemIdList: selectedProblemIdList.value,
                 problemScoreMap: selectedProblemScoreMap.value
             },
@@ -532,7 +571,7 @@ async function submitEdit() { //提交修改
         var response = await updateProblemSet(request);
         if (response) {//更改成功
             throwMessage('update success');
-            console.log('修改试卷成功:', response.data);
+            console.log('修改试卷成功:', response);
             setTimeout(() => { backToHome(); }, 500);
         }
         else {
@@ -668,8 +707,10 @@ function handleProblemSetList() { //处理起止时间和时限的显示格式
             temp.durationStr = hour + "h" + min + "min";
             if (hour > 0) {
                 temp.durationStr = hour + "h" + min + "min";
-            } else {
+            } else if (min > 0) {
                 temp.durationStr = min + "min";
+            } else {
+                temp.durationStr = "";
             }
             temp.duration = queryData.value[i].duration ?? 0;
         }
@@ -840,6 +881,7 @@ function handleSizeChange(n: number) {
 .selected-row {
     background-color: rgba(173, 216, 230, 0.3) !important;
 }
+
 .unselected-row {}
 </style>
 
