@@ -52,6 +52,15 @@
           </template>
         </el-table-column>
 
+        <el-table-column prop="" label="" width="150px">
+          <!-- <template #header>
+            <el-button type="" @click=";">搜索</el-button>
+          </template> -->
+          <template #default="scope">
+            <el-button type="warning" @click="recordDetail(scope.row.testRecordId);">查看详情</el-button>
+          </template>
+        </el-table-column>
+
         <tableOption :clear=clearPara :num=tabLength :back=back :type=true
           @edit-confirm="(index) => { CRUDhandler.editRow(edited, index); }"
           @edit="(index) => { CRUDhandler.updateMsg(edited, queryData, index); isSelected[index] = !isSelected[index]; clearPara = false; }"
@@ -71,7 +80,10 @@
     </div>
   </div>
 
+  <el-dialog v-model="dialogVisible" title="测试记录详情" width="900" draggable overflow :close-on-click-modal="false"
+    :close-on-press-escape="false">
 
+  </el-dialog>
 
 
 </template>
@@ -209,12 +221,12 @@ async function fetchTestRecords(pageNum?: number, pageLimit?: number, msg?: Obje
       queryData.value = TestRecordPage.value.datas;
 
       for (var rec of queryData.value) { //处理时间显示格式
-        console.log('提交时间:',rec.submitTime);
+        console.log('提交时间:', rec.submitTime);
         if (rec.submitTime) {
           var time = new Date(rec.submitTime);
           rec.submitTime = time.getFullYear() + '-' + (time.getMonth() + 1) + '-' + time.getDate() + ' ' + time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0');
         }
-        
+
         // if (time) {
         //   time = time.toString().slice(0, 10) + " " + time.toString().slice(11, 16);
         // }
@@ -329,7 +341,12 @@ const component = defineComponent({
   name: "TestRecordManagement"
 })
 
+const currentRecordId = ref('');
+const dialogVisible = ref(false);
+function recordDetail(id: string) {
 
+  dialogVisible.value = true;
+}
 
 </script>
 

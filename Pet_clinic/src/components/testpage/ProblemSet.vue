@@ -62,7 +62,7 @@ defineComponent({
 })
 
 const ProblemSetPage = ref<ProblemSetPageResponse>({ datas: [], total: 0, limit: 0 });
-var problemSetList = ref(ProblemSetPage.value?.datas);
+const problemSetList = ref(ProblemSetPage.value?.datas);
 async function fetchProblemSets() {
     try {
         const response = await pageNoQuery(1);
@@ -184,7 +184,6 @@ var current = ref(1);
 var size = ref(10);
 function handleCurrentChange(n: number) {
     current.value = n;
-    // console.log('当前页号:', n);
 }
 function handleSizeChange(n: number) {
     size.value = n;

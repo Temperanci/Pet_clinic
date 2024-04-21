@@ -225,6 +225,7 @@ async function submit() {
     const userInfo = ref(store.state.token);
     testRecord.candidateId = userInfo.value.personnelId; //考生id
     testRecord.startTime = props.enterTime; //进入测试时间
+    console.log('开始时间:',testRecord.startTime);
     testRecord.answerMap = Object.fromEntries(answerMap); //题目id-->考生答案
     const submitContent: TestRecordUpdateRequest = {
         testRecord: testRecord,
