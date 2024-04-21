@@ -1,5 +1,5 @@
-<template>
-  <div class="background">
+<template >
+  <div v-if="adminVerify()" class="background">
     <div style="height: 10%;">
       <el-header>
         <div class="h1">
@@ -13,9 +13,9 @@
 
             </div>
             <div class="card-right">
-              <el-button @click="Switch(1)">前台页面</el-button>
+              <el-button type="primary" link size="large" @click="router.push('home')">前台页面</el-button>
               <el-divider />
-              <el-button @click="Logout()">注销</el-button>
+              <el-button type="danger" link size="large" @click="Logout()">注销</el-button>
             </div>
           </div>
         </el-card>
@@ -76,6 +76,9 @@
     </div>
 
   </div>
+  <div v-else style="display: flex;">
+    <p style="margin: auto;">NMSL</p>
+  </div>
 </template>
 <script setup lang="ts">
 import { defineComponent, onMounted, ref } from 'vue'
@@ -94,6 +97,11 @@ import CreateTest from './background/CreateTest.vue'
 import QuestionBank from './background/QuestionBank.vue'
 import FinishedTest from './background/FinishedTest.vue'
 import { store } from '@/main'
+//路由
+import { useRouter } from 'vue-router';
+const router = useRouter();
+//认证
+import {adminVerify} from '../scripts/authentication'
 //登录
 const userName = ref('');
 defineComponent({
@@ -102,7 +110,7 @@ defineComponent({
 function Logout(){
   userName.value='';
   store.commit('clearToken');
-  Switch(2);
+  router.push('login');
 }
 const aside = ref(true);//控制侧栏的可见性
 const emit = defineEmits(['switch'])

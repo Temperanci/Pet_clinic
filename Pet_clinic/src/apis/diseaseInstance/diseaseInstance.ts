@@ -13,7 +13,7 @@ interface Result<T> {
 // Assume this is the base URL for your API
 const API_BASE_URL = 'http://123.60.5.195:8084';
 const diseaseInstance={
-
+    limit:999
 }
 // Function to query disease instances with pagination
 export async function pageQuery(request?:DiseaseInstancePageRequest){
