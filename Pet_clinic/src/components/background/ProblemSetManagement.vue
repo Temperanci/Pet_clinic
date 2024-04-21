@@ -113,7 +113,7 @@
                             <el-input type="textarea" placeholder="" v-model="editDesc" :rows="5" style="width: 80%;" />
                         </div>
                         <div class="duration">
-                            <b>时限：</b>
+                            <b>限时：</b>
                             <el-input type="input" placeholder="" v-model="editHour" :rows="1" style="width: 40px;" />
                             <span> 时 </span>
                             <el-input type="input" placeholder="" v-model="editMin" :rows="1" style="width: 40px;" />
