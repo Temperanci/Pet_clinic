@@ -108,7 +108,6 @@ import DepartmentDetails from './subpage/DepartmentDetails.vue'
 import DrugResource from './subpage/DrugResource.vue'
 import BedInquiry from './subpage/BedInquiry.vue'
 import FunctionalStudy from './subpage/FunctionalStudy.vue'
-import {accout} from '@/scripts/data'
 import {store} from '@/main'
 import { onMounted } from 'vue';
 import {StorageToken} from '@/scripts/storage'
