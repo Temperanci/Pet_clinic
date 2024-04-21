@@ -73,7 +73,7 @@
 <script setup lang="ts">
 import { defineComponent } from "vue";
 import { ref, onMounted } from 'vue';
-import { accout } from '@/scripts/data'
+// import { accout } from '@/scripts/data'
 import { store } from '@/main'
 import { StorageToken } from '@/scripts/storage'
 import { Personnel } from '@/apis/class';

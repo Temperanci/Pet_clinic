@@ -154,6 +154,9 @@ function refreshLogin(){
     router.push('home');
     console.log('refreshLogin.store.state.token',store.state.token);
   }
+  else{
+    store.commit('clearToken');
+  }
   console.log('refreshLogin.StrorageToken',StorageToken.get('token'))
 }
 const PersonnelPage = ref<PersonnelPageResponse>({ datas: [], total: 0, limit: 0 });
@@ -179,6 +182,12 @@ async function LoginRequest(phone:string,pwd:string){
 }
 
 onMounted(() => {
+  // StorageToken.set('token',{
+  //   name:"test",
+  //   password:"123456",
+  //   phoneNumber:""
+  // });
+  // console.log('Storage.set.token',StorageToken.get('token'));
   console.log('onMounted','success');
   refreshLogin();
 });

@@ -192,9 +192,11 @@ function refreshLogin(){
       userStatus.value = 0;
     }
     userName.value = store.state.token.name;
+    console.log('Storage.token.phoneNumber',StorageToken.get('token').phoneNumber);
     console.log('refreshLogin.store.state.token',store.state.token);
   }
   else{
+    store.commit('clearToken');
     router.push('login');
   }
   console.log('refreshLogin.StrorageToken',StorageToken.get('token'))
@@ -222,6 +224,12 @@ async function LoginRequest(phone:string,pwd:string){
 }
 
 onMounted(() => {
+  // StorageToken.set('token',{
+  //   name:"test",
+  //   password:"123456",
+  //   phoneNumber:""
+  // });
+  // console.log('Storage.set.token',StorageToken.get('token'));
   console.log('onMounted','success');
   refreshLogin();
 });
