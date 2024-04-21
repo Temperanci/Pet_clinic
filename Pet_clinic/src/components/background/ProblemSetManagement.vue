@@ -65,7 +65,7 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="problemIdList" label="" width="150px">
+                <el-table-column prop="" label="" width="150px">
                     <template #header>
                         <el-button type="success" @click="createProblemSet();">创建试卷</el-button>
                     </template>
@@ -194,25 +194,38 @@
                     </div>
 
                     <div class="edit-confirm">
+                        <el-button v-if="!createNew" type="danger" size="large" @click="confirmDelete=true;">
+                            删除
+                        </el-button>
                         <el-button :type="createNew ? 'success' : 'primary'" size="large"
                             @click="if (createNew) { submitCreate(); } else { submitEdit(); }; clearEdit(); dialogVisible = false;">
                             {{ createNew ? '新建' : '确认' }}
                         </el-button>
-                        <el-button type="info" size="large" @click="clearEdit(); dialogVisible = false;">
+                        <!-- <el-button type="info" size="large" @click="clearEdit(); dialogVisible = false;">
                             取消
-                        </el-button>
+                        </el-button> -->
                     </div>
                 </el-aside>
             </el-container>
         </div>
     </el-dialog>
 
+    <el-dialog v-model="confirmDelete" title="确认删除试卷？该操作无法撤销" width="400px" overflow :close-on-click-modal="false" :close-on-press-escape="false">
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button type="info" @click="confirmDelete = false">取消</el-button>
+                <el-button type="danger" @click="submitDelete();">
+                    确认
+                </el-button>
+            </div>
+        </template>
+    </el-dialog>
 </template>
 
 <script setup lang="ts">
 import { defineComponent } from "vue";
 //分页
-import { ref } from 'vue'
+import { ref,watch } from 'vue'
 import { getPagination, LENGTH } from '../../scripts/paginate'
 import '@/assets/table.css'
 //request
@@ -433,9 +446,11 @@ interface ProblemInfo {
 }
 
 //编辑试卷题目
+const createNew = ref(false);
 const editId = ref('');
 const dialogVisible = ref(false);
-const createNew = ref(false);
+const confirmDelete = ref(false);
+
 
 const editTitle = ref('');
 const editDesc = ref('');
@@ -581,6 +596,27 @@ async function submitEdit() { //提交修改
         console.error('Error updating problemSet:', error);
     }
 }
+async function submitDelete(){ //删除试卷
+    try {
+        const request: ProblemSetUpdateRequest = {
+            problemSet: {
+                problemSetId: editId.value,
+            },
+            delete: true
+        }
+        var response = await updateProblemSet(request);
+        if (response) {//更改成功
+            throwMessage('delete fail');
+        }
+        else {
+            throwMessage('delete success');
+            console.log('删除试卷成功:', response);
+            setTimeout(() => { backToHome();confirmDelete.value=false;dialogVisible.value=false; }, 500);
+        }
+    } catch (error) {
+        console.error('Error deleting problemSet:', error);
+    }
+}
 
 async function fetchProblems() {
     try {
@@ -667,6 +703,11 @@ function searchProblems() {
         selectedIndex.value = 0;
     }
 }
+
+watch(selected, () => {
+    searchProblems();
+});
+
 
 function clearConditions() {
     searchTitle.value = '';

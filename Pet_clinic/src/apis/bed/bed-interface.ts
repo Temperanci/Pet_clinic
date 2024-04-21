@@ -4,6 +4,7 @@ export interface BedPageRequest extends BasePageRequest{
     bedId?: string;
     location?: string;
     departmentId?: string;
+    occupation?: boolean;
 }
 
 export interface BedPageResponse {

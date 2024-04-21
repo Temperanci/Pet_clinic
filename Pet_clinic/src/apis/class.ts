@@ -41,15 +41,18 @@ export class Bed implements schemas.BedBO{
     bedId: string;
     location: string;
     departmentId: string;
+    occupation: boolean;
     constructor(){
         this.bedId=''
         this.location=''
         this.departmentId=''
+        this.occupation=false
     }
     clear(){
         this.bedId='';
         this.location='';
         this.departmentId='';
+        this.occupation=false
     }
 }
 
