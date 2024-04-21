@@ -309,7 +309,7 @@ async function fetchDiseaseInstances(pageNum?: number, pageLimit?: number, msg?:
     instanceId: ((temp as DiseaseInstance).instanceId === '') ? undefined : (temp as DiseaseInstance).instanceId,
     time: ((temp as DiseaseInstance).time === 0) ? undefined : (temp as DiseaseInstance).time,
     diseaseId: ((temp as DiseaseInstance).diseaseId === '') ? undefined : (temp as DiseaseInstance).diseaseId,
-    desc: undefined,
+    desc: ((temp as DiseaseInstance).desc === '')?undefined:(temp as DiseaseInstance).desc,
     fileUrlList: undefined,
     pictureUrlList: undefined,
     currPageNo: pageNum || 1,

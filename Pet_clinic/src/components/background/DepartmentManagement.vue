@@ -266,14 +266,15 @@ const fileInput=ref<any>(null);
 function selectFile(){
   fileInput.value.click();
 }
+const url = '/departments/'
 function loadFile(index:any){
   if(validateFileType(fileInput.value.files[0].name)){
     (edited.value[index] as Department).uploadFile.append(fileInput.value.files[0].name,fileInput.value.files[0]);
-    (edited.value[index] as Department).uploadFile.append((edited.value[index] as Department).picOptions.value[0].label,'');  
+    // (edited.value[index] as Department).uploadFile.append((edited.value[index] as Department).picOptions.value[0].label,'');  
     (edited.value[index] as Department).picOptions.value=[
       {
-        label:fileInput.value.files[0].name,
-        value:fileInput.value.files[0].name
+        label:url+fileInput.value.files[0].name,
+        value:url+fileInput.value.files[0].name
       }
     ]
     console.log('loadFile.uploadFile',(edited.value[index] as Department).uploadFile.get(fileInput.value.files[0].name));

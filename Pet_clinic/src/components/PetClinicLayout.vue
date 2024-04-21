@@ -1,4 +1,5 @@
 <template>
+  <div v-if="userVerify()">
   <el-container>
     <el-header>
       <div class="h1">
@@ -13,9 +14,9 @@
 
           </div>
           <div class="card-right">
-              <el-button  v-if="userStatus === 0" @click="Switch(0)">后台页面</el-button>
+              <el-button  v-if="userStatus === 0" type="primary" link size="large" @click="router.push('console')">后台页面</el-button>
              <el-divider />
-              <el-button @click="Logout">注销</el-button>
+              <el-button type="danger" link size="large" @click="Logout">注销</el-button>
           </div>
         </div>
       </el-card>
@@ -89,6 +90,10 @@
       <el-text>© 2024 Pet Clinic Online   All right reserved</el-text>
     </el-footer>
   </el-container>
+  </div>
+  <div v-else style="display: flex">
+    <p style="margin: auto;">请先登录</p>
+  </div>
 </template>
 <script lang="ts">
 const ifLogined = ref(false)//false:未登录
@@ -110,6 +115,11 @@ import {StorageToken} from '@/scripts/storage'
 import { Personnel } from '@/apis/class';
 import type { PersonnelPageRequest, PersonnelPageResponse,PersonnelUpdateRequest } from "@/apis/personnel/personnel-interface"
 import { pageQuery as personnelPageQuery } from "@/apis/personnel/personnel"
+//路由
+import { useRouter } from 'vue-router';
+const router = useRouter();
+//认证
+import { userVerify } from '@/scripts/authentication';
 defineComponent({
   name: "PetClinicLayout"
 })
@@ -133,7 +143,7 @@ const componentsMap: ComponentsMap = {
 const activeIndex = ref('1')
 const currentComponent = ref(componentsMap[activeIndex.value])
 const selectedDepartmentName = ref("");
-const userStatus = ref(0)//0:管理 1:路人
+const userStatus = ref(1)//0:管理 1:路人
 const loginVisible = ref(false)
 const registerVisible = ref(false)
 const handleSelect = (index: string) => {
@@ -173,15 +183,20 @@ function Logout(){
   userStatus.value=1;
   ifLogined.value=false;
   store.commit('clearToken');
-  Switch(2);
+  router.push('login');
 }
 function refreshLogin(){
   if(StorageToken.get('token')!==null){
     store.commit('setToken',StorageToken.get('token'));
     ifLogined.value = true;
-    userStatus.value = accout.status;
+    if(store.state.token.role==="管理员"){
+      userStatus.value = 0;
+    }
     userName.value = store.state.token.name;
     console.log('refreshLogin.store.state.token',store.state.token);
+  }
+  else{
+    router.push('login');
   }
   console.log('refreshLogin.StrorageToken',StorageToken.get('token'))
 }

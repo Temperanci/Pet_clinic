@@ -129,12 +129,17 @@ function Switch(n:number){
 async function Login(){
   await LoginRequest(formData.username,formData.password);
   if(PersonnelPage.value.datas.length>0){
-    let token = PersonnelPage.value.datas[0];
+    if(PersonnelPage.value.datas[0].status!='banned'){
+      let token = PersonnelPage.value.datas[0];
     store.commit('setToken',token)
-    Switch(1);
+    router.push('home');
     
     console.log('Login.userName',store.state.token.name)
     console.log('Login.userPhone',store.state.token.phoneNumber)
+    }else{
+      throwMessage('banned');
+    }
+    
   }
   else{
     throwMessage('No user or wrong psw');
@@ -146,7 +151,7 @@ async function Login(){
 function refreshLogin(){
   if(StorageToken.get('token')!==null){
     store.commit('setToken',StorageToken.get('token'));
-    Switch(1);
+    router.push('home');
     console.log('refreshLogin.store.state.token',store.state.token);
   }
   console.log('refreshLogin.StrorageToken',StorageToken.get('token'))

@@ -18,9 +18,13 @@ export default {
 </script>
 <template>
   <div id="app" >
-    <LogIn v-if="status === 2" @switch="(index) => status = index"/>
+    <router-view></router-view>
+    <!-- <router-view name="home"></router-view>
+    <router-view name="login"></router-view> -->
+
+    <!-- <LogIn v-if="status === 2" @switch="(index) => status = index"/>
     <BackgroundLayout  v-if="status === 0" @switch="(index) => status = index"/>
-    <PetClinicLayout  v-if="status === 1" @switch="(index) => status = index"/>
+    <PetClinicLayout  v-if="status === 1" @switch="(index) => status = index"/> -->
   </div>
 </template>
 <style lang="scss">

@@ -22,7 +22,7 @@
             <span v-if="status[scope.$index] === 0">
                 <el-button link type="primary" size="small"
                     @click="emit('edit', scope.$index); status[scope.$index] = 1">编辑</el-button>
-                <el-button link type="primary" size="small"
+                <el-button link type="danger" size="small" 
                     @click="emit('delete', scope.$index); status[scope.$index] = 2;">删除</el-button>
             </span>
             <span v-if="status[scope.$index] === 1">
@@ -32,7 +32,7 @@
                     @click="status[scope.$index] = 0; emit('cancel', scope.$index);">取消</el-button>
             </span>
             <span v-if="status[scope.$index] === 2">
-                <el-button link type="primary" size="small"
+                <el-button link type="danger" size="small"
                     @click="emit('deleteConfirm', scope.$index); status[scope.$index] = 0;">确定
                 </el-button>
                 <el-button link type="primary" size="small" @click="status[scope.$index] = 0">取消</el-button>
