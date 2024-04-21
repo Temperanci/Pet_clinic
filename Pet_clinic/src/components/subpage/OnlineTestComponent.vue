@@ -6,9 +6,9 @@
       <template v-if="content === 'Menu'">
         <div class="test-module">
           <el-row :gutter="40">
-            <el-col :span="8">
+            <el-col :span="12">
               <el-card shadow="hover">
-                <el-result title="套题" sub-title="选择试卷参加测试">
+                <el-result title="套题考试" sub-title="选择试卷参加测试，ai自动批卷及时反馈">
                   <template #icon>
                     <el-icon size="50">
                       <Checked />
@@ -20,9 +20,9 @@
                 </el-result>
               </el-card>
             </el-col>
-            <el-col :span="8">
+            <el-col :span="12">
               <el-card shadow="hover">
-                <el-result title="单题" sub-title="按知识点筛选题目练习">
+                <el-result title="单题练习" sub-title="按病种知识点筛选题目，自主练习巩固弱项">
                   <template #icon>
                     <el-icon size="50">
                       <Checked />
@@ -35,7 +35,7 @@
               </el-card>
 
             </el-col>
-            <el-col :span="8">
+            <!-- <el-col :span="8">
               <el-card shadow="hover">
                 <el-result title="测试记录" sub-title="查看套题的答题记录和分数">
                   <template #icon>
@@ -49,7 +49,7 @@
                 </el-result>
               </el-card>
 
-            </el-col>
+            </el-col> -->
           </el-row>
         </div>
       </template>

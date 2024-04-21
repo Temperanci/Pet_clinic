@@ -8,69 +8,65 @@
             <el-table :data="handleProblemSetList()" height="100%" empty-text="来到了没有数据的荒原...">
                 <el-table-column prop="problemSetId" label="试卷编号">
                     <template #default="scope">
-                        <!-- <el-input v-if="searchBar[scope.$index]" v-model="edited[0].problemSetId"></el-input>
+                        <el-input v-if="searchBar[scope.$index]" v-model="edited[0].problemSetId"></el-input>
                         <el-input v-else-if="unwritableBar[scope.$index]" disabled
                             v-model="edited[scope.$index].problemSetId"></el-input>
-                        <span v-else>{{ scope.row.problemSetId }}</span> -->
-                        <span>{{ scope.row.problemSetId }}</span>
+                        <span v-else>{{ scope.row.problemSetId }}</span>
+                        <!-- <span>{{ scope.row.problemSetId }}</span> -->
                     </template>
                 </el-table-column>
                 <el-table-column prop="title" label="名称">
                     <template #default="scope">
-                        <!-- <el-input v-if="isSelected[scope.$index] === true"
+                        <el-input v-if="isSelected[scope.$index] === true"
                             v-model="edited[scope.$index].title"></el-input>
-                        <span v-else>{{ scope.row.title }}</span> -->
-                        <span>{{ scope.row.title }}</span>
+                        <span v-else>{{ scope.row.title }}</span>
+                        <!-- <span>{{ scope.row.title }}</span> -->
                     </template>
                 </el-table-column>
                 <el-table-column prop="desc" label="描述" width="200px">
                     <template #default="scope">
-                        <!-- <el-input v-if="isSelected[scope.$index] === true"
+                        <el-input v-if="isSelected[scope.$index] === true"
                             v-model="edited[scope.$index].desc"></el-input>
-                        <span v-else>{{ scope.row.desc }}</span> -->
-                        <span>{{ scope.row.desc }}</span>
+                        <span v-else>{{ scope.row.desc }}</span>
+                        <!-- <span>{{ scope.row.desc }}</span> -->
                     </template>
                 </el-table-column>
                 <el-table-column prop="startTimeStr" label="开始时间">
                     <template #default="scope">
-                        <!-- 
-                        <span v-else>{{ scope.row.startTime }}</span> -->
-                        <!-- <el-input v-if="searchBar[scope.$index]" disabled></el-input> -->
-                        <!-- <el-input v-else-if="unwritableBar[scope.$index]" disabled
-                            v-model="edited[scope.$index].startTime"></el-input> -->
-                        <!-- <el-input v-else-if="isSelected[scope.$index] === true"
+                        <el-input v-if="searchBar[scope.$index]" disabled></el-input>
+                        <el-input v-else-if="unwritableBar[scope.$index]" disabled
                             v-model="edited[scope.$index].startTime"></el-input>
-                        <span v-else>{{ scope.row.startTimeStr }}</span> -->
-                        <span>{{ scope.row.startTimeStr }}</span>
+                        <!-- <el-input v-else-if="isSelected[scope.$index] === true" disabled
+                            v-model="edited[scope.$index].startTime"></el-input> -->
+                        <span v-else>{{ scope.row.startTimeStr }}</span>
+                        <!-- <span>{{ scope.row.startTimeStr }}</span> -->
                     </template>
                 </el-table-column>
                 <el-table-column prop="endTimeStr" label="截止时间">
                     <template #default="scope">
-                        <!-- <el-input v-if="isSelected[scope.$index] === true"
-                            v-model="edited[scope.$index].endTime"></el-input>
-                        <span v-else>{{ scope.row.endTime }}</span> -->
-                        <!-- <el-input v-if="searchBar[scope.$index]" disabled></el-input>
-                        <el-input v-else-if="isSelected[scope.$index] === true"
-                            v-model="edited[scope.$index].endTime"></el-input>
-                        <span v-else>{{ scope.row.endTimeStr }}</span> -->
-                        <span>{{ scope.row.endTimeStr }}</span>
+                        <el-input v-if="searchBar[scope.$index]" disabled></el-input>
+                        <!-- <el-input v-else-if="isSelected[scope.$index] === true" disabled
+                            v-model="edited[scope.$index].endTime"></el-input> -->
+                        <span v-else>{{ scope.row.endTimeStr }}</span>
+                        <!-- <span>{{ scope.row.endTimeStr }}</span> -->
                     </template>
                 </el-table-column>
                 <el-table-column prop="durationStr" label="限时">
                     <template #default="scope">
-                        <!-- <el-input v-if="isSelected[scope.$index] === true"
+                        <el-input v-if="isSelected[scope.$index] === true" disabled
                             v-model="edited[scope.$index].duration"></el-input>
-                        <span v-else>{{ scope.row.durationStr }}</span> -->
-                        <span>{{ scope.row.durationStr }}</span>
+                        <span v-else>{{ scope.row.durationStr }}</span>
+                        <!-- <span>{{ scope.row.durationStr }}</span> -->
                     </template>
                 </el-table-column>
 
                 <el-table-column prop="" label="" width="150px">
                     <template #header>
-                        <el-button type="success" @click="createProblemSet();">创建试卷</el-button>
+                        <el-button type="success" size="small" @click="createProblemSet();">创建</el-button>
+                        <el-button type="info" size="small" @click="createProblemSet();">搜索</el-button>
                     </template>
                     <template #default="scope">
-                        <el-button type="primary" @click="editProblemSet(scope.row.problemSetId);">编辑试卷</el-button>
+                        <el-button type="primary" size="" @click="editProblemSet(scope.row.problemSetId);">编辑</el-button>
                     </template>
                 </el-table-column>
                 <!-- <el-table-column prop="problemIdList" label="" width="100px">
