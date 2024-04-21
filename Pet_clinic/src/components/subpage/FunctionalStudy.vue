@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/require-v-for-key -->
 <template>
 
   <div class="container">
@@ -68,7 +69,7 @@
 
 
 
-    <el-dialog v-model="dialogOverflowVisible" title="智能医生" width="600" draggable overflow>
+    <el-dialog v-model="dialogOverflowVisible" title="智能医生" width="600" draggable overflow :close-on-click-modal="false" :close-on-press-escape="false">
       <div class="dialog-content">
         <el-container>
           <el-header>

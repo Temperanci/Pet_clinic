@@ -3,8 +3,9 @@
     <div class="onlineTestLayout">
         <el-container>
             <el-container width="60%">
-                <el-header>
-                    <h3>题{{ selectedIndex + 1 }}:（{{ selectedProblem.score }}分）</h3>
+                <el-header>                 
+                    <h3 v-if="selectedProblem.score">题{{ selectedIndex + 1 }}:（{{ selectedProblem.score }}分）</h3>
+                    <h3 v-else>题{{ selectedIndex + 1 }}:</h3>
                     <h4>{{ selectedProblem.problem.title }}</h4>
                 </el-header>
                 <el-main>
@@ -56,7 +57,7 @@
         </el-container>
     </div>
 
-    <el-dialog v-model="submitDialog" title="" width="400">
+    <el-dialog v-model="submitDialog" title="" width="400" :close-on-click-modal="false" :close-on-press-escape="false">
         <span>{{ warningMsg }}</span>
         <template #footer>
             <div class="dialog-footer">
@@ -72,6 +73,10 @@
 <script setup lang="ts">
 import { defineComponent } from "vue";
 import { ref, onMounted } from 'vue';
+import {accout} from '@/scripts/data'
+import {store} from '@/main'
+import {StorageToken} from '@/scripts/storage'
+import { Personnel } from '@/apis/class';
 import { pageQuery as problemSetQuery } from '@/apis/problemSet/problemSet';
 import { pageQuery as problemQuery } from '@/apis/problem/problem';
 import { update } from '@/apis/testRecord/testRecord';
@@ -211,7 +216,8 @@ async function submit() {
         answerMap: {}
     };
     testRecord.problemSetId = props.testId;
-    testRecord.candidateId = 'testUser'; //考生id
+    const userInfo = ref(store.state.token);
+    testRecord.candidateId = userInfo.value.personnelId; //考生id
     testRecord.startTime = props.enterTime; //进入测试时间
     testRecord.answerMap = Object.fromEntries(answerMap); //题目id-->考生答案
     const submitContent: TestRecordUpdateRequest = {
