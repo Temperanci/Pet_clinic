@@ -10,7 +10,7 @@
       <div class="filter">
         <!-- <el-input class="option" v-model="DrugId" placeholder="请输入药品编号"></el-input> -->
         <el-input class="option" v-model="Name" placeholder="请输入药品名称"></el-input>
-        <el-input class="option" v-model="Type" placeholder="请输入药品类型"></el-input>
+        <el-input class="option" v-model="Type" placeholder="请选择药品类型"></el-input>
         <el-select class="option" placeholder="请选择科室" v-model="DepartmentId" style="width: 100%">
           <el-option v-for="item in deptOptions" :key="item.value" :label="item.label" :value="item.value"
             :disabled="item.disabled" />

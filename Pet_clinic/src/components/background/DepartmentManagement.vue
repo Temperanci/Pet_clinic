@@ -32,7 +32,8 @@
         <el-table-column prop="picture" label="图片">
           <template #default="scope">
             <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].picture"></el-input> -->
-            <el-select v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].picture"
+            <el-input v-if="searchBar[scope.$index]" disabled></el-input>
+            <el-select v-else-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].picture"
               placeholder="Select" style="width: 100%">
               <el-option v-for="item in edited[scope.$index].picOptions.value" :key="item.value" :label="item.label"
                 :value="item.value" />
