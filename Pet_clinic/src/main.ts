@@ -4,7 +4,7 @@ import App from './App.vue'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import "leaflet/dist/leaflet.css";
-import router from './router'
+import router from './router/index'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import Vuex from 'vuex'
 import {StorageToken} from './scripts/storage'

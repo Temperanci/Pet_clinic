@@ -73,5 +73,11 @@ export function throwMessage(str:string){
                 type: 'error',
             })
             break;
+        case 'banned':
+            ElMessage({
+                message:'用户已封禁',
+                type:'error'
+            })
+            break;
     }
 }
