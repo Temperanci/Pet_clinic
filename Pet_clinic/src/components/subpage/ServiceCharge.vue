@@ -12,7 +12,11 @@
         <el-input class="option" v-model="Title" placeholder="请输入服务名称"></el-input>
         <!-- <el-input class="option" v-model="PriceId" placeholder="请输入价格编号"></el-input> -->
         <!-- <el-input class="option" v-model="DepartmentId" placeholder="请输入科室编号"></el-input> -->
-        <el-input class="option" v-model="Type" placeholder="请输入服务类型"></el-input>
+        <!-- <el-input class="option" v-model="Type" placeholder="请输入服务类型"></el-input> -->
+        <el-select class="option" placeholder="请选择服务类型" v-model="Type" style="width: 100%">
+          <el-option v-for="item in typeOptions" :key="item.value" :label="item.label" :value="item.value"
+           />
+        </el-select>
         <el-select class="option" placeholder="请选择科室" v-model="DepartmentId" style="width: 100%">
           <el-option v-for="item in deptOptions" :key="item.value" :label="item.label" :value="item.value"
             :disabled="item.disabled" />
@@ -199,6 +203,16 @@ function clearFilter() {
   DepartmentId.value = '';
   PriceId.value = '';
 }
+const typeOptions=[
+  {
+    label:'药品',
+    value:'药品'
+  },
+  {
+    label:'服务',
+    value:'服务'
+  }
+]
 const deptOptions: Ref<any[]> = ref<any[]>([])
 const deptMap:Ref<Map<any,any>> = ref<Map<any,any>>(new Map());
 const priceMap:Ref<Map<any,any>> =ref<Map<any,any>>( new Map());

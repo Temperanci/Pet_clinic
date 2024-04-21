@@ -67,5 +67,11 @@ export function throwMessage(str:string){
             break;
         case 'error':
             break;
+        case 'No user or wrong psw':
+            ElMessage({
+                message: '用户不存在或密码错误',
+                type: 'error',
+            })
+            break;
     }
 }

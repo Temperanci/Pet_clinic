@@ -173,6 +173,7 @@ function Logout(){
   userStatus.value=1;
   ifLogined.value=false;
   store.commit('clearToken');
+  Switch(2);
 }
 function refreshLogin(){
   if(StorageToken.get('token')!==null){
