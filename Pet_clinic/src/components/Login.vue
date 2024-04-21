@@ -149,7 +149,7 @@ async function Login(){
 //
 // }
 function refreshLogin(){
-  if(StorageToken.get('token')!==null){
+  if(StorageToken.get('token')!==null&&StorageToken.get('token').phoneNumber!=''){
     store.commit('setToken',StorageToken.get('token'));
     router.push('home');
     console.log('refreshLogin.store.state.token',store.state.token);

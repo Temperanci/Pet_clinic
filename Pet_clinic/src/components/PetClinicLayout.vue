@@ -185,7 +185,7 @@ function Logout(){
   router.push('login');
 }
 function refreshLogin(){
-  if(StorageToken.get('token')!==null){
+  if(StorageToken.get('token')!==null&&StorageToken.get('token').phoneNumber!=''){
     store.commit('setToken',StorageToken.get('token'));
     ifLogined.value = true;
     if(store.state.token.role==="管理员"){
