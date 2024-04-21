@@ -1,21 +1,24 @@
 <script lang="ts">
 import PetClinicLayout from './components/PetClinicLayout.vue'
 import BackgroundLayout from './components/BackgroundLayout.vue'
+import LogIn from './components/Login.vue'
 import {ref} from 'vue'
 export default {
   name: 'App',
   components: {
     PetClinicLayout,
-    BackgroundLayout
+    BackgroundLayout,
+    LogIn
   }
 }
 </script>
 <script setup lang="ts">
 
- const status = ref(1)
+ const status = ref(2)//0:back 1:front 2:login 
 </script>
 <template>
   <div id="app" >
+    <LogIn v-if="status === 2" @switch="(index) => status = index"/>
     <BackgroundLayout  v-if="status === 0" @switch="(index) => status = index"/>
     <PetClinicLayout  v-if="status === 1" @switch="(index) => status = index"/>
   </div>

@@ -15,7 +15,7 @@
             <div class="card-right">
               <el-button @click="Switch(1)">前台页面</el-button>
               <el-divider />
-              <el-button>注销</el-button>
+              <el-button @click="Logout()">注销</el-button>
             </div>
           </div>
         </el-card>
@@ -99,7 +99,11 @@ const userName = ref('');
 defineComponent({
   name: "BackgroundLayout"
 })
-
+function Logout(){
+  userName.value='';
+  store.commit('clearToken');
+  Switch(2);
+}
 const aside = ref(true);//控制侧栏的可见性
 const emit = defineEmits(['switch'])
 function Switch(n: number) {

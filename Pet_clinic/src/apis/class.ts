@@ -95,15 +95,24 @@ export class DiseaseInstance {
     time: number;
     diseaseId: string;
     instanceId: string;
-    fileUrlList: string;
-    pictureUrlList: string;
+    fileUrlList: string[];
+    fileOptions:Ref<OptionItem[]>
+    pictureUrlList: string[];
+    pictureOptions:Ref<OptionItem[]>
+    form:any;
     constructor(){
         this.desc='';
         this.time=0;
         this.diseaseId='';
         this.instanceId='';
-        this.fileUrlList='';
-        this.pictureUrlList='';
+        this.fileUrlList=[];
+        this.pictureUrlList=[];
+        this.fileOptions=ref<OptionItem[]>([]);
+        this.pictureOptions=ref<OptionItem[]>([]);
+        this.form = {
+            fileList: [], // 这里假设 fileList 是 File 类型的数组
+            videoList: [], // 同上，videoList 是 File 类型的数组
+          }
     }
 }
 
