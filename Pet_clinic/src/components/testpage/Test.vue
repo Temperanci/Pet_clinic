@@ -3,7 +3,7 @@
     <div class="onlineTestLayout">
         <el-container>
             <el-container width="60%">
-                <el-header>                 
+                <el-header>
                     <h3 v-if="selectedProblem.score">题{{ selectedIndex + 1 }}:（{{ selectedProblem.score }}分）</h3>
                     <h3 v-else>题{{ selectedIndex + 1 }}:</h3>
                     <h4>{{ selectedProblem.problem.title }}</h4>
@@ -35,9 +35,9 @@
             </el-container>
             <el-aside>
 
-                <div class="countdown">
+                <div class="countdown" v-if="!noTimeLimit">
                     剩余时间：
-                    {{ Math.floor(clock / 3600000) }}h {{ Math.floor((clock % 3600000) / 60000) }}min {{
+                    {{ Math.floor(clock / 3600000) }}h {{ Math.floor((clock % 3600000) / 60000) }}m {{
                         Math.floor((clock % 60000) / 1000) }}s
                 </div>
 
@@ -73,9 +73,9 @@
 <script setup lang="ts">
 import { defineComponent } from "vue";
 import { ref, onMounted } from 'vue';
-import {accout} from '@/scripts/data'
-import {store} from '@/main'
-import {StorageToken} from '@/scripts/storage'
+import { accout } from '@/scripts/data'
+import { store } from '@/main'
+import { StorageToken } from '@/scripts/storage'
 import { Personnel } from '@/apis/class';
 import { pageQuery as problemSetQuery } from '@/apis/problemSet/problemSet';
 import { pageQuery as problemQuery } from '@/apis/problem/problem';
@@ -98,6 +98,7 @@ const props = defineProps({
 
 const warningMsg = ref('确认提交试卷？');
 const choices = ref(['A', 'B', 'C', 'D']);
+const noTimeLimit = ref(true);
 const clock = ref(999999);
 const answer = ref<string[]>([]); //暂存答案
 const answerMap = new Map<string, string>(); //题号id-->考生答案
@@ -127,6 +128,9 @@ async function fetchProblems() {
         const idList = problemSetResponse.data.datas[0].problemIdList;
         const scoreList = problemSetResponse.data.datas[0].problemScoreMap;
         clock.value = problemSetResponse.data.datas[0].duration;
+        if (problemSetResponse.data.datas[0].duration > 0) {
+            noTimeLimit.value = false;
+        }
         // clock.value = 3000;
 
         // console.log('获取测试:', problemSetResponse.data.datas[0]);
@@ -159,8 +163,10 @@ const count = setInterval(() => {
         clock.value -= 1000;
     } else if (clock.value == 0) {
         clearInterval(count);
-        warningMsg.value = '考试时间已结束！';
-        submitDialog.value = true;
+        if (!noTimeLimit.value) {
+            warningMsg.value = '考试时间已结束！';
+            submitDialog.value = true;
+        }
     }
 }, 1000);
 
