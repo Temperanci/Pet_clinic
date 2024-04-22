@@ -118,7 +118,6 @@ const selectedProblem = ref<{ problem: ProblemBO, score: number }>({
     score: 0
 })
 
-// const ProblemPage = ref<ProblemPageResponse>({ datas: [], total: 0, limit: 0 });
 const problemList = ref<{ problem: ProblemBO, score: number }[]>([]);
 async function fetchProblems() {
     try {
@@ -130,9 +129,6 @@ async function fetchProblems() {
         if (problemSetResponse.data.datas[0].duration > 0) {
             noTimeLimit.value = false;
         }
-        // clock.value = 3000;
-
-        // console.log('获取测试:', problemSetResponse.data.datas[0]);
         idList.forEach(async (id: string) => {
             const problemRequest: ProblemPageRequest = { problemId: id };
             const problemResponse = await problemQuery(problemRequest);
@@ -141,17 +137,15 @@ async function fetchProblems() {
                 score: scoreList[id]
             };
             temp.problem.content = (temp.problem.content ?? '').replace(/(A\.|B\.|C\.|D\.)/g, '\n$1'); //单选题选项换行
-            // console.log('获取题目:', temp);
             problemList.value.push(temp);
         })
-        // console.log("获取problemList:", problemList.value);
+        // console.log("获取题目:", problemList.value);
         setTimeout(() => { jumpProblem(selectedIndex.value); }, 1000);
 
     } catch (error) {
-        console.error('Error fetching problems:', error);
+        console.error('获取试卷题目失败！', error);
     }
 }
-
 onMounted(async () => {
     await fetchProblems();
 })

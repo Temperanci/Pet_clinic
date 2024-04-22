@@ -163,7 +163,7 @@ const DepartmentId = ref('');
 const Occupation = ref();
 const BedId = ref('');
 function clearFilter() {
-
+  Occupation.value = '';
   Location.value = '';
   DepartmentId.value = '';
   BedId.value = '';
