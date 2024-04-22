@@ -34,17 +34,17 @@
                 </el-result>
               </el-card>
             </el-col>
-
-            <!-- <el-col :span="8">
+<!-- 
+            <el-col :span="8">
               <el-card shadow="hover">
-                <el-result title="测试记录" sub-title="查看套题的答题记录和分数">
+                <el-result title="Test" sub-title="">
                   <template #icon>
                     <el-icon size="50">
                       <Checked />
                     </el-icon>
                   </template>
                   <template #extra>
-                    <el-button type="primary" size="large" @click="changeContent('TestRecord')">进入</el-button>
+                    <el-button type="primary" size="large" @click="testId='b3495e38-1c8d-4707-9cf4-93ea68424968';changeContent('TestRecord')">进入</el-button>
                   </template>
                 </el-result>
               </el-card>

@@ -82,7 +82,7 @@
 
   <el-dialog v-model="dialogVisible" title="测试记录详情" width="900" draggable overflow :close-on-click-modal="false"
     :close-on-press-escape="false">
-
+    
   </el-dialog>
 
 
@@ -100,8 +100,16 @@ import { isSelectGen, EditedGen, clearIsSelected } from "../subComponents/tableO
 import { onMounted } from "vue";
 import type { Ref } from "vue";
 import { pageQuery, update } from "../../apis/testRecord/testRecord"
-import type { TestRecordPageRequest, TestRecordPageResponse, TestRecordUpdateRequest } from "@/apis/testRecord/testRecord-interface"
-import { TestRecord } from "@/apis/class";
+import { pageQuery as problemSetQuery } from '@/apis/problemSet/problemSet';
+import { pageQuery as problemQuery } from '@/apis/problem/problem';
+import { pageQuery as diseaseQuery } from '@/apis/disease/disease';
+import type { TestRecordPageRequest, TestRecordPageResponse, TestRecordUpdateRequest } from '@/apis/testRecord/testRecord-interface';
+import type { ProblemSetPageRequest, ProblemSetPageResponse } from '@/apis/problemSet/problemSet-interface';
+import type { ProblemPageRequest, ProblemPageResponse } from '@/apis/problem/problem-interface';
+import type { DiseasePageRequest, DiseasePageResponse } from '@/apis/disease/disease-interface';
+import type { TestRecordBO, ProblemSetBO, ProblemBO, DiseaseBO } from '@/apis/schemas';
+import { Personnel, TestRecord, ProblemSet, Problem, Disease } from "@/apis/class";
+
 import { type rowCRUD } from '../../scripts/tableOpt'
 import type { PersonnelPageRequest } from "@/apis/personnel/personnel-interface";
 const TestRecordPage = ref<TestRecordPageResponse>({ datas: [], total: 0, limit: 0 });
@@ -280,7 +288,7 @@ function pagination(val: number) {
 //filter && view
 import { pageQuery as personnelPageQuery } from "@/apis/personnel/personnel";
 import { pageQuery as problemsetPageQuery } from "@/apis/problemSet/problemSet";
-import type { ProblemSetPageRequest } from "@/apis/problemSet/problemSet-interface";
+// import type { ProblemSetPageRequest } from "@/apis/problemSet/problemSet-interface";
 const problemsetMap: Ref<Map<any, any>> = ref<Map<any, any>>(new Map());
 async function getProblemsetInfo() {
   var request: ProblemSetPageRequest = {
@@ -340,6 +348,23 @@ const gradeMap = new Map([
 const component = defineComponent({
   name: "TestRecordManagement"
 })
+interface ProblemInfo {
+  problem?: ProblemBO;
+  // problemId?: string;
+  // title?: string;
+  // type?: string;
+  // subjectId?: string; 
+  // content?: string;
+  // answer?: string; //参考答案
+  // background?: string;
+  // gradingPoints?: string;
+  typeName?: string; //题型
+  subjectName?: string; //病种知识点
+  score?: number //题目分值
+  userAnswer?: string; //考生答案
+  grade?: number; //考生得分
+  reason?: string //主观题批分理由
+}
 
 const currentRecordId = ref('');
 const dialogVisible = ref(false);
@@ -347,6 +372,8 @@ function recordDetail(id: string) {
 
   dialogVisible.value = true;
 }
+
+
 
 </script>
 
