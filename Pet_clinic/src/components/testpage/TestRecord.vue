@@ -8,9 +8,9 @@
             <div class="problemset-content">
                 <el-table :data="queryData" border>
                     <!-- <el-table-column prop="problemSetId" label="id" width="" /> -->
-                    <el-table-column prop="title" label="考试名" width="" />
-                    <el-table-column prop="submitTimeStr" label="提交时间" width="" />
-                    <el-table-column prop="score" label="分数" width="" />
+                    <el-table-column prop="problemSetId" label="考试名" width="" />
+                    <el-table-column prop="submitTime" label="提交时间" width="" />
+                    <el-table-column prop="graded" label="分数" width="" />
                     <el-table-column label="" width="100px">
                         <template #default="scope">
                             <el-button size="small"
@@ -109,7 +109,7 @@ async function fetchTestRecords(pageNum?: number, pageLimit?: number, msg?: Obje
           var time = new Date(rec.submitTime);
           rec.submitTime = time.getFullYear() + '-' + (time.getMonth() + 1) + '-' + time.getDate() + ' ' + time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0');
         }
-        
+        console.log(queryData);
         // if (time) {
         //   time = time.toString().slice(0, 10) + " " + time.toString().slice(11, 16);
         // }

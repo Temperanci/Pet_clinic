@@ -6,9 +6,9 @@
       <template v-if="content === 'Menu'">
         <div class="test-module">
           <el-row :gutter="40">
-            <el-col :span="8">
+            <el-col :span="12">
               <el-card shadow="hover">
-                <el-result title="套题" sub-title="选择试卷参加测试">
+                <el-result title="套题考试" sub-title="选择试卷参加测试，ai自动批卷及时反馈">
                   <template #icon>
                     <el-icon size="50">
                       <Checked />
@@ -20,9 +20,9 @@
                 </el-result>
               </el-card>
             </el-col>
-            <el-col :span="8">
+            <el-col :span="12">
               <el-card shadow="hover">
-                <el-result title="单题" sub-title="按知识点筛选题目练习">
+                <el-result title="单题练习" sub-title="按病种知识点筛选题目，自主练习巩固弱项">
                   <template #icon>
                     <el-icon size="50">
                       <Checked />
@@ -53,18 +53,11 @@
           </el-row>
         </div>
       </template>
-      <SingleProblem v-if="content === 'SingleProblem'"
-        @content="(c: string) => content = c" />
-      <ProblemSet v-if="content === 'ProblemSet'"
-        @content="(c: string) => content = c"
-        @id="(id: string) => testId = id"
-        @time="(time: Date) => enterTime = time" />
-      <Test v-if="content === 'Test'"
-        @content="(c: string) => content = c"
-        :testId="testId"
-        :enterTime="enterTime" />
-        <TestRecord v-if="content === 'TestRecord'"
-        @content="(c: string) => content = c" />
+      <SingleProblem v-if="content === 'SingleProblem'" @content="(c: string) => content = c" />
+      <ProblemSet v-if="content === 'ProblemSet'" @content="(c: string) => content = c"
+        @id="(id: string) => testId = id" @time="(time: Date) => enterTime = time" />
+      <Test v-if="content === 'Test'" @content="(c: string) => content = c" :testId="testId" :enterTime="enterTime" />
+      <TestRecord v-if="content === 'TestRecord'" @content="(c: string) => content = c" :testId="testId" />
     </div>
   </div>
 </template>
