@@ -401,7 +401,7 @@ var currentPage = 1;
 function backToHome() {
     fetchProblemSets(currentPage);
 }
-function pagination(val: number) {
+function pagination(val: number) { //分页
     currentPage = val
     backToHome();
     //恢复初始值
@@ -411,7 +411,7 @@ function pagination(val: number) {
     searchBar.value[0] = false;
     unwritableBar.value[0] = false;
 }
-//分页
+
 const component = defineComponent({
     name: "ProblemSetManagement"
 })
@@ -427,26 +427,60 @@ interface ProblemSetInfo {
     durationStr?: string;
     duration?: number
 }
+function handleProblemSetList() { //处理起止时间和时限的显示格式
+    const problemList: ProblemSetInfo[] = [];
+    for (let i in queryData.value) {
+        const temp: ProblemSetInfo = {
+            problemSetId: "",
+            title: "",
+            desc: "",
+            startTimeStr: "",
+            startTime: new Date(0),
+            endTimeStr: "",
+            endTime: new Date('2077-12-31T23:59:59'),
+            durationStr: "",
+            duration: 0
+        };
+        temp.problemSetId = queryData.value[i].problemSetId ?? "";
+        temp.title = queryData.value[i].title ?? "";
+        temp.desc = queryData.value[i].desc ?? "";
+        if (queryData.value[i].startTime) {
+            temp.startTime = new Date(queryData.value[i].startTime);
+            temp.startTimeStr = temp.startTime.getFullYear() + '-' + (temp.startTime.getMonth() + 1) + '-' + temp.startTime.getDate() + ' ' + temp.startTime.getHours().toString().padStart(2, '0') + ':' + temp.startTime.getMinutes().toString().padStart(2, '0');
+            // temp.startTimeStr = temp.startTime .toString().slice(0, 10) + ' ' + temp.startTime .startTime?.toString().slice(11, 16);
+        }
+        if (queryData.value[i].endTime && queryData.value[i].endTime < new Date('2077-12-31T23:59:59')) {
+            temp.endTime = new Date(queryData.value[i].endTime);
+            temp.endTimeStr = temp.endTime.getFullYear() + '-' + (temp.endTime.getMonth() + 1) + '-' + temp.endTime.getDate() + ' ' + temp.endTime.getHours().toString().padStart(2, '0') + ':' + temp.endTime.getMinutes().toString().padStart(2, '0');
+            // temp.endTimeStr = queryData.value[i].endTime?.toString().slice(0, 10) + ' ' + queryData.value[i].endTime?.toString().slice(11, 16);
+        }
+        if (queryData.value[i].duration) {
+            var hour = Math.floor((queryData.value[i].duration ?? 0) / (1000 * 60 * 60));
+            var min = Math.floor((queryData.value[i].duration ?? 0) / (1000 * 60) - hour * 60);
+            temp.durationStr = hour + "h" + min + "min";
+            if (hour > 0) {
+                temp.durationStr = hour + "h" + min + "min";
+            } else if (min > 0) {
+                temp.durationStr = min + "min";
+            } else {
+                temp.durationStr = "";
+            }
+            temp.duration = queryData.value[i].duration ?? 0;
+        }
+        problemList.push(temp);
 
-interface ProblemInfo {
-    problemId?: string;
-    type?: string;
-    typeName?: string;
-    subjectId?: string;
-    subjectName?: string;
-    title?: string;
-    content?: string;
-    answer?: string;
-    background?: string;
-    gradingPoints?: string;
+    }
+
+    return problemList;
 }
+
+
 
 //编辑试卷题目
 const createNew = ref(false);
 const editId = ref('');
 const dialogVisible = ref(false);
 const confirmDelete = ref(false);
-
 
 const editTitle = ref('');
 const editDesc = ref('');
@@ -470,6 +504,19 @@ const chosenSubject = ref('');
 const selected = ref(false); //是否只展示已选题目
 const resultList = ref<ProblemInfo[]>([]); //筛选并处理显示格式后的题目列表
 
+interface ProblemInfo {
+    problemId?: string;
+    type?: string;
+    typeName?: string;
+    subjectId?: string;
+    subjectName?: string;
+    title?: string;
+    content?: string;
+    answer?: string;
+    background?: string;
+    gradingPoints?: string;
+}
+
 let typeOptions = ref([{
     value: 'objective',
     label: '单选题'
@@ -481,6 +528,7 @@ let subjectOptions = ref([{
     value: '',
     label: ''
 }]);
+
 const rowClassName = ({ rowIndex }: { rowIndex: number }) => { //题目的行样式随选择情况更改
     var currentList = loadCurrentProblemList();
     // console.log('行编号:',rowIndex,'题目id:',currentList[rowIndex].problemId);
@@ -495,7 +543,7 @@ function createProblemSet() { //创建新试卷
     createNew.value = true;
     dialogVisible.value = true;
 }
-function editProblemSet(id: string) { //修改试卷
+function editProblemSet(id: string) { //打开试卷修改窗口
     clearEdit();
     createNew.value = false;
     const currentSet = queryData.value.find(set => set.problemSetId === id);
@@ -510,10 +558,10 @@ function editProblemSet(id: string) { //修改试卷
             editHour.value = hour;
             editMin.value = min;
         }
-        if (currentSet.startTime) {
+        if (currentSet.startTime && currentSet.startTime>new Date(0)) { //有效开始时间大于最小值
             editStartTime.value = currentSet.startTime;
         }
-        if (currentSet.endTime) {
+        if (currentSet.endTime && currentSet.endTime<new Date('2077-12-31T23:59:59')) { ////有效截止时间小于最大值
             editEndTime.value = currentSet.endTime;
         }
         selectedProblemIdList.value = currentSet.problemIdList ?? [];
@@ -527,8 +575,10 @@ function clearEdit() { //清除修改项数据
     editDesc.value = '';
     editHour.value = undefined;
     editMin.value = undefined;
-    editStartTime.value = '';
-    editEndTime.value = '';
+    editStartTime.value = undefined;
+    editEndTime.value = undefined;
+    // editStartTime.value = new Date();
+    // editEndTime.value = new Date('2077-12-31T23:59:59');
     selectedProblemIdList.value = [];
     selectedProblemScoreMap.value = {};
     searchTitle.value = '';
@@ -543,8 +593,8 @@ async function submitCreate() { //提交创建
             problemSet: {
                 title: editTitle.value,
                 desc: editDesc.value,
-                startTime: editStartTime.value,
-                endTime: editEndTime.value,
+                startTime: editStartTime.value ?? new Date(0),
+                endTime: editEndTime.value ?? new Date('2077-12-31T23:59:59'),
                 duration: ((editHour.value ?? 0) * 60 + (editMin.value ?? 0)) * 60 * 1000,
                 problemIdList: selectedProblemIdList.value,
                 problemScoreMap: selectedProblemScoreMap.value
@@ -552,7 +602,7 @@ async function submitCreate() { //提交创建
             delete: false
         }
         var response = await updateProblemSet(request);
-        if (response) {//更改成功
+        if (response) { //更改成功
             throwMessage('create success');
             console.log('创建试卷成功:', response);
             setTimeout(() => { backToHome(); }, 500);
@@ -566,13 +616,14 @@ async function submitCreate() { //提交创建
 }
 async function submitEdit() { //提交修改
     try {
+        // console.log('起止时间',editStartTime.value==null,editEndTime.value==null);
         const request: ProblemSetUpdateRequest = {
             problemSet: {
                 problemSetId: editId.value,
                 title: editTitle.value,
                 desc: editDesc.value,
-                startTime: editStartTime.value,
-                endTime: editEndTime.value,
+                startTime: editStartTime.value ?? new Date(0),
+                endTime: editEndTime.value ?? new Date('2077-12-31T23:59:59'),
                 duration: ((editHour.value ?? 0) * 60 + (editMin.value ?? 0)) * 60 * 1000,
                 problemIdList: selectedProblemIdList.value,
                 problemScoreMap: selectedProblemScoreMap.value
@@ -674,6 +725,9 @@ onMounted(async () => {
     await fetchDiseases();
     await fetchProblems();
 })
+
+
+
 function searchProblems() {
     resultList.value.splice(0, resultList.value.length);
     // console.log("当前试卷选题:",selectedProblemIdList);
@@ -699,86 +753,26 @@ function searchProblems() {
         selectedIndex.value = 0;
     }
 }
-
 watch(selected, () => {
     searchProblems();
 });
-
-
-function clearConditions() {
+function clearConditions() { //情空题目筛选条件
     searchTitle.value = '';
     chosenType.value = '';
     chosenSubject.value = '';
     searchProblems();
 }
-function handleProblemSetList() { //处理起止时间和时限的显示格式
-    const problemList: ProblemSetInfo[] = [];
-    for (let i in queryData.value) {
-        const temp: ProblemSetInfo = {
-            problemSetId: "",
-            title: "",
-            desc: "",
-            startTimeStr: "",
-            startTime: new Date(0),
-            endTimeStr: "",
-            endTime: new Date('9999-12-31T23:59:59'),
-            durationStr: "",
-            duration: 0
-        };
-        temp.problemSetId = queryData.value[i].problemSetId ?? "";
-        temp.title = queryData.value[i].title ?? "";
-        temp.desc = queryData.value[i].desc ?? "";
-        if (queryData.value[i].startTime) {
-            temp.startTime = new Date(queryData.value[i].startTime);
-            temp.startTimeStr = temp.startTime.getFullYear() + '-' + (temp.startTime.getMonth() + 1) + '-' + temp.startTime.getDate() + ' ' + temp.startTime.getHours().toString().padStart(2, '0') + ':' + temp.startTime.getMinutes().toString().padStart(2, '0');
-            // temp.startTimeStr = temp.startTime .toString().slice(0, 10) + ' ' + temp.startTime .startTime?.toString().slice(11, 16);
-        }
-        if (queryData.value[i].endTime) {
-            temp.endTime = new Date(queryData.value[i].endTime);
-            temp.endTimeStr = temp.endTime.getFullYear() + '-' + (temp.endTime.getMonth() + 1) + '-' + temp.endTime.getDate() + ' ' + temp.endTime.getHours().toString().padStart(2, '0') + ':' + temp.endTime.getMinutes().toString().padStart(2, '0');
-            // temp.endTimeStr = queryData.value[i].endTime?.toString().slice(0, 10) + ' ' + queryData.value[i].endTime?.toString().slice(11, 16);
-        }
-        if (queryData.value[i].duration) {
-            var hour = Math.floor((queryData.value[i].duration ?? 0) / (1000 * 60 * 60));
-            var min = Math.floor((queryData.value[i].duration ?? 0) / (1000 * 60) - hour * 60);
-            temp.durationStr = hour + "h" + min + "min";
-            if (hour > 0) {
-                temp.durationStr = hour + "h" + min + "min";
-            } else if (min > 0) {
-                temp.durationStr = min + "min";
-            } else {
-                temp.durationStr = "";
-            }
-            temp.duration = queryData.value[i].duration ?? 0;
-        }
-        problemList.push(temp);
-
-    }
-
-    return problemList;
-}
-function loadCurrentProblemList() {
-    var currentList: ProblemInfo[] = [];
-    for (var i in resultList.value) {
-        var index = resultList.value.indexOf(resultList.value[i])
-        if (index >= current.value * 10 - 10 && index < current.value * 10) {
-            currentList.push(resultList.value[i]);
-        }
-    }
-    return currentList;
-}
-
-function selectProblemWithId(id: string) {
+function selectProblemWithId(id: string) { //从试卷添加or移除题目
     var temp = resultList.value.find(pro => pro.problemId === id);
     if (temp != null) {
         selectedProblem.value = temp;
         selectedIndex.value = resultList.value.indexOf(temp);
     }
 
-    if (!selectedProblemIdList.value.includes(id)) { //添加题目
+    if (!selectedProblemIdList.value.includes(id)) { //添加
         selectedProblemIdList.value.push(id);
     } else {
-        selectedProblemIdList.value = selectedProblemIdList.value.filter(item => item !== id); //移除题目
+        selectedProblemIdList.value = selectedProblemIdList.value.filter(item => item !== id); //移除
     }
 
 }
@@ -800,6 +794,16 @@ function handleCurrentChange(n: number) {
 }
 function handleSizeChange(n: number) {
     size.value = n;
+}
+function loadCurrentProblemList() {
+    var currentList: ProblemInfo[] = [];
+    for (var i in resultList.value) {
+        var index = resultList.value.indexOf(resultList.value[i])
+        if (index >= current.value * 10 - 10 && index < current.value * 10) {
+            currentList.push(resultList.value[i]);
+        }
+    }
+    return currentList;
 }
 </script>
 

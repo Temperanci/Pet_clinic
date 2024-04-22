@@ -35,7 +35,7 @@
               </el-card>
 
             </el-col>
-            <!-- <el-col :span="8">
+            <el-col :span="8">
               <el-card shadow="hover">
                 <el-result title="测试记录" sub-title="查看套题的答题记录和分数">
                   <template #icon>
@@ -49,22 +49,15 @@
                 </el-result>
               </el-card>
 
-            </el-col> -->
+            </el-col>
           </el-row>
         </div>
       </template>
-      <SingleProblem v-if="content === 'SingleProblem'"
-        @content="(c: string) => content = c" />
-      <ProblemSet v-if="content === 'ProblemSet'"
-        @content="(c: string) => content = c"
-        @id="(id: string) => testId = id"
-        @time="(time: Date) => enterTime = time" />
-      <Test v-if="content === 'Test'"
-        @content="(c: string) => content = c"
-        :testId="testId"
-        :enterTime="enterTime" />
-        <TestRecord v-if="content === 'TestRecord'"
-        @content="(c: string) => content = c" />
+      <SingleProblem v-if="content === 'SingleProblem'" @content="(c: string) => content = c" />
+      <ProblemSet v-if="content === 'ProblemSet'" @content="(c: string) => content = c"
+        @id="(id: string) => testId = id" @time="(time: Date) => enterTime = time" />
+      <Test v-if="content === 'Test'" @content="(c: string) => content = c" :testId="testId" :enterTime="enterTime" />
+      <TestRecord v-if="content === 'TestRecord'" @content="(c: string) => content = c" :testId="testId" />
     </div>
   </div>
 </template>
