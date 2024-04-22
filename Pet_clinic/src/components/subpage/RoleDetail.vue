@@ -133,6 +133,7 @@ onMounted(() => {
 .entries-list {
   flex: 1;
   padding: 20px;
+  overflow: scroll;
   .h1{
     font-size: 38px;
     font-weight: bold;
@@ -145,6 +146,7 @@ onMounted(() => {
 .entry-detail {
   flex: 2;
   padding: 20px;
+  overflow: scroll;
 }
 
 .close-overlay {
