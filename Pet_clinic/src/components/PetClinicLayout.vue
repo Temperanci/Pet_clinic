@@ -92,7 +92,7 @@
   </el-container>
   </div>
   <div v-else style="display: flex">
-    <p style="margin: auto;">请先登录</p>
+    <el-button type="primay" size="large" style="margin: auto;" @click="router.push('login')">请先登录</el-button>
   </div>
 </template>
 <script lang="ts">
