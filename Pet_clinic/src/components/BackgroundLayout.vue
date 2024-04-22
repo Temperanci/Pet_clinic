@@ -77,7 +77,7 @@
 
   </div>
   <div v-else style="display: flex;">
-    <p style="margin: auto;">NMSL</p>
+    <el-button type="primay" size="large" style="margin: auto;" @click="router.push('login')">请先登录</el-button>
   </div>
 </template>
 <script setup lang="ts">
@@ -102,6 +102,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 //认证
 import {adminVerify} from '../scripts/authentication'
+import { StorageToken } from '@/scripts/storage'
 //登录
 const userName = ref('');
 defineComponent({
@@ -111,6 +112,19 @@ function Logout(){
   userName.value='';
   store.commit('clearToken');
   router.push('login');
+}
+function refreshLogin(){
+  if(StorageToken.get('token')!==null&&StorageToken.get('token').phoneNumber!=''){
+    store.commit('setToken',StorageToken.get('token'));
+    userName.value = store.state.token.name;
+    console.log('Storage.token.phoneNumber',StorageToken.get('token').phoneNumber);
+    console.log('refreshLogin.store.state.token',store.state.token);
+  }
+  else{
+    store.commit('clearToken');
+    router.push('login');
+  }
+  console.log('refreshLogin.StrorageToken',StorageToken.get('token'))
 }
 const aside = ref(true);//控制侧栏的可见性
 const emit = defineEmits(['switch'])
@@ -156,6 +170,7 @@ function handleSelect(n: string) {
 const activeIndex = ref('1')
 const currentComponent = ref(componentsMap['1']);
 onMounted(() => {
+  refreshLogin();
   if (store.state.token.name !== '') {
     userName.value = store.state.token.name;
   }

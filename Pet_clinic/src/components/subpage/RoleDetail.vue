@@ -22,7 +22,7 @@
       </div>
     </div>
     <!-- 关闭按钮 -->
-    <button class="close-overlay" @click="closeOverlay">Close</button>
+    <button class="close-overlay" @click="closeOverlay">X</button>
   </div>
 </template>
 
@@ -83,7 +83,7 @@ const processChosen = ref<ProcessBO>({
   content: '',
   processId: ''
 })
-function selectedList(name: string) {
+function selectedList(name: any) {
   const foundProcess = processList.value.datas.find(process => process.title === name);
   processChosen.value = foundProcess || { type: '', title: '', content: '', processId: '' }; // 提供默认空对象
 }
@@ -133,6 +133,7 @@ onMounted(() => {
 .entries-list {
   flex: 1;
   padding: 20px;
+  overflow: scroll;
   .h1{
     font-size: 38px;
     font-weight: bold;
@@ -145,6 +146,7 @@ onMounted(() => {
 .entry-detail {
   flex: 2;
   padding: 20px;
+  overflow: scroll;
 }
 
 .close-overlay {

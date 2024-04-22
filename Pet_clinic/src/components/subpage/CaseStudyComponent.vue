@@ -120,18 +120,19 @@ const diseasePage = ref<DiseasePageResponse>({ datas: [], total: 0, limit: 0 })
 // 定义选中的疾病详情
 const selectedCase = ref<DiseaseBO | null>(null)
 const activeInstance = ref(null)
-
+const diseaseInstance = ref<DiseaseInstancePageResponse>({ datas: [], total: 0, limit: 0 })
+const selectedCaseInstance = ref<DiseaseInstanceBO[] | null>(null)
 // 定义获取疾病列表的函数
 async function fetchDisease() {
   try {
     const response = await DiseasePageQuery()
     diseasePage.value = response.data
+    selectedCase.value = response.data.datas[0]
   } catch (error) {
     console.error('Failed to fetch disease:', error)
   }
 }
-const diseaseInstance = ref<DiseaseInstancePageResponse>({ datas: [], total: 0, limit: 0 })
-const selectedCaseInstance = ref<DiseaseInstanceBO[] | null>(null)
+
 async function fetchDiseaseInstance() {
   try {
     const response = await pageQuery()
@@ -152,10 +153,14 @@ function showCaseDetails(disease: DiseaseBO) {
 
 // 组件挂载后获取疾病数据
 
-onMounted(() => {
-  fetchDisease()
-  fetchDiseaseInstance()
-})
+onMounted(async () => {
+  await fetchDisease(); // 等待疾病数据加载完成
+  await fetchDiseaseInstance(); // 然后加载疾病实例数据
+  if (selectedCase.value) {
+    showCaseDetails(selectedCase.value); // 显示默认疾病的详情
+  }
+});
+
 
 const showDialog = ref(false)
 const uploadForm = ref<InstanceType<typeof ElForm>>()

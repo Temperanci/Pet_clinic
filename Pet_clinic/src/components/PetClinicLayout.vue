@@ -92,7 +92,7 @@
   </el-container>
   </div>
   <div v-else style="display: flex">
-    <p style="margin: auto;">请先登录</p>
+    <el-button type="primay" size="large" style="margin: auto;" @click="router.push('login')">请先登录</el-button>
   </div>
 </template>
 <script lang="ts">
@@ -185,16 +185,18 @@ function Logout(){
   router.push('login');
 }
 function refreshLogin(){
-  if(StorageToken.get('token')!==null){
+  if(StorageToken.get('token')!==null&&StorageToken.get('token').phoneNumber!=''){
     store.commit('setToken',StorageToken.get('token'));
     ifLogined.value = true;
     if(store.state.token.role==="管理员"){
       userStatus.value = 0;
     }
     userName.value = store.state.token.name;
+    console.log('Storage.token.phoneNumber',StorageToken.get('token').phoneNumber);
     console.log('refreshLogin.store.state.token',store.state.token);
   }
   else{
+    store.commit('clearToken');
     router.push('login');
   }
   console.log('refreshLogin.StrorageToken',StorageToken.get('token'))
@@ -222,6 +224,12 @@ async function LoginRequest(phone:string,pwd:string){
 }
 
 onMounted(() => {
+  // StorageToken.set('token',{
+  //   name:"test",
+  //   password:"123456",
+  //   phoneNumber:""
+  // });
+  // console.log('Storage.set.token',StorageToken.get('token'));
   console.log('onMounted','success');
   refreshLogin();
 });

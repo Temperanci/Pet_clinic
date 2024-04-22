@@ -62,18 +62,18 @@ const rules = {
         required: true,
         message: "请输入密码"
     },
-    {
-    pattern:/^.{8,20}$/,
-    message:"密码应该包含8~20个字符"
-  },
-  // {
-  //   pattern:/^.{,20}$/,
-  //   message:"密码最多为20个字符"
+  //   {
+  //   pattern:/^.{8,20}$/,
+  //   message:"密码应该包含8~20个字符"
   // },
-  {
-    pattern:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@!%*?&])[A-Za-z\d@!%*?&]/,
-    message:"密码应该包含大小写字母数字和特殊字符"
-  }
+  // // {
+  // //   pattern:/^.{,20}$/,
+  // //   message:"密码最多为20个字符"
+  // // },
+  // {
+  //   pattern:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@!%*?&])[A-Za-z\d@!%*?&]/,
+  //   message:"密码应该包含大小写字母数字和特殊字符"
+  // }
   ],
     // checkCode: [{
     //     required: true,
@@ -149,10 +149,13 @@ async function Login(){
 //
 // }
 function refreshLogin(){
-  if(StorageToken.get('token')!==null){
+  if(StorageToken.get('token')!==null&&StorageToken.get('token').phoneNumber!=''){
     store.commit('setToken',StorageToken.get('token'));
     router.push('home');
     console.log('refreshLogin.store.state.token',store.state.token);
+  }
+  else{
+    store.commit('clearToken');
   }
   console.log('refreshLogin.StrorageToken',StorageToken.get('token'))
 }
@@ -179,6 +182,12 @@ async function LoginRequest(phone:string,pwd:string){
 }
 
 onMounted(() => {
+  // StorageToken.set('token',{
+  //   name:"test",
+  //   password:"123456",
+  //   phoneNumber:""
+  // });
+  // console.log('Storage.set.token',StorageToken.get('token'));
   console.log('onMounted','success');
   refreshLogin();
 });
