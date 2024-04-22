@@ -33,9 +33,9 @@
                   </template>
                 </el-result>
               </el-card>
-
             </el-col>
-            <el-col :span="8">
+
+            <!-- <el-col :span="8">
               <el-card shadow="hover">
                 <el-result title="测试记录" sub-title="查看套题的答题记录和分数">
                   <template #icon>
@@ -48,8 +48,8 @@
                   </template>
                 </el-result>
               </el-card>
+            </el-col> -->
 
-            </el-col>
           </el-row>
         </div>
       </template>
@@ -90,7 +90,7 @@ function changeContent(c: string) { //改变测试页面内容
 function returnUpper() { //返回测试页面上一级
   switch (content.value) {
     case 'TestRecord':
-      changeContent('Menu');
+      changeContent('ProblemSet');
       break;
     case 'SingleProblem':
       changeContent('Menu');

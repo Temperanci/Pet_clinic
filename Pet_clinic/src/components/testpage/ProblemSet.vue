@@ -80,7 +80,6 @@ defineComponent({
 })
 const userInfo = ref(store.state.token);
 
-const ProblemSetPage = ref<ProblemSetPageResponse>({ datas: [], total: 0, limit: 0 });
 const problemSetList: Ref<ProblemSetBO[]> = ref([]);
 async function fetchProblemSets() {
     try {
@@ -89,8 +88,7 @@ async function fetchProblemSets() {
         for (var i = 1; i <= pages; i++) {
             const response = await pageNoQuery(i);
             if (response && response.data && response.data.datas) {
-                ProblemSetPage.value = response.data;
-                problemSetList.value = problemSetList.value.concat(ProblemSetPage.value.datas);
+                problemSetList.value = problemSetList.value.concat(response.data.datas);
             }
             else {
                 console.log('没有数据！');
@@ -101,17 +99,15 @@ async function fetchProblemSets() {
         console.error('获取测试失败！', error);
     }
 }
-const UserTestRecordPage = ref<TestRecordPageResponse>({ datas: [], total: 0, limit: 0 });
 const userTestRecordList: Ref<TestRecordBO[]> = ref([]);
-async function fetchUserTestRecords() {
+async function fetchUserTestRecords() { //加载当前用户的测试记录
     try {
         const request: TestRecordPageRequest = {
             candidateId: userInfo.value.personnelId
         }
         const response = await testRecordQuery(request);
         if (response && response.data && response.data.datas) {
-            UserTestRecordPage.value = response.data;
-            userTestRecordList.value = UserTestRecordPage.value.datas;
+            userTestRecordList.value = response.data.datas;
         }
         // console.log('获取用户测试记录:',userTestRecordList.value);
     } catch (error) {
@@ -123,8 +119,7 @@ onMounted(async () => {
     await fetchUserTestRecords();
     setTimeout(() => {
         handleProblemSetList();
-    }
-        , 50)
+    }, 50)
 });
 
 interface problemSetInfo {
@@ -144,7 +139,6 @@ interface problemSetInfo {
 // 处理试卷列表
 const resultList: Ref<problemSetInfo[]> = ref([]);
 function handleProblemSetList() {
-    // console.log('problemSetList:',problemSetList.value);
     for (var i in problemSetList.value) {
         const temp: problemSetInfo = {
             problemSetId: "",
@@ -153,7 +147,7 @@ function handleProblemSetList() {
             startTimeStr: "",
             startTime: new Date(0),
             endTimeStr: "",
-            endTime: new Date('9999-12-31T23:59:59'),
+            endTime: new Date('2077-12-31T23:59:59'),
             durationStr: "",
             duration: 0,
             status: "unsubmitted",
@@ -163,12 +157,12 @@ function handleProblemSetList() {
         temp.title = problemSetList.value[i].title ?? "";
         temp.desc = problemSetList.value[i].desc ?? "";
         if (problemSetList.value[i].startTime) {
-            temp.startTime = new Date(problemSetList.value[i].startTime);
+            temp.startTime = new Date(problemSetList.value[i].startTime??0);
             temp.startTimeStr = temp.startTime.getFullYear() + '-' + (temp.startTime.getMonth() + 1) + '-' + temp.startTime.getDate() + ' ' + temp.startTime.getHours().toString().padStart(2, '0') + ':' + temp.startTime.getMinutes().toString().padStart(2, '0');
             // temp.startTimeStr = problemSetList.value[i].startTime?.toString().slice(0, 10) + ' ' + problemSetList.value[i].startTime?.toString().slice(11, 16);
         }
-        if (problemSetList.value[i].endTime) {
-            temp.endTime = new Date(problemSetList.value[i].endTime);
+        if (problemSetList.value[i].endTime && problemSetList.value[i].endTime < new Date('2077-12-31T23:59:59')) {
+            temp.endTime = new Date(problemSetList.value[i].endTime??'2077-12-31T23:59:59');
             temp.endTimeStr = temp.endTime.getFullYear() + '-' + (temp.endTime.getMonth() + 1) + '-' + temp.endTime.getDate() + ' ' + temp.endTime.getHours().toString().padStart(2, '0') + ':' + temp.endTime.getMinutes().toString().padStart(2, '0');
             // temp.endTimeStr = problemSetList.value[i].endTime?.toString().slice(0, 10) + ' ' + problemSetList.value[i].endTime?.toString().slice(11, 16);;
         }
@@ -184,7 +178,7 @@ function handleProblemSetList() {
             }
             temp.duration = problemSetList.value[i].duration ?? 0;
         }
-        if (userTestRecordList.value.some(record => record.problemSetId === temp.problemSetId)) {
+        if (userTestRecordList.value.some(record => record.problemSetId === temp.problemSetId)) { //批卷情况
             temp.status = userTestRecordList.value.find(record => record.problemSetId === temp.problemSetId)?.graded ? 'judged' : 'judging';
             temp.submitted = true;
         } else {
@@ -226,7 +220,7 @@ const selectedTest = ref({
     id: "",
     title: "",
     start: new Date(0),
-    end: new Date('9999-12-31T23:59:59'),
+    end: new Date('2077-12-31T23:59:59'),
     duration: 0
 });
 const emit = defineEmits(['content', 'id', 'time'])
@@ -268,7 +262,7 @@ function loadCurrentList() {
 .problemset-content {
     min-height: 500px;
     max-height: 500px;
-    padding: 0 50px;
+    padding: 10px 50px;
 }
 
 .problemset-pagination {
