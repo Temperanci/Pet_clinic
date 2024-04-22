@@ -2,6 +2,7 @@ export interface BedBO{
     bedId?: string;
     location?: string;
     departmentId?: string;
+    occupation?: boolean;
 }
 
 export interface DepartmentBO{

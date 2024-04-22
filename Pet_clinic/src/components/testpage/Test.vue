@@ -62,7 +62,7 @@
         <template #footer>
             <div class="dialog-footer">
                 <el-button v-if="clock !== 0" @click="submitDialog = false">取消</el-button>
-                <el-button type="primary" @click="submitDialog = false; submit()">
+                <el-button type="primary" @click="submitDialog = false; submit();">
                     提交
                 </el-button>
             </div>
@@ -73,7 +73,6 @@
 <script setup lang="ts">
 import { defineComponent } from "vue";
 import { ref, onMounted } from 'vue';
-// import { accout } from '@/scripts/data'
 import { store } from '@/main'
 import { StorageToken } from '@/scripts/storage'
 import { Personnel } from '@/apis/class';
@@ -119,7 +118,6 @@ const selectedProblem = ref<{ problem: ProblemBO, score: number }>({
     score: 0
 })
 
-// const ProblemPage = ref<ProblemPageResponse>({ datas: [], total: 0, limit: 0 });
 const problemList = ref<{ problem: ProblemBO, score: number }[]>([]);
 async function fetchProblems() {
     try {
@@ -131,9 +129,6 @@ async function fetchProblems() {
         if (problemSetResponse.data.datas[0].duration > 0) {
             noTimeLimit.value = false;
         }
-        // clock.value = 3000;
-
-        // console.log('获取测试:', problemSetResponse.data.datas[0]);
         idList.forEach(async (id: string) => {
             const problemRequest: ProblemPageRequest = { problemId: id };
             const problemResponse = await problemQuery(problemRequest);
@@ -142,17 +137,15 @@ async function fetchProblems() {
                 score: scoreList[id]
             };
             temp.problem.content = (temp.problem.content ?? '').replace(/(A\.|B\.|C\.|D\.)/g, '\n$1'); //单选题选项换行
-            // console.log('获取题目:', temp);
             problemList.value.push(temp);
         })
-        // console.log("获取problemList:", problemList.value);
+        // console.log("获取题目:", problemList.value);
         setTimeout(() => { jumpProblem(selectedIndex.value); }, 1000);
 
     } catch (error) {
-        console.error('Error fetching problems:', error);
+        console.error('获取试卷题目失败！', error);
     }
 }
-
 onMounted(async () => {
     await fetchProblems();
 })
@@ -213,40 +206,52 @@ function checkAnswerMap() {
 }
 
 //提交试卷
+var submitDialog = ref(false)
 async function submit() {
     saveAnswer();
     const testRecord: TestRecordBO = {
         problemSetId: '',
         candidateId: '',
         startTime: new Date(0),
+        submitTime: new Date(),
         answerMap: {}
     };
     testRecord.problemSetId = props.testId;
     const userInfo = ref(store.state.token);
     testRecord.candidateId = userInfo.value.personnelId; //考生id
     testRecord.startTime = props.enterTime; //进入测试时间
+    console.log('进入测试时间:', testRecord.startTime);
     testRecord.answerMap = Object.fromEntries(answerMap); //题目id-->考生答案
     const submitContent: TestRecordUpdateRequest = {
         testRecord: testRecord,
+        delete: false,
         submitted: false
     };
-    const updateResponse = await update(submitContent);
-    if (updateResponse && updateResponse.data) {
-        const id = updateResponse.data.testRecordId;
-        console.log("更新测试记录:", updateResponse.data);
-        const confirmSubmission: TestRecordUpdateRequest = {
-            testRecord: {
-                testRecordId: id,
-            },
-            submitted: true
-        };
-        const submitResponse = await update(confirmSubmission);
-        console.log("提交测试记录:", submitResponse.data);
-        console.log(props.enterTime);
+    try {
+        const updateResponse = await update(submitContent);
+        if (updateResponse && updateResponse.data) {
+            const id = updateResponse.data.testRecordId;
+            console.log("更新测试记录:", updateResponse.data);
+            const confirmSubmission: TestRecordUpdateRequest = {
+                testRecord: {
+                    testRecordId: id,
+                },
+                delete: false,
+                submitted: true
+            };
+            const submitResponse = await update(confirmSubmission);
+            console.log("提交测试记录:", submitResponse.data);
+            console.log(props.enterTime);
+        } else{
+            console.log('没有数据！');
+        }
+        emit('content', 'ProblemSet'); //返回试卷列表
+    } catch (error) {
+        console.error('更新测试记录失败！', error);
     }
-    emit('content', 'ProblemSet'); //返回试卷列表
+
 }
-var submitDialog = ref(false)
+
 
 </script>
 

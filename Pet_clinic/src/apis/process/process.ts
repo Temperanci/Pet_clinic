@@ -10,13 +10,14 @@ export interface Result<T> {
 }
 // API 基础路径，确保这是后端服务的正确地址
 const API_BASE_URL = 'http://123.60.5.195:8084';
-const process = {}
+const process = {
+    limit: 999
+}
 
 // 分页查询流程信息的函数
-export async function processPageQuery(){
+export async function processPageQuery(request?:ProcessPageRequest){
     try {
-        const response = await axios.post<Result<ProcessPageResponse>>(`${API_BASE_URL}/process/pageQuery`, process);
-        // 假设后端直接返回 Result 类型，并且 Result 包含了一个 'success' 属性以及 'data'
+        const response = await axios.post<Result<ProcessPageResponse>>(`${API_BASE_URL}/process/pageQuery`, request||process);
         return response.data;
     } catch (error) {
         console.error('Error occurred during the process page query:', error);
