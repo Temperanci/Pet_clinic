@@ -14,6 +14,6 @@ export interface DiseaseContentPageResponse {
 }
 
 export interface DiseaseContentUpdateRequest {
-    DiseaseContentBO: DiseaseContentBO;
+    diseaseContent: DiseaseContentBO;
     delete?: boolean;
 }

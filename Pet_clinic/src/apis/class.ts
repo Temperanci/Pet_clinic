@@ -245,3 +245,16 @@ export class TestRecord implements schemas.TestRecordBO {
     }
 }
 
+export class DiseaseContent{
+    title:string;
+    content:string;
+    contentId:string;
+    diseaseId:string;
+    constructor(){
+        this.content = '';
+        this.title = '';
+        this.contentId = '';
+        this.diseaseId = '';
+    }
+}
+
