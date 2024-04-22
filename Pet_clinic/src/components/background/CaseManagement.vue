@@ -372,15 +372,15 @@ async function getDiseaseInfo() {
     limit: 999
   }
   try {
-    var deptResponse = await diseasePageQuery(request);
-    if (deptResponse && deptResponse.data && deptResponse.data.datas) {
-      console.log('Fetched diseases:', deptResponse.data.datas);
-      for (var i = 0; i < deptResponse.data.datas.length; i++) {
+    var diseaseResponse = await diseasePageQuery(request);
+    if (diseaseResponse && diseaseResponse.data && diseaseResponse.data.datas) {
+      console.log('Fetched diseases:', diseaseResponse.data.datas);
+      for (var i = 0; i < diseaseResponse.data.datas.length; i++) {
         diseaseOptions.value.push({
-          value: deptResponse.data.datas[i].diseaseId,
-          label: deptResponse.data.datas[i].name
+          value: diseaseResponse.data.datas[i].diseaseId,
+          label: diseaseResponse.data.datas[i].name
         });
-        diseaseMap.value.set(deptResponse.data.datas[i].diseaseId, deptResponse.data.datas[i].name);
+        diseaseMap.value.set(diseaseResponse.data.datas[i].diseaseId, diseaseResponse.data.datas[i].name);
       }
       console.log('deptMap', diseaseMap)
     } else {

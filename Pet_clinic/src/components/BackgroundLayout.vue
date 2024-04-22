@@ -93,6 +93,7 @@ import StudyManagement from './background/StudyManagement.vue'
 import ProblemManagement from './background/ProblemManagement.vue'
 import ProblemSetManagement from './background/ProblemSetManagement.vue'
 import TestRecordManagement from './background/TestRecordManagement.vue'
+import DiseaseContentManagement from './background/DiseaseContentManagement.vue'
 import CreateTest from './background/CreateTest.vue'
 import QuestionBank from './background/QuestionBank.vue'
 import FinishedTest from './background/FinishedTest.vue'
@@ -145,7 +146,8 @@ const componentsMap: ComponentsMap = {
   '7': StudyManagement,
   '8': ProblemManagement,
   '9': ProblemSetManagement,
-  '10': TestRecordManagement
+  '10': TestRecordManagement,
+  '11':DiseaseContentManagement
 };
 const guidanceMap = new Map([
   ['1', '住院管理'],
@@ -156,7 +158,8 @@ const guidanceMap = new Map([
   ['6', '人员管理'],
   ['8', '题库管理'],
   ['9', '套题管理'],
-  ['10', '测试记录']
+  ['10', '测试记录'],
+  ['11','智能助教配置']
 ])//导航名称
 // const studyMap = new Map([
 //   ['8', '题库管理'],

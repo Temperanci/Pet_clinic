@@ -17,6 +17,7 @@ declare module 'vue' {
     CreateTest: typeof import('./src/components/background/CreateTest.vue')['default']
     DepartmentDetails: typeof import('./src/components/subpage/DepartmentDetails.vue')['default']
     DepartmentManagement: typeof import('./src/components/background/DepartmentManagement.vue')['default']
+    DiseaseContentManagement: typeof import('./src/components/background/DiseaseContentManagement.vue')['default']
     DrugManagement: typeof import('./src/components/background/DrugManagement.vue')['default']
     DrugResource: typeof import('./src/components/subpage/DrugResource.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']

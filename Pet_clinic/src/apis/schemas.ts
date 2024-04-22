@@ -13,10 +13,10 @@ export interface DepartmentBO{
 }
 
 export interface DiseaseContentBO{
-    title: string;
-    content: string;
-    contentId: string;
-    diseaseId: string;
+    title?: string;
+    content?: string;
+    contentId?: string;
+    diseaseId?: string;
 }
 
 export interface DiseaseBO{

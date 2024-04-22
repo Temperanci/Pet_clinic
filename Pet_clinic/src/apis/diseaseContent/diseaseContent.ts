@@ -12,17 +12,27 @@ interface Result<T> {
 
 // 假设这是你的API的基础URL
 const API_BASE_URL = 'http://123.60.5.195:8084';
+const diseaseContent = {
 
+}
 // 分页查询疾病内容信息
-export const pageQuery = async (request: DiseaseContentPageRequest): Promise<Result<DiseaseContentPageResponse>> => {
-    const response = await axios.get<Result<DiseaseContentPageResponse>>(`${API_BASE_URL}/diseaseContent/pageQuery`, {
-        params: request,
-    });
-    return response.data; // 假设后端直接返回Result类型
+export async function pageQuery(request?:DiseaseContentPageRequest){
+    try {
+        const response = await axios.post(`${API_BASE_URL}/diseaseContent/pageQuery`, request||diseaseContent);
+        return response.data; // 假设后端直接返回 Result<BedPageResponse> 结构
+    } catch (error) {
+        console.error('page query diseaseContent error', error);
+        throw error;
+    }
 };
 
-// 更新疾病内容信息
-export const update = async (request: DiseaseContentUpdateRequest): Promise<Result<DiseaseContentBO>> => {
-    const response = await axios.post<Result<DiseaseContentBO>>(`${API_BASE_URL}/diseaseContent/update`, request);
-    return response.data; // 假设后端直接返回Result类型
+export async function update(request: DiseaseContentUpdateRequest) : Promise<Result<DiseaseContentBO>> {
+    try {
+        const response = await axios.post<Result<DiseaseContentBO>>(`${API_BASE_URL}/diseaseContent/update`, request||diseaseContent);
+        return response.data; // 假设后端直接返回 Result<BedBO> 结构
+    } catch (error) {
+        console.error('update diseaseContent error', error);
+        throw error;
+    }
 };
+
