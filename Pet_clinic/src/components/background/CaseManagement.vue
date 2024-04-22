@@ -43,7 +43,22 @@
             <el-select v-else-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].fileUrlList" multiple
               collapse-tags collapse-tags-tooltip placeholder="Select" style="width: 100%">
               <el-option v-for="item in edited[scope.$index].fileOptions.value" :key="item.value" :label="item.label"
-                :value="item.value" />
+                :value="item.value" >
+                <el-popover
+                trigger="hover"
+                :width="400"
+                :height="225"
+                >
+                <template #reference>
+                  <span style="float: right">{{ item.label }}</span>
+                </template>
+                <video
+              :src="item.label"
+              controls
+              class="case-video"
+            ></video>
+                </el-popover>
+              </el-option>
               <template #footer>
                 <el-upload
               class="upload-demo"
@@ -69,7 +84,21 @@
             <el-select v-else-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].pictureUrlList" multiple
               collapse-tags collapse-tags-tooltip placeholder="Select" style="width: 100%">
               <el-option v-for="item in edited[scope.$index].pictureOptions.value" :key="item.value" :label="item.label"
-                :value="item.value" />
+                :value="item.value">
+                <el-popover
+                trigger="hover"
+                :width="400"
+                :height="225"
+                >
+                <template #reference>
+                  <span style="float: right">{{ item.label }}</span>
+                </template>
+                <img
+              :src="item.label"
+              class="case-image"
+            >
+                </el-popover>
+              </el-option>
               <template #footer>
                 <el-upload
               class="upload-demo"
@@ -436,5 +465,14 @@ const component = defineComponent({
 <style scoped lang="scss">
 // .el-table__body, .el-table__header{
 //     width: 100%;
-//   }</style>
+//   }
+.case-video {
+  width: 100%; /* 视频宽度占满整个容器宽度 */
+  margin-bottom: 10px; /* 添加底部间隔 */
+}
+.case-image {
+  width: 100%; /* 每张图片占行宽的48%，留下一些空间以避免精确到100%导致换行 */
+  margin-bottom: 10px; /* 添加底部间隔 */
+}
+</style>
 ../../scripts/data.js../../scripts/paginate.js
