@@ -63,7 +63,7 @@
                 <el-table-column prop="" label="" width="150px">
                     <template #header>
                         <el-button type="success" size="small" @click="createProblemSet();">创建</el-button>
-                        <el-button type="info" size="small" @click="createProblemSet();">搜索</el-button>
+                        <el-button type="info" size="small" @click=";">搜索</el-button>
                     </template>
                     <template #default="scope">
                         <el-button type="primary" size="" @click="editProblemSet(scope.row.problemSetId);">编辑</el-button>
@@ -135,7 +135,7 @@
                     <!-- <el-header>
                     </el-header> -->
                     <div class="problem-content">
-                        <pre style="white-space:pre;white-space:pre-wrap;">{{ selectedProblem.content }}</pre>
+                        <pre style="white-space:pre;white-space:pre-wrap;">{{ selectedProblem?.content }}</pre>
                     </div>
                     <el-main>
                         <div class="problemlist-content">
@@ -143,8 +143,14 @@
                                 <el-table-column fixed prop="title" label="题目" width="120px" />
                                 <el-table-column prop="subjectName" label="知识点" width="100px" />
                                 <el-table-column prop="typeName" label="题型" width="60px" />
-                                <el-table-column prop="" label="分值" width="60px" />
-                                <el-table-column label="" width="60px">
+                                <!-- <el-table-column prop="score" label="分值" width="60px" /> -->
+                                <el-table-column prop="score" label="分值" width="60px">
+                                    <template #default="scope">
+                                        <!-- scope.row.score -->
+                                        <el-input v-model="selectedProblemScoreMap[scope.row.problemId]" size="small" placeholder="" />
+                                    </template>
+                                </el-table-column>                                                              
+                                <el-table-column label="" width="">
                                     <template #default="scope">
                                         <el-button size="small"
                                             @click="selectProblemWithId(scope.row.problemId)">选择</el-button>
@@ -425,7 +431,8 @@ interface ProblemSetInfo {
     endTimeStr?: string;
     endTime?: Date;
     durationStr?: string;
-    duration?: number
+    duration?: number;
+    problemScoreMap?: Record<string, number>
 }
 function handleProblemSetList() { //处理起止时间和时限的显示格式
     const problemList: ProblemSetInfo[] = [];
@@ -439,7 +446,8 @@ function handleProblemSetList() { //处理起止时间和时限的显示格式
             endTimeStr: "",
             endTime: new Date('2077-12-31T23:59:59'),
             durationStr: "",
-            duration: 0
+            duration: 0,
+            problemScoreMap: {}
         };
         temp.problemSetId = queryData.value[i].problemSetId ?? "";
         temp.title = queryData.value[i].title ?? "";
@@ -467,8 +475,11 @@ function handleProblemSetList() { //处理起止时间和时限的显示格式
             }
             temp.duration = queryData.value[i].duration ?? 0;
         }
+        if(queryData.value[i].problemScoreMap){
+            temp.problemScoreMap = queryData.value[i].problemScoreMap;
+        }
+        
         problemList.push(temp);
-
     }
 
     return problemList;
@@ -491,8 +502,8 @@ const editEndTime = ref();
 const selectedProblemIdList = ref<string[]>([]); //已选题目
 const selectedProblemScoreMap = ref<Record<string, number>>({}); //已选题目分值
 
-const selectedIndex = ref(0);
-const selectedProblem = ref<ProblemBO>({});
+const selectedIndex = ref();
+const selectedProblem = ref<ProblemBO>();
 // const showAnswer = ref(false);
 // const showOrHide = ref('显示答案');
 const problemList = ref<ProblemBO[]>([]);
@@ -515,6 +526,7 @@ interface ProblemInfo {
     answer?: string;
     background?: string;
     gradingPoints?: string;
+    score?: number
 }
 
 let typeOptions = ref([{
@@ -595,7 +607,7 @@ async function submitCreate() { //提交创建
                 desc: editDesc.value,
                 startTime: editStartTime.value ?? new Date(0),
                 endTime: editEndTime.value ?? new Date('2077-12-31T23:59:59'),
-                duration: ((editHour.value ?? 0) * 60 + (editMin.value ?? 0)) * 60 * 1000,
+                duration: (editHour.value ?? 0)  * 60 * 60 * 1000 + (editMin.value ?? 0) * 60 * 1000,
                 problemIdList: selectedProblemIdList.value,
                 problemScoreMap: selectedProblemScoreMap.value
             },
@@ -615,8 +627,27 @@ async function submitCreate() { //提交创建
     }
 }
 async function submitEdit() { //提交修改
-    try {
-        // console.log('起止时间',editStartTime.value==null,editEndTime.value==null);
+    try {           
+        // for (var res of resultList.value) {
+        //     if (res.problemId && selectedProblemScoreMap.value[res.problemId] && selectedProblemScoreMap.value.hasOwnProperty(res.problemId)) {
+        //         selectedProblemScoreMap.value[res.problemId] = res.score??0;
+        //     }
+        // }
+        for (var id in selectedProblemScoreMap.value) { //清除未加入试卷的题目赋分
+            if (!selectedProblemIdList.value.includes(id)) {
+                // console.log('这道题没加进试卷捏:',id,selectedProblemScoreMap.value[id]);
+                delete selectedProblemScoreMap.value[id];
+            }
+        }
+        for (var index in selectedProblemIdList.value) { //未赋分时分值自动为0
+            var id = selectedProblemIdList.value[index];
+            if(!selectedProblemScoreMap.value.hasOwnProperty(id)){
+                // console.log('这道题还没赋分捏:',id,selectedProblemIdList.value[id]);
+                selectedProblemScoreMap.value[id] = 0;
+            }
+        }
+        console.log('selectedProblemScoreMap:',selectedProblemScoreMap.value);
+
         const request: ProblemSetUpdateRequest = {
             problemSet: {
                 problemSetId: editId.value,
@@ -624,7 +655,7 @@ async function submitEdit() { //提交修改
                 desc: editDesc.value,
                 startTime: editStartTime.value ?? new Date(0),
                 endTime: editEndTime.value ?? new Date('2077-12-31T23:59:59'),
-                duration: ((editHour.value ?? 0) * 60 + (editMin.value ?? 0)) * 60 * 1000,
+                duration: (editHour.value ?? 0) * 60 * 60 * 1000 + (editMin.value ?? 0) * 60 * 1000,
                 problemIdList: selectedProblemIdList.value,
                 problemScoreMap: selectedProblemScoreMap.value
             },
@@ -739,7 +770,6 @@ function searchProblems() {
             }
         }
     }
-    // console.log("resultList:", resultList.value);
     for (var res of resultList.value) {
         res.subjectName = diseaseList.value.find(dis => dis.diseaseId === res.subjectId)?.name;
         if (res.type === 'subjective') {
@@ -747,11 +777,18 @@ function searchProblems() {
         } else if (res.type === 'objective') {
             res.typeName = '单选';
         }
+        if(res.problemId){
+            res.score = selectedProblemScoreMap.value[res.problemId]??0;
+        } 
     }
     if (resultList.value[0]) {
         selectedProblem.value = resultList.value[0];
         selectedIndex.value = 0;
+    } else {
+        selectedProblem.value = undefined;
+        selectedIndex.value = undefined;
     }
+    // console.log("resultList:", resultList.value);
 }
 watch(selected, () => {
     searchProblems();
