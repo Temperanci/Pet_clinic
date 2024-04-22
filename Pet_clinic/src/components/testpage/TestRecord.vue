@@ -52,11 +52,8 @@
           </el-card>
         </div>
       </el-aside>
-
     </el-container>
   </div>
-
-
 
 </template>
 
@@ -251,7 +248,6 @@ onMounted(async () => {
   await fetchProblemSet();
   await fetchUserTestRecord();
   await fetchDiseases();
-  // await fetchProblemInfo();
   setTimeout(() => {
     fetchProblemInfo();
   }, 200)
