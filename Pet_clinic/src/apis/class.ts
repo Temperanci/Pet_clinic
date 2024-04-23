@@ -250,11 +250,13 @@ export class DiseaseContent{
     content:string;
     contentId:string;
     diseaseId:string;
+    indexStatus:string;
     constructor(){
         this.content = '';
         this.title = '';
         this.contentId = '';
         this.diseaseId = '';
+        this.indexStatus = '';
     }
 }
 

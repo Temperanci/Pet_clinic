@@ -18,6 +18,7 @@ export interface DiseaseContentBO{
     content?: string;
     contentId?: string;
     diseaseId?: string;
+    indexStatus?:string;
 }
 
 export interface DiseaseBO{

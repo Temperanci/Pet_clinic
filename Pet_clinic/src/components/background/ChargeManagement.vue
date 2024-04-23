@@ -261,7 +261,9 @@ var queryData = ref<any[]>([]);
 var currentPage = 1;
 function pagination(val: number) {
   currentPage = val
-  backToHome();
+  if(val!=1){
+    backToHome();
+  }
   //恢复初始值
   isSelected=clearIsSelected(isSelected);
   clearPara.value = true;

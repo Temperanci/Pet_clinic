@@ -268,7 +268,9 @@ function backToHome() {
 }
 function pagination(val: number) {
   currentPage = val
-  backToHome();
+  if(val!=1){
+    backToHome();
+  }
   //恢复初始值
   // eslint-disable-next-line vue/no-ref-as-operand
   isSelected = clearIsSelected(isSelected);
