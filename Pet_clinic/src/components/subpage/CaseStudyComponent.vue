@@ -69,10 +69,12 @@
           class="instance-item"
         >
           <template #title>
-            <h2>病情描述：{{ instance.desc }}</h2>
+            <h2 v-if="activeInstance!=instance.instanceId" class="instance-title">病情描述：{{ instance.desc }}</h2>
           </template>
           <div>
             <!-- 在这里可以放置病例的详细内容，如图片、视频等 -->
+            <h2 class="instance-title">病情描述：</h2>
+            <p>{{ instance.desc }}</p>
             <p>病例ID：{{ instance.instanceId }}</p>
             <img
               v-for="(picUrl, index) in instance.pictureUrlList"
@@ -153,7 +155,6 @@ function showCaseDetails(disease: DiseaseBO) {
     (item) => item.diseaseId === disease.diseaseId
   )
 }
-
 // 组件挂载后获取疾病数据
 
 onMounted(async () => {
@@ -294,6 +295,11 @@ const handlePreview: UploadProps['onPreview'] = (file) => {
   margin: 10px;
   padding: 10px;
   border: #2a1f1f 1px solid;
+}
+.instance-title{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .case-images,
 .case-videos {
