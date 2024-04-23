@@ -2,7 +2,7 @@
     <div style="height: 100%;display: flex;flex-flow: column;">
         <div style="height: 90%;" class="table">
           <el-table :data="queryData" height="100%" empty-text="来到了没有数据的荒原...">
-            <el-table-column prop="contentId" label="配置编号">
+            <el-table-column prop="contentId" label="知识编号">
               <template #default="scope">
                 <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].contentId"></el-input> -->
                 <el-input v-if="searchBar[scope.$index]" v-model="edited[0].contentId"></el-input>
@@ -10,7 +10,7 @@
                 <span v-else>{{ scope.row.contentId }}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="title" label="配置名称">
+            <el-table-column prop="title" label="知识主题">
               <template #default="scope">
                 <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].title"></el-input>
                 <span v-else>{{ scope.row.title }}</span>
@@ -39,13 +39,24 @@
             <el-table-column prop="indexStatus" label="学习情况">
               <template #default="scope">
                 <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].contentId"></el-input> -->
-                <el-input v-if="searchBar[scope.$index]" v-model="edited[0].indexStatus"></el-input>
-                <el-input v-else-if="unwritableBar[scope.$index]" disabled v-model="edited[scope.$index].indexStatus"></el-input>
+                <!-- <el-input v-if="searchBar[scope.$index]" v-model="edited[0].indexStatus"></el-input> -->
+                <el-input v-if="unwritableBar[scope.$index]" disabled v-model="edited[scope.$index].indexStatus"></el-input>
+                <el-select v-else-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].indexStatus" placeholder="Select" style="width: 100%">
+    <el-option
+      v-for="item in indexOptions"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value"
+    />
+  </el-select>
+                
                 <span v-else-if="indexMap.get(scope.row.indexStatus)==='已学习'" style="color: green;">{{ indexMap.get(scope.row.indexStatus) }}</span>
-                <span v-else style="color:grey">{{ indexMap.get(scope.row.indexStatus) }}</span>
+                <span v-else-if="indexMap.get(scope.row.indexStatus)==='学习中'" style="color:grey">{{ indexMap.get(scope.row.indexStatus) }}</span>
+                <span v-else style="color:red">{{ indexMap.get(scope.row.indexStatus) }}</span>
               </template>
             </el-table-column>
             <tableOption 
+              :is-edit=false
               :clear=clearPara
               :num = tabLength
               :back = back
@@ -103,22 +114,32 @@
             // title:'',
             // diseaseId:'',
             // content:'',
-            indexStatus:'DELETE'
+            // indexStatus:'DELETE'
           },
-        delete:false
+        delete:true
       }
         console.log('delete request',request);
-        var DCDelResponse= await DCUpdate(request);
-        if(DCDelResponse){//更改成功
-          if(DCDelResponse)
-          throwMessage('delete success');
-          setTimeout(()=>{backToHome();},500);
-          
+        if((Msg[index] as DiseaseContent).indexStatus==='已学习'){
+          var DCDelResponse= await DCUpdate(request);
+                  if(DCDelResponse){//更改成功
+                    if(DCDelResponse.data.indexStatus==='DELETE'){
+                      throwMessage('delete success');
+                      setTimeout(()=>{backToHome();},500);
+                    }else{
+                      throwMessage('unknown');
+                    }
+                    
+                  }
+                  else{
+                    throwMessage('delete success');
+                    setTimeout(()=>{backToHome();},500);
+                  }
+                  console.log('delete response',DCDelResponse); 
         }
         else{
-          throwMessage('unknown');
+          throwMessage('no delete NO_INDEX');
         }
-        console.log('delete response',DCDelResponse); 
+        
       }//删除
     async  editRow(Msg: Object[],index:number) {
         var request:DiseaseContentUpdateRequest = {
@@ -273,8 +294,23 @@
 //filter && display
 const indexMap= new Map([
   ["NO_INDEX","学习中"],
-  ["HAS_INDEX","已学习"]
+  ["HAS_INDEX","已学习"],
+  ["DELETE","不可用"]
 ]);
+const indexOptions = [
+  {
+    label:"学习中",
+    value:"NO_INDEX"
+  },
+  {
+    label:"已学习",
+    value:"HAS_INDEX"
+  },
+  {
+    label:"不可用",
+    value:"DELETE"
+  },
+]
     const component = defineComponent({
       name: "DiseaseContent"
     })
