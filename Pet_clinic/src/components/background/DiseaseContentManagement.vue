@@ -2,7 +2,7 @@
     <div style="height: 100%;display: flex;flex-flow: column;">
         <div style="height: 90%;" class="table">
           <el-table :data="queryData" height="100%" empty-text="来到了没有数据的荒原...">
-            <el-table-column prop="contentId" label="配置编号">
+            <el-table-column prop="contentId" label="知识编号">
               <template #default="scope">
                 <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].contentId"></el-input> -->
                 <el-input v-if="searchBar[scope.$index]" v-model="edited[0].contentId"></el-input>
@@ -10,7 +10,7 @@
                 <span v-else>{{ scope.row.contentId }}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="title" label="配置名称">
+            <el-table-column prop="title" label="知识主题">
               <template #default="scope">
                 <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].title"></el-input>
                 <span v-else>{{ scope.row.title }}</span>
