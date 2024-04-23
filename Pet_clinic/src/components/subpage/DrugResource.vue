@@ -185,7 +185,7 @@ var edited: Ref<Drug[]> = ref<Drug[]>([]);
 var queryData = ref<any[]>([]);
 function pagination(val: number) {
   currentPage = val
-  if(val!=1){
+  if(!back.value){
     fetchDrugs(currentPage,defaultNum);
   }
   
