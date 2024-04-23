@@ -5,7 +5,7 @@
     </p> -->
   <div style="height: 100%;display: flex;flex-flow: column;">
     <div style="height: 90%;" class="table">
-      <el-table :data="queryData" height="100%" empty-text="来到了没有数据的荒原...">
+      <el-table :data="loadResult()" v-loading="testRecordLoading" height="100%" empty-text="来到了没有数据的荒原...">
         <el-table-column prop="testRecordId" label="记录编号">
           <template #default="scope">
             <el-input v-if="searchBar[scope.$index]" v-model="edited[0].testRecordId"></el-input>
@@ -15,12 +15,20 @@
           </template>
         </el-table-column>
         <el-table-column prop="problemSetId" label="试卷">
+          <template #header>
+            <el-input v-model="searchProblemSet" placeholder="试卷"></el-input>
+          </template>
+
           <template #default="scope">
             <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].problemSetId"></el-input>
             <span v-else>{{ problemsetMap.get(scope.row.problemSetId) }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="candidateId" label="考生">
+          <template #header>
+            <el-input v-model="searchCandidate" placeholder="考生"></el-input>
+          </template>
+
           <template #default="scope">
             <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].candidateId"></el-input>
             <span v-else>{{ personnelMap.get(scope.row.candidateId) }}</span> -->
@@ -38,6 +46,7 @@
               <el-option v-for="item in gradeOptions" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
             <span v-else>{{ gradeMap.get(scope.row.graded) }}</span>
+            <!-- <el-option v-for="(value, key) in personnelMap" :key="key" :label="value" :value="key" /> -->
           </template>
         </el-table-column>
 
@@ -53,16 +62,16 @@
         </el-table-column>
 
         <el-table-column prop="" label="" width="150px">
-          <!-- <template #header>
-            <el-button type="" @click=";">搜索</el-button>
-          </template> -->
+
+          <template #header>
+            <el-button type="info" size="small" @click=";">搜索</el-button>
+          </template>
           <template #default="scope">
             <el-button type="warning"
               @click="testRecordDetail(scope.row.candidateId, scope.row.problemSetId, scope.row.testRecordId);">查看详情</el-button>
           </template>
         </el-table-column>
-
-        <tableOption :clear=clearPara :num=tabLength :back=back :type=true
+        <!-- <tableOption :clear=clearPara :num=tabLength :back=back :type=true
           @edit-confirm="(index) => { CRUDhandler.editRow(edited, index); }"
           @edit="(index) => { CRUDhandler.updateMsg(edited, queryData, index); isSelected[index] = !isSelected[index]; clearPara = false; }"
           @cancel="(index) => { isSelected[index] = !isSelected[index]; clearPara = false; unwritableBar[0] = false; searchBar[0] = false; }"
@@ -72,7 +81,7 @@
           @create-confirm="(index) => { CRUDhandler.createRow(edited[index]); unwritableBar[0] = false; }"
           @search="(index) => { CRUDhandler.clear(edited[index]); isSelected[index] = true; clearPara = false; searchBar[0] = true; }"
           @search-confirm="(index) => { CRUDhandler.search(edited[index]); searchBar[0] = false; back = true; }"
-          @back="fetchTestRecords(); back = false;" />
+          @back="fetchTestRecords(); back = false;" /> -->
       </el-table>
     </div>
     <div class="pagination-block">
@@ -81,8 +90,8 @@
     </div>
   </div>
 
-  <el-dialog v-model="dialogVisible" title="测试记录详情" width="1300" draggable overflow :close-on-click-modal="false"
-    :close-on-press-escape="false">
+  <el-dialog v-model="dialogVisible" title="测试记录详情" width="1450" style="text-align: left" draggable overflow
+    :close-on-click-modal="false" :close-on-press-escape="false">
 
     <div class="testrecord-layout">
       <el-container>
@@ -92,7 +101,8 @@
               <h3>{{ problemSet?.title }}</h3>
             </el-header>
             <div class="probleminfo-content">
-              <el-table :data="loadCurrentList()" border height="450px" style="overflow: auto;">
+              <el-table :data="loadCurrentList()" v-loading="problemInfoLoading" border height="450px"
+                style="overflow: auto;">
                 <el-table-column prop="problem.title" label="题目" width="90px" />
                 <el-table-column prop="problem.content" label="内容" width="" />
                 <el-table-column prop="subjectName" label="知识点" width="100px" />
@@ -130,10 +140,26 @@
               </div>
             </el-card>
           </div>
+          <div class="testrecord-edit">
+            <el-button type="danger" size="large" @click="confirmDelete = true;">删除</el-button>
+          </div>
         </el-aside>
       </el-container>
     </div>
 
+  </el-dialog>
+
+  <el-dialog v-model="confirmDelete" title="确认删除测试记录？" width="400px" style="text-align: left" overflow
+    :close-on-click-modal="false" :close-on-press-escape="false">
+    <span>该操作无法撤销，删除后考生可重新进入测试答题</span>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button type="info" @click="confirmDelete = false">取消</el-button>
+        <el-button type="danger" @click="submitDelete(userTestRecord?.testRecordId ??'');">
+          确认
+        </el-button>
+      </div>
+    </template>
   </el-dialog>
 
 
@@ -142,7 +168,7 @@
 <script setup lang="ts">
 import { defineComponent } from "vue";
 //分页
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { getPagination, LENGTH } from '../../scripts/paginate'
 import '@/assets/table.css'
 //request
@@ -161,6 +187,7 @@ import type { DiseasePageRequest, DiseasePageResponse } from '@/apis/disease/dis
 import type { TestRecordBO, ProblemSetBO, ProblemBO, DiseaseBO } from '@/apis/schemas';
 import { Personnel, TestRecord, ProblemSet, Problem, Disease } from "@/apis/class";
 
+import { throwMessage } from "@/scripts/display";
 import { type rowCRUD } from '../../scripts/tableOpt'
 import type { PersonnelPageRequest } from "@/apis/personnel/personnel-interface";
 const TestRecordPage = ref<TestRecordPageResponse>({ datas: [], total: 0, limit: 0 });
@@ -280,7 +307,6 @@ async function fetchTestRecords(pageNum?: number, pageLimit?: number, msg?: Obje
       queryData.value = TestRecordPage.value.datas;
 
       for (var rec of queryData.value) { //处理时间显示格式
-        console.log('提交时间:', rec.submitTime);
         if (rec.submitTime) {
           var time = new Date(rec.submitTime);
           rec.submitTime = time.getFullYear() + '-' + (time.getMonth() + 1) + '-' + time.getDate() + ' ' + time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0');
@@ -312,6 +338,8 @@ onMounted(() => {
   getPersonnelInfo();
   getProblemsetInfo();
   fetchTestRecords();
+  setTimeout(() => { testRecordLoading.value = false; }, 500);
+
 });
 //request
 var entryNum = ref(0);
@@ -402,6 +430,16 @@ const gradeMap = new Map([
 const component = defineComponent({
   name: "TestRecordManagement"
 })
+//搜索
+const searchProblemSet = ref('');
+const searchCandidate = ref('');
+const searchStatus = ref('all');
+function loadResult(){
+
+  return queryData.value;
+}
+
+
 const userTestRecordList: Ref<TestRecordBO[]> = ref([]);
 const userTestRecord: Ref<TestRecordBO | null> = ref(null);
 async function fetchUserTestRecord(testRecordId: string) { //获取当前用户的测试记录
@@ -415,7 +453,7 @@ async function fetchUserTestRecord(testRecordId: string) { //获取当前用户�
     if (response && response.data && response.data.datas) {
       userTestRecordList.value = response.data.datas;
       userTestRecord.value = userTestRecordList.value[0];
-      console.log('获取用户测试记录:', userTestRecord.value);
+      // console.log('获取用户测试记录:', userTestRecord.value);
     } else {
       console.log('用户没有该测试记录！');
     }
@@ -433,7 +471,7 @@ async function fetchProblemSet(problemSetId: string) { //获取试卷
     const response = await problemSetQuery(request);
     if (response && response.data && response.data.datas) {
       problemSet.value = response.data.datas[0];
-      console.log('获取试卷:', problemSet.value);
+      // console.log('获取试卷:', problemSet.value);
     } else {
       console.log('试卷不存在！');
     }
@@ -457,6 +495,24 @@ const testRecordInfo = ref({
   subCorrectRatio: 0 //主观题得分率
 
 })
+function clearInfo() {
+  problemInfoLoading.value = true;
+  problemInfoList.value = [];
+  testRecordInfo.value = {
+    totalScore: 0,
+    userScore: 0,
+    rank: 0,
+    diseaseTotalScore: {} as Record<string, number>,
+    diseaseUserScore: {} as Record<string, number>,
+    diseaseRatio: {} as Record<string, number>,
+    objNum: 0,
+    objCorrectNum: 0,
+    subNum: 0,
+    subTotalScore: 0,
+    subUserScore: 0,
+    subCorrectRatio: 0
+  };
+}
 interface ProblemInfo {
   problem?: ProblemBO;
   // problemId?: string;
@@ -503,7 +559,7 @@ async function fetchProblemInfo() { //获取试卷题目及答题情况
       //统计题型得分情况
       if (temp.type === 'subjective') {
         info.typeName = '简答'
-        testRecordInfo.value.subNum++;
+        // testRecordInfo.value.subNum++;
         testRecordInfo.value.subTotalScore += info.score ?? 0;
         testRecordInfo.value.subUserScore += info.grade ?? 0;
       } else {
@@ -534,9 +590,9 @@ async function fetchProblemInfo() { //获取试卷题目及答题情况
       problemInfoList.value.push(info);
     })
 
-    setTimeout(() => {
-      console.log('考试情况:', testRecordInfo.value);
-    }, 5000);
+    // setTimeout(() => {
+    //   console.log('考试情况:', testRecordInfo.value);
+    // }, 5000);
   } catch (error) {
     console.error('获取答题信息失败！', error);
   }
@@ -564,17 +620,49 @@ async function fetchDiseases() { //获取病种
 
 
 const dialogVisible = ref(false);
-async function testRecordDetail(candidateId: string, problemSetId: string, testRecordId: string) {
+watch(dialogVisible, () => {
+  clearInfo();
+});
+async function testRecordDetail(candidateId: string, problemSetId: string, testRecordId: string) { //查看测试记录详情
+  clearInfo();
+  dialogVisible.value = true;
   await fetchProblemSet(problemSetId);
   await fetchUserTestRecord(testRecordId);
   await fetchDiseases();
   setTimeout(() => {
     fetchProblemInfo();
+    problemInfoLoading.value = false;
   }, 3000)
-  dialogVisible.value = true;
+}
+
+const confirmDelete = ref(false);
+async function submitDelete(id: string) { //删除测试记录
+  try {
+    const request: TestRecordUpdateRequest = {
+      testRecord: {
+        testRecordId: id,
+      },
+      delete: true
+    }
+    var response = await update(request);
+    if (response) {//更改成功
+      throwMessage('delete fail');
+    }
+    else {
+      throwMessage('delete success');
+      console.log('删除测试记录成功:', response);
+      setTimeout(() => { backToHome(); confirmDelete.value = false; dialogVisible.value = false; }, 100);
+    }
+  } catch (error) {
+    console.error('Error deleting testRecord:', error);
+  }
 }
 
 
+
+//加载动画
+const testRecordLoading = ref(true);
+const problemInfoLoading = ref(true);
 // 前端分页处理
 var current = ref(1);
 var size = ref(10);
@@ -597,13 +685,11 @@ function loadCurrentList() {
 </script>
 
 <style scoped lang="scss">
-.testrecord-layout {
-
-}
+.testrecord-layout {}
 
 .probleminfo-content {
-  min-height: 300px;
-  max-height: 300px;
+  min-height: 400px;
+  max-height: 400px;
   // padding: 10px;
   // margin: 10px 0;
 }
@@ -616,16 +702,23 @@ function loadCurrentList() {
 
 .testrecord-info {
   display: flex;
-  margin: 50px 10px;
+  margin: 20px 10px;
   // padding: 10px 5px;
   min-height: 450px;
   max-height: 450px;
+  text-align: left;
 }
 
 .testrecord-info .disease-score {
   overflow: scroll;
   min-height: 200px;
   max-height: 200px;
+}
+
+.testrecord-edit {
+  display: flex;
+  float: right;
+  position: relative;
 }
 </style>
 ../../scripts/data.js../../scripts/paginate.js

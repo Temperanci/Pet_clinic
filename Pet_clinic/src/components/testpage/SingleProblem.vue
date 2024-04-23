@@ -340,6 +340,6 @@ function handleSizeChange(n: number) {
 
 
 .current-row {
-    background-color: #f5f7fa !important;
+    // background-color: #f5f7fa !important;
 }
 </style>

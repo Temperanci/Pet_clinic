@@ -156,12 +156,12 @@ function handleProblemSetList() {
         temp.problemSetId = problemSetList.value[i].problemSetId ?? "";
         temp.title = problemSetList.value[i].title ?? "";
         temp.desc = problemSetList.value[i].desc ?? "";
-        if (problemSetList.value[i].startTime) {
+        if (problemSetList.value[i].startTime && new Date(problemSetList.value[i].startTime) > new Date(0)) {
             temp.startTime = new Date(problemSetList.value[i].startTime??0);
             temp.startTimeStr = temp.startTime.getFullYear() + '-' + (temp.startTime.getMonth() + 1) + '-' + temp.startTime.getDate() + ' ' + temp.startTime.getHours().toString().padStart(2, '0') + ':' + temp.startTime.getMinutes().toString().padStart(2, '0');
             // temp.startTimeStr = problemSetList.value[i].startTime?.toString().slice(0, 10) + ' ' + problemSetList.value[i].startTime?.toString().slice(11, 16);
         }
-        if (problemSetList.value[i].endTime && problemSetList.value[i].endTime < new Date('2077-12-31T23:59:59')) {
+        if (problemSetList.value[i].endTime && new Date(problemSetList.value[i].endTime) < new Date('2077-12-31T23:59:59')) {
             temp.endTime = new Date(problemSetList.value[i].endTime??'2077-12-31T23:59:59');
             temp.endTimeStr = temp.endTime.getFullYear() + '-' + (temp.endTime.getMonth() + 1) + '-' + temp.endTime.getDate() + ' ' + temp.endTime.getHours().toString().padStart(2, '0') + ':' + temp.endTime.getMinutes().toString().padStart(2, '0');
             // temp.endTimeStr = problemSetList.value[i].endTime?.toString().slice(0, 10) + ' ' + problemSetList.value[i].endTime?.toString().slice(11, 16);;

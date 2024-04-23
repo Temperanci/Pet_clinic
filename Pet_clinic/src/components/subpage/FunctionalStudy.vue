@@ -1,6 +1,5 @@
 <!-- eslint-disable vue/require-v-for-key -->
 <template>
-
   <div class="container">
     <el-row :gutter="80" justify="end">
       <el-col :span="8">
@@ -46,8 +45,8 @@
         </el-card>
       </el-col>
 
-      <div class="ai-helper">
-        <el-button plain @click="dialogOverflowVisible = true">
+      <div class="aitutor-entry">
+        <el-button type="warning" plain @click="dialogVisible = true">
           智能医生
         </el-button>
       </div>
@@ -63,49 +62,53 @@
         <OnlineTestComponent v-if="activeComponent === 'OnlineTestComponent'" @close="showOverlay = false" />
       </OverlayComponent>
 
-
-
     </el-row>
 
-
-
-    <el-dialog v-model="dialogOverflowVisible" title="智能医生" width="600" draggable overflow :close-on-click-modal="false" :close-on-press-escape="false">
-      <div class="dialog-content">
+    <el-dialog v-model="dialogVisible" title="智能医生" width="800px" draggable overflow :close-on-click-modal="false"
+      :close-on-press-escape="false">
+      <div class="aitutor-content">
         <el-container>
-          <el-header>
-            对话内容
-          </el-header>
           <el-main>
-            <div v-for="(message, index) in dialog">
-              <div v-if="index % 2 == 0" class="user-message">
-                <div class="message-wrapper-right">{{ message }}</div>
-              </div>
-              <div v-else class="ai-message">
-                <div class="message-wrapper-left">{{ message }}</div>
+            <div class="dialog">
+              <div v-for="(msg, index) in userDialogRecords">
+                <div class="user-message" v-if="userDialogRecords[index]">
+                  <div class="message-wrapper-right">
+                    {{ userDialogRecords[index] }}
+                  </div>
+                </div>
+                <div class="ai-message" v-if="aiDialogRecords[index]">
+                  <div class="message-wrapper-left">
+                    {{ aiDialogRecords[index] }}
+                  </div>
+                </div>
+
               </div>
             </div>
           </el-main>
-          <el-footer>
-          </el-footer>
         </el-container>
       </div>
-      <el-input type="textarea" placeholder="在此输入" v-model="input" />
-      <el-button size="small" @click="sendMessage">
-        Send
-      </el-button>
-    </el-dialog>
+      <div class="aitutor-tool">
+        <el-input type="textarea" placeholder="在此输入你的问题" v-model="userQuestion" style="width:90%;" />
+        <el-button type="primary" size="" @click="sendMessage" style="margin:0 20px;">
+          发送
+        </el-button>
+      </div>
 
+    </el-dialog>
 
   </div>
 </template>
 
 <script setup lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, watch } from "vue";
 import { Checked, Memo, UserFilled } from "@element-plus/icons-vue";
 import OverlayComponent from './OverlayComponent.vue';
 import RolePlayComponent from './RolePlayComponent.vue';
 import CaseStudyComponent from './CaseStudyComponent.vue';
 import OnlineTestComponent from './OnlineTestComponent.vue';
+import { answerQuestion } from '@/apis/aiTutor/aiTutor';
+import type { AiTutorQuestionRequest } from '@/apis/aiTutor/aiTutor-interface';
+import type { AiTutorBO } from '@/apis/schemas';
 
 
 defineComponent({
@@ -113,34 +116,65 @@ defineComponent({
   components: {
   }
 })
-
-
 const showOverlay = ref(false);
 const activeComponent = ref(''); // 这里你可以根据逻辑设置为相应的组件名
-
-const dialogOverflowVisible = ref(false);
-const input = ref('');
-const dialog = ref(['Hi', 'Hello, can I help you?', 'How to solve the question?', 'The answer is...']);
-
-function sendMessage() {
-  dialog.value.push(input.value);
-  console.log('用户输入: ', input.value);
-}
-
 // 你还需要定义打开覆盖层时设置 activeComponent 的逻辑
 function openOverlayWithComponent(componentName: string) {
   activeComponent.value = componentName;
   showOverlay.value = true;
 }
 
+
+
+//智能医生对话
+const dialogVisible = ref(false);
+const userQuestion = ref('');
+const userDialogRecords = ref(['']);
+const aiDialogRecords = ref(['你好，我是这个虚拟宠物医院的智能医生，有关病例的问题可以向我提问~']);
+
+async function sendMessage() {
+  if (userQuestion.value !== '') {
+    userDialogRecords.value.push(userQuestion.value);
+  }
+
+  const request: AiTutorQuestionRequest = { question: userQuestion.value };
+  userQuestion.value = '';
+  const response = await answerQuestion(request);
+  console.log('用户发送问题:', request.question);
+  console.log('智能助教回复:', response.data);
+  if (response.data) {
+    aiDialogRecords.value.push(response.data);
+  }
+
+}
+
+function clearDialog() { //清空对话内容
+  userDialogRecords.value = [''];
+  aiDialogRecords.value = ['你好，我是这个虚拟宠物医院的智能医生，有关病例的问题可以向我提问~'];
+  userQuestion.value = '';
+}
+watch(dialogVisible, () => {
+  clearDialog();
+});
+
+
+
+
 </script>
 
 <style scoped lang="scss">
-.dialog-content {
+.aitutor-content {
   min-height: 400px;
   max-height: 400px;
   overflow: auto;
 }
+
+.aitutor-tool {
+  display: flex;
+  padding: 10px 0;
+}
+
+.dialog {}
 
 .user-message {
   display: flex;
@@ -155,16 +189,24 @@ function openOverlayWithComponent(componentName: string) {
 }
 
 .message-wrapper-right {
-  max-width: 230px;
+  padding: 10px 20px;
+  min-height: 20px;
+  max-height: 1000px;
+  max-width: 300px;
+  // padding: 0 2px;
   word-wrap: break-word;
-  background-color: powderblue;
+  background-color: rgba(176, 224, 230, 0.492);
   border-radius: 12px 0px 12px 12px;
 }
 
 .message-wrapper-left {
-  max-width: 230px;
+  padding: 10px 20px;
+  min-height: 20px;
+  max-height: 1000px;
+  max-width: 300px;
+  // padding: 0 2px;
   word-wrap: break-word;
-  background-color: lightslategray;
+  background-color: rgba(119, 136, 153, 0.219);
   border-radius: 0px 12px 12px 12px;
 }
 
@@ -194,7 +236,7 @@ function openOverlayWithComponent(componentName: string) {
   /* 确保它位于其他内容之上 */
 }
 
-.ai-helper {
+.aitutor-entry {
   text-align: right;
   display: inline-flex;
 }
