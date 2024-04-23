@@ -18,7 +18,7 @@
       <p>{{ selectedCase.desc }}</p>
       <el-divider />
       <p>病例列表：(点击条目展开详情)</p>
-      <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div v-if="store.state.token.role===('管理员'||'医师'||'医助')" style="display: flex; justify-content: space-between; align-items: center;">
         <el-button type="primary" @click="showDialog = true">上传病例</el-button>
       </div>
       <el-dialog title="上传新病例" v-model="showDialog">
@@ -109,6 +109,7 @@ import { update } from '@/apis/diseaseInstance/diseaseInstance'
 import type { DiseaseInstanceUpdateRequest } from "@/apis/diseaseInstance/diseaseInstance-interface";
 import axios from "axios";
 import {requestUploadLink} from "@/apis/fileStore/fileStore";
+import { store } from '@/main'; 
 
 // 声明组件名称
 defineComponent({
@@ -135,7 +136,9 @@ async function fetchDisease() {
 
 async function fetchDiseaseInstance() {
   try {
-    const response = await pageQuery()
+    const response = await pageQuery({
+      limit:999
+    })
     // console.log('response:', response)
     diseaseInstance.value = response.data
   } catch (error) {
