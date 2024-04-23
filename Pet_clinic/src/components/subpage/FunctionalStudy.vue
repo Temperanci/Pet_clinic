@@ -71,16 +71,15 @@
           <el-main>
             <div class="dialog">
               <div v-for="(msg, index) in userDialogRecords">
-                <div class="user-message">
+                <div class="user-message" v-if="userDialogRecords[index]">
                   <div class="message-wrapper-right">
                     {{ userDialogRecords[index] }}
                   </div>
                 </div>
-                <div class="ai-message" v-if="aiDialogRecords[index] !== ''">
+                <div class="ai-message" v-if="aiDialogRecords[index]">
                   <div class="message-wrapper-left">
                     {{ aiDialogRecords[index] }}
                   </div>
-
                 </div>
 
               </div>
@@ -89,8 +88,8 @@
         </el-container>
       </div>
       <div class="aitutor-tool">
-        <el-input type="textarea" placeholder="在此输入你的问题" v-model="userQuestion" />
-        <el-button type="primary" size="" @click="sendMessage">
+        <el-input type="textarea" placeholder="在此输入你的问题" v-model="userQuestion" style="width:90%;" />
+        <el-button type="primary" size="" @click="sendMessage" style="margin:0 20px;">
           发送
         </el-button>
       </div>
@@ -101,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineComponent, ref, watch} from "vue";
+import { defineComponent, ref, watch } from "vue";
 import { Checked, Memo, UserFilled } from "@element-plus/icons-vue";
 import OverlayComponent from './OverlayComponent.vue';
 import RolePlayComponent from './RolePlayComponent.vue';
@@ -134,21 +133,25 @@ const userDialogRecords = ref(['']);
 const aiDialogRecords = ref(['你好，我是这个虚拟宠物医院的智能医生，有关病例的问题可以向我提问~']);
 
 async function sendMessage() {
-  if(userQuestion.value!==''){
+  if (userQuestion.value !== '') {
     userDialogRecords.value.push(userQuestion.value);
   }
 
   const request: AiTutorQuestionRequest = { question: userQuestion.value };
+  userQuestion.value = '';
   const response = await answerQuestion(request);
-  console.log('用户发送问题:',request.question);
-  console.log('智能助教回复:',response.question);
+  console.log('用户发送问题:', request.question);
+  console.log('智能助教回复:', response.data);
+  if (response.data) {
+    aiDialogRecords.value.push(response.data);
+  }
 
 }
 
-function clearDialog(){ //清空对话内容
-  userDialogRecords.value=[''];
-  aiDialogRecords.value=['你好，我是这个虚拟宠物医院的智能医生，有关病例的问题可以向我提问~'];
-  userQuestion.value='';
+function clearDialog() { //清空对话内容
+  userDialogRecords.value = [''];
+  aiDialogRecords.value = ['你好，我是这个虚拟宠物医院的智能医生，有关病例的问题可以向我提问~'];
+  userQuestion.value = '';
 }
 watch(dialogVisible, () => {
   clearDialog();
@@ -168,6 +171,7 @@ watch(dialogVisible, () => {
 
 .aitutor-tool {
   display: flex;
+  padding: 10px 0;
 }
 
 .dialog {}
@@ -175,16 +179,17 @@ watch(dialogVisible, () => {
 .user-message {
   display: flex;
   flex-direction: row-reverse;
-  // margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 .ai-message {
   display: flex;
   flex-direction: row;
-  // margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 .message-wrapper-right {
+  padding: 10px 20px;
   min-height: 20px;
   max-height: 1000px;
   max-width: 300px;
@@ -195,6 +200,7 @@ watch(dialogVisible, () => {
 }
 
 .message-wrapper-left {
+  padding: 10px 20px;
   min-height: 20px;
   max-height: 1000px;
   max-width: 300px;
