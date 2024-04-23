@@ -114,12 +114,12 @@
     <div class="testrecord-layout">
       <el-container>
         <el-container width="80%">
+          <el-header style="display: flex; justify-content: center;">
+            <h3>{{ problemSet?.title }}</h3>
+          </el-header>
           <el-main>
-            <el-header style="display: flex; justify-content: center;">
-              <h3>{{ problemSet?.title }}</h3>
-            </el-header>
             <div class="probleminfo-content">
-              <el-table :data="loadCurrentList()" v-loading="problemInfoLoading" border height="450px"
+              <el-table :data="loadCurrentList()" v-loading="problemInfoLoading" border height="400px"
                 style="overflow: auto;">
                 <el-table-column prop="problem.title" label="题目" width="90px" />
                 <el-table-column prop="problem.content" label="内容" width="" />
@@ -143,9 +143,11 @@
           <div class="testrecord-info">
             <el-card>
               <h4>考试结果</h4>
-              <p :style="{ color: testRecordDetails.userScore / testRecordDetails.totalScore < 0.6 ? 'red' : 'black' }">
-                分数：{{
-        testRecordDetails.userScore }} / {{ testRecordDetails.totalScore }}</p>
+
+              <p v-if="testRecordDetails.status === 'judged'"
+                :style="{ color: testRecordDetails.userScore / testRecordDetails.totalScore < 0.6 ? 'red' : 'black' }">
+                分数：{{ testRecordDetails.userScore }} / {{ testRecordDetails.totalScore }}</p>
+              <p v-else style="color:orange;">试卷正在批改中…</p>
               <p>客观题正确数：{{ testRecordDetails.objCorrectNum }} / {{ testRecordDetails.objNum }}</p>
               <p>主观题得分率：{{ testRecordDetails.subUserScore }} / {{ testRecordDetails.subTotalScore }}</p>
               <h5>知识点掌握情况</h5>
@@ -173,7 +175,7 @@
     <template #footer>
       <div class="dialog-footer">
         <el-button type="info" @click="confirmDelete = false">取消</el-button>
-        <el-button type="danger" @click="submitDelete(userTestRecord?.testRecordId ??'');">
+        <el-button type="danger" @click="submitDelete(userTestRecord?.testRecordId ?? '');">
           确认
         </el-button>
       </div>
@@ -517,7 +519,7 @@ function handleTestRecordList() {
       var hours = Math.floor(temp.costTime / (1000 * 60 * 60));
       var minutes = Math.floor((temp.costTime % (1000 * 60 * 60)) / (1000 * 60));
       var seconds = Math.floor((temp.costTime % (1000 * 60)) / 1000);
-      temp.costTimeStr = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0'); 
+      temp.costTimeStr = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
     }
 
     temp.status = queryData.value[i].graded === true ? 'judged' : 'judging';
@@ -618,6 +620,7 @@ async function fetchProblemSet(problemSetId: string) { //获取试卷
   }
 }
 const testRecordDetails = ref({ //考生测试记录的详细信息
+  status: '',
   totalScore: 0, //试卷总分
   userScore: 0, //考生分数
   rank: 0, //排名
@@ -636,6 +639,7 @@ function clearInfo() {
   problemInfoLoading.value = true;
   problemInfoList.value = [];
   testRecordDetails.value = {
+    status: '',
     totalScore: 0,
     userScore: 0,
     rank: 0,
@@ -675,6 +679,7 @@ async function fetchProblemInfo() { //获取试卷题目及答题情况
     const scoreMap = problemSet.value?.problemScoreMap;
     const answerMap = userTestRecord.value?.answerMap;
     const gradeMap = userTestRecord.value?.gradeMap;
+
     idList?.forEach(async (id: string) => {
       const problemRequest: ProblemPageRequest = { problemId: id };
       const problemResponse = await problemQuery(problemRequest);
@@ -765,6 +770,12 @@ async function testRecordDetail(candidateId: string, problemSetId: string, testR
   dialogVisible.value = true;
   await fetchProblemSet(problemSetId);
   await fetchUserTestRecord(testRecordId);
+  if (userTestRecord.value?.graded === true) {
+    testRecordDetails.value.status = 'judged';
+  } else {
+    testRecordDetails.value.status = 'judging';
+  }
+
   await fetchDiseases();
   setTimeout(() => {
     fetchProblemInfo();
@@ -822,7 +833,10 @@ function loadCurrentList() {
 </script>
 
 <style scoped lang="scss">
-.testrecord-layout {}
+.testrecord-layout {
+  // min-height: 600px;
+  // max-height: 600px;
+}
 
 .probleminfo-content {
   min-height: 400px;

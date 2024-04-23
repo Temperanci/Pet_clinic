@@ -28,8 +28,9 @@
                 </el-main>
                 <el-footer>
                     <div class="test-button">
-                        <el-button @click="priorProblem()">上一题</el-button>
-                        <el-button @click="nextProblem()">下一题</el-button>
+                        <el-button @click="priorProblem()" :disabled="selectedIndex === 0">上一题</el-button>
+                        <el-button @click="nextProblem()"
+                            :disabled="selectedIndex === problemList.length - 1">下一题</el-button>
                     </div>
                 </el-footer>
             </el-container>
@@ -44,7 +45,7 @@
                 <div class="problem-table">
                     <div class="problem-number" v-for="(pro, index) in problemList">
                         <el-button style="width: 45px" @click="jumpProblem(index)" :style="{
-                        background: index === selectedIndex ? 'aqua' : (answer[index] !== undefined && answer[index] !== '' ? 'aquamarine' : '')
+                        background: index === selectedIndex ? '#b46cf577' : (answer[index] !== undefined && answer[index] !== '' ? '#7fffd466' : '')
                     }">
                             {{ index + 1 }}
                         </el-button>
@@ -72,7 +73,7 @@
 
 <script setup lang="ts">
 import { defineComponent } from "vue";
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { store } from '@/main'
 import { StorageToken } from '@/scripts/storage'
 import { Personnel } from '@/apis/class';
@@ -139,7 +140,6 @@ async function fetchProblems() {
             temp.problem.content = (temp.problem.content ?? '').replace(/(A\.|B\.|C\.|D\.)/g, '\n$1'); //单选题选项换行
             problemList.value.push(temp);
         })
-        // console.log("获取题目:", problemList.value);
         setTimeout(() => { jumpProblem(selectedIndex.value); }, 1000);
 
     } catch (error) {
@@ -148,6 +148,15 @@ async function fetchProblems() {
 }
 onMounted(async () => {
     await fetchProblems();
+    setTimeout(() => {
+        problemList.value.forEach((pro) => {
+            if(pro.problem.problemId){
+                answerMap.set(pro.problem.problemId, '');
+            }
+            console.log('默认空值',pro.problem.problemId);
+        });
+    }, 100)
+
 })
 
 //考试倒计时
@@ -187,22 +196,23 @@ function priorProblem() {
 function saveAnswer() {
     var pro = selectedProblem.value;
     var temp = answer.value[selectedIndex.value];
-    if (pro.problem.type == 'objective') {
-        answerMap.set(pro.problem.problemId ?? '', temp);
-    } else if (pro.problem.type == 'subjective') {
-        answerMap.set(pro.problem.problemId ?? '', temp);
+    if(pro.problem.problemId){
+        answerMap.set(pro.problem.problemId, temp??'');
     }
+
 }
 
 //检查是否已完成全部题目
 function checkAnswerMap() {
     saveAnswer();
+    warningMsg.value = '确认提交试卷？';
     problemList.value.forEach(pro => {
-        if (pro.problem.problemId && !answerMap.has(pro.problem.problemId)) {
-            // console.log('未答题:', problemList.value.indexOf(pro));
+        if (pro.problem.problemId && (!answerMap.has(pro.problem.problemId) || answerMap.get(pro.problem.problemId ?? '') === '')) {
             warningMsg.value = '有题目未作答，确认提交？';
+            answerMap.set(pro.problem.problemId ?? '', '');
         }
     })
+    console.log('answerMap:', answerMap);
 }
 
 //提交试卷
@@ -242,7 +252,7 @@ async function submit() {
             const submitResponse = await update(confirmSubmission);
             console.log("提交测试记录:", submitResponse.data);
             console.log(props.enterTime);
-        } else{
+        } else {
             console.log('没有数据！');
         }
         emit('content', 'ProblemSet'); //返回试卷列表
@@ -251,7 +261,9 @@ async function submit() {
     }
 
 }
-
+// watch(submitDialog, () => {
+//     warningMsg.value = '确认提交试卷？';
+// });
 
 </script>
 

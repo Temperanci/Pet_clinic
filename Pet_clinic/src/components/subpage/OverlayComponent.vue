@@ -1,6 +1,6 @@
 <template>
   <div v-if="modelValue" class="overlay">
-    <el-button type="primary" size="large" class="overlay-back" @click="closeOverlay">返回</el-button>
+    <el-button type="primary" size="large" class="overlay-back" @click="closeOverlay">返回主页</el-button>
     <div class="overlay-content">
       <slot></slot>
     </div>
