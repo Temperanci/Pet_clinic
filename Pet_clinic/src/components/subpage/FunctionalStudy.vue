@@ -76,8 +76,10 @@
                     {{ userDialogRecords[index] }}
                   </div>
                 </div>
-                <div class="ai-message" v-if="aiDialogRecords[index]">
-                  <div class="message-wrapper-left">
+                <div class="ai-message">
+                  <!-- <div v-if="responceLoading && currentResponceIndex===index" v-loading="responceLoading" element-loading-text="智能医生思考中...">
+                  </div> -->
+                  <div class="message-wrapper-left" v-loading="responceLoading && currentResponceIndex === index">
                     {{ aiDialogRecords[index] }}
                   </div>
                 </div>
@@ -129,8 +131,13 @@ function openOverlayWithComponent(componentName: string) {
 //智能医生对话
 const dialogVisible = ref(false);
 const userQuestion = ref('');
+
+//从本地读取对话历史记录
 const userDialogRecords = ref(['']);
 const aiDialogRecords = ref(['你好，我是这个虚拟宠物医院的智能医生，有关病例的问题可以向我提问~']);
+
+const currentResponceIndex = ref(1);
+const responceLoading = ref(false);
 
 async function sendMessage() {
   if (userQuestion.value !== '') {
@@ -139,22 +146,34 @@ async function sendMessage() {
 
   const request: AiTutorQuestionRequest = { question: userQuestion.value };
   userQuestion.value = '';
+  responceLoading.value = true;
   const response = await answerQuestion(request);
   console.log('用户发送问题:', request.question);
   console.log('智能助教回复:', response.data);
   if (response.data) {
     aiDialogRecords.value.push(response.data);
   }
-
+  currentResponceIndex.value++;
+  responceLoading.value = false;
 }
+function resetDialog() { //重置对话记录
 
-function clearDialog() { //清空对话内容
+  //重置对话记录 userDialogRecords 和 aiDialogRecords 为以下内容：
+
+
   userDialogRecords.value = [''];
   aiDialogRecords.value = ['你好，我是这个虚拟宠物医院的智能医生，有关病例的问题可以向我提问~'];
-  userQuestion.value = '';
+}
+function saveDialog() { //保存对话记录
+
+  //保存对话记录 userDialogRecords 和 aiDialogRecords 
+
+
+
 }
 watch(dialogVisible, () => {
-  clearDialog();
+  saveDialog();
+  userQuestion.value = '';
 });
 
 
