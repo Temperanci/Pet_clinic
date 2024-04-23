@@ -266,7 +266,7 @@ var queryData = ref<any[]>([]);
 var currentPage = 1;
 function pagination(val: number) {
   currentPage = val
-  if(val!=1){
+  if(!back.value){
     backToHome();
   }
   //恢复初始值

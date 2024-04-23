@@ -413,7 +413,7 @@ function backToHome() {
 }
 function pagination(val: number) { //分页
     currentPage = val
-    if(val!=1){
+    if(!back.value){
     backToHome();
   }
     //恢复初始值

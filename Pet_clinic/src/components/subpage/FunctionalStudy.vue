@@ -111,6 +111,7 @@ import OnlineTestComponent from './OnlineTestComponent.vue';
 import { answerQuestion } from '@/apis/aiTutor/aiTutor';
 import type { AiTutorQuestionRequest } from '@/apis/aiTutor/aiTutor-interface';
 import type { AiTutorBO } from '@/apis/schemas';
+import { BOTools } from "@/apis/class";
 
 
 defineComponent({
@@ -142,6 +143,7 @@ const responceLoading = ref(false);
 async function sendMessage() {
   if (userQuestion.value !== '') {
     userDialogRecords.value.push(userQuestion.value);
+    console.log('sendMessage.userDialogRecords',userDialogRecords.value);
   }
 
   const request: AiTutorQuestionRequest = { question: userQuestion.value };
@@ -165,11 +167,14 @@ function resetDialog() { //重置对话记录
   aiDialogRecords.value = ['你好，我是这个虚拟宠物医院的智能医生，有关病例的问题可以向我提问~'];
 }
 function saveDialog() { //保存对话记录
-
   //保存对话记录 userDialogRecords 和 aiDialogRecords 
-
-
-
+  localStorage.setItem('userDialogRecords',JSON.stringify(userDialogRecords.value));
+  localStorage.setItem('aiDialogRecords',JSON.stringify(aiDialogRecords.value));
+  console.log('saveDialog.localStorage',localStorage.getItem('userDialogRecords'));
+}
+function clearDialog(){//清除对话记录
+  localStorage.removeItem('userDialogRecords');
+  localStorage.removeItem('aiDialogRecords');
 }
 watch(dialogVisible, () => {
   saveDialog();

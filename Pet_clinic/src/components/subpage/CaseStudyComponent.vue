@@ -69,10 +69,12 @@
           class="instance-item"
         >
           <template #title>
-            <h2>病情描述：{{ instance.desc }}</h2>
+            <h2 v-if="activeInstance!=instance.instanceId" class="instance-title">病情描述：{{ instance.desc }}</h2>
           </template>
           <div>
             <!-- 在这里可以放置病例的详细内容，如图片、视频等 -->
+            <h2 class="instance-title">病情描述：</h2>
+            <p>{{ instance.desc }}</p>
             <p>病例ID：{{ instance.instanceId }}</p>
             <img
               v-for="(picUrl, index) in instance.pictureUrlList"
@@ -153,7 +155,6 @@ function showCaseDetails(disease: DiseaseBO) {
     (item) => item.diseaseId === disease.diseaseId
   )
 }
-
 // 组件挂载后获取疾病数据
 
 onMounted(async () => {
@@ -173,7 +174,11 @@ const form = reactive({
   fileList: [], // 这里假设 fileList 是 File 类型的数组
   videoList: [], // 同上，videoList 是 File 类型的数组
 });
-
+function clearForm(){
+  form.details='';
+  form.fileList=[];
+  form.videoList=[];
+}
 // 监控 form 对象中所有属性的变化
 watch(() => form, (newForm) => {
   console.log('Form changed:', newForm);
@@ -217,6 +222,7 @@ function submitForm() {
             type: 'success',
             duration: 3000 // 显示3秒后消失
           });
+          clearForm();//清除表单
           await refreshCurrentCase(); // 刷新当前病例
           showDialog.value = false; // 关闭对话框
         } catch (error) {
@@ -294,6 +300,11 @@ const handlePreview: UploadProps['onPreview'] = (file) => {
   margin: 10px;
   padding: 10px;
   border: #2a1f1f 1px solid;
+}
+.instance-title{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .case-images,
 .case-videos {
