@@ -185,7 +185,10 @@ var edited: Ref<Drug[]> = ref<Drug[]>([]);
 var queryData = ref<any[]>([]);
 function pagination(val: number) {
   currentPage = val
-  fetchDrugs(currentPage,defaultNum);
+  if(val!=1){
+    fetchDrugs(currentPage,defaultNum);
+  }
+  
   //恢复初始值
   isSelected = clearIsSelected(isSelected);
   clearPara.value = true;

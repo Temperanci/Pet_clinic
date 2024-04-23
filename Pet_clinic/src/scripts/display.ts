@@ -79,5 +79,11 @@ export function throwMessage(str:string){
                 type:'error'
             })
             break;
+        case 'unknown':
+            ElMessage({
+                message:'未知错误',
+                type:'error'
+            })
+            break;
     }
 }

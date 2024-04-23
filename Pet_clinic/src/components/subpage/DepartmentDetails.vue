@@ -119,7 +119,9 @@ const personnelList = ref<PersonnelBO[]>([]);
 // 从后端获取departments数据并更新DepartmentPage
 async function fetchDepartments() {
   try {
-    const response = await pageQuery();
+    const response = await pageQuery({
+      limit:999
+    });
     console.log('response:', response)
     if (response && response.data && response.data.datas) {
       DepartmentPage.value = response.data; // 假设响应中有data属性，且包含datas数组
@@ -144,7 +146,9 @@ async function fetchDepartments() {
 }
 async function fetchPersonnel() {
   try {
-    const result = await PersonnelPageQuery();
+    const result = await PersonnelPageQuery({
+      limit:999
+    });
     if (result.success) {
       // 过滤出匹配的科室人员
       personnelList.value = result.data.datas.filter((personnel: PersonnelBO) =>
