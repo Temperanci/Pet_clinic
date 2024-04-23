@@ -85,5 +85,11 @@ export function throwMessage(str:string){
                 type:'error'
             })
             break;
+        case 'no delete NO_INDEX':
+            ElMessage({
+                message:'不能删除学习中和不可用的条目',
+                type:'error'
+            })
+            break;
     }
 }

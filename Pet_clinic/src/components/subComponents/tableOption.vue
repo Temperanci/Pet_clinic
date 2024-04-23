@@ -20,7 +20,7 @@
         </template>
         <template v-else #default="scope">
             <span v-if="status[scope.$index] === 0">
-                <el-button link type="primary" size="small"
+                <el-button v-if="props.isEdit" link type="primary" size="small"
                     @click="emit('edit', scope.$index); status[scope.$index] = 1">编辑</el-button>
                 <el-button link type="danger" size="small" 
                     @click="emit('delete', scope.$index); status[scope.$index] = 2;">删除</el-button>
@@ -77,7 +77,11 @@ const props = defineProps({
     back:Boolean,
     type:{
         type:Boolean,
-        default:false}
+        default:false},
+    isEdit:{
+        type:Boolean,
+        default:true
+    }
 })
 function statusGen(num: number): Ref<number[]> {
     var temp = ref<number[]>([]);
