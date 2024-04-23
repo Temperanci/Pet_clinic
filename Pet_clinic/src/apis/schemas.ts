@@ -117,6 +117,7 @@ export interface GradeResultBO{
     reason?: string;
 }
 
-export interface AiTutor{
-    
+export interface AiTutorBO{
+    question?: string;
+    responce: string;
 }

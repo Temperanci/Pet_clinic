@@ -37,7 +37,7 @@
 <!-- 
             <el-col :span="8">
               <el-card shadow="hover">
-                <el-result title="Test" sub-title="">
+                <el-result title="智能医生" sub-title="">
                   <template #icon>
                     <el-icon size="50">
                       <Checked />

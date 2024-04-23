@@ -4,7 +4,7 @@ export interface AiTutorQuestionRequest extends BasePageRequest{
     question?: string;
 }
 
-export interface AiTutorPageResponse {
+export interface AiTutorResponse {
     answer?: string;
 }
 
