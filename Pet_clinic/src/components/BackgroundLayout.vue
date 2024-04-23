@@ -94,9 +94,6 @@ import ProblemManagement from './background/ProblemManagement.vue'
 import ProblemSetManagement from './background/ProblemSetManagement.vue'
 import TestRecordManagement from './background/TestRecordManagement.vue'
 import DiseaseContentManagement from './background/DiseaseContentManagement.vue'
-import CreateTest from './background/CreateTest.vue'
-import QuestionBank from './background/QuestionBank.vue'
-import FinishedTest from './background/FinishedTest.vue'
 import { store } from '@/main'
 //路由
 import { useRouter } from 'vue-router';
