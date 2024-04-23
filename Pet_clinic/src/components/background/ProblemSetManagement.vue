@@ -806,7 +806,7 @@ function clearConditions() { //情空题目筛选条件
     searchTitle.value = '';
     chosenType.value = '';
     chosenSubject.value = '';
-    searchProblems();
+    // searchProblems();
 }
 function selectProblemWithId(id: string) { //从试卷添加or移除题目
     var temp = problemResultList.value.find(pro => pro.problemId === id);

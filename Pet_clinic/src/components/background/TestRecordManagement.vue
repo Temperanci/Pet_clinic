@@ -5,13 +5,14 @@
     </p> -->
   <div style="height: 100%;display: flex;flex-flow: column;">
     <div style="height: 90%;" class="table">
-      <el-table :data="loadResult()" v-loading="testRecordLoading" height="100%" empty-text="来到了没有数据的荒原...">
-        <el-table-column prop="testRecordId" label="记录编号">
+      <el-table :data="testRecordResultList" v-loading="testRecordLoading" height="100%" empty-text="来到了没有数据的荒原...">
+        <el-table-column prop="testRecordId" label="编号">
           <template #default="scope">
-            <el-input v-if="searchBar[scope.$index]" v-model="edited[0].testRecordId"></el-input>
+            <!-- <el-input v-if="searchBar[scope.$index]" v-model="edited[0].testRecordId"></el-input>
             <el-input v-else-if="unwritableBar[scope.$index]" disabled
               v-model="edited[scope.$index].testRecordId"></el-input>
-            <span v-else>{{ scope.row.testRecordId }}</span>
+            <span v-else>{{ scope.row.testRecordId }}</span> -->
+            <span>{{ scope.row.testRecordId }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="problemSetId" label="试卷">
@@ -20,8 +21,9 @@
           </template>
 
           <template #default="scope">
-            <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].problemSetId"></el-input>
-            <span v-else>{{ problemsetMap.get(scope.row.problemSetId) }}</span>
+            <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].problemSetId"></el-input>
+            <span v-else>{{ problemsetMap.get(scope.row.problemSetId) }}</span> -->
+            <span>{{ scope.row.problemSetTitle }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="candidateId" label="考生">
@@ -30,41 +32,47 @@
           </template>
 
           <template #default="scope">
-            <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].candidateId"></el-input>
-            <span v-else>{{ personnelMap.get(scope.row.candidateId) }}</span> -->
-            <el-input v-if="searchBar[scope.$index]"></el-input>
+            <!-- <el-input v-if="searchBar[scope.$index]"></el-input>
             <el-input v-else-if="unwritableBar[scope.$index]" disabled
               v-model="edited[scope.$index].candidateId"></el-input>
-            <span v-else>{{ personnelMap.get(scope.row.candidateId) }}</span>
+            <span v-else>{{ personnelMap.get(scope.row.candidateId) }}</span> -->
+            <span>{{ scope.row.candidateName }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="graded" label="批卷情况">
+          <template #header>
+            <el-select v-model="searchStatus" placeholder="批卷情况">
+              <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
+          </template>
+
           <template #default="scope">
-            <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].graded"></el-input> -->
-            <el-select v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].graded"
+            <!-- <el-select v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].graded"
               placeholder="Select" style="width: 100%">
               <el-option v-for="item in gradeOptions" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
-            <span v-else>{{ gradeMap.get(scope.row.graded) }}</span>
-            <!-- <el-option v-for="(value, key) in personnelMap" :key="key" :label="value" :value="key" /> -->
+            <span v-else>{{ gradeMap.get(scope.row.graded) }}</span> -->
+            <span>{{ scope.row.status }}</span>
           </template>
         </el-table-column>
-
+        <el-table-column prop="costTime" label="用时">
+          <template #default="scope">
+            <span>{{ scope.row.costTimeStr }}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="submitTime" label="提交时间">
           <template #default="scope">
-            <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].submitTime"></el-input>
-            <span v-else>{{ scope.row.submitTime }}</span> -->
-            <el-input v-if="searchBar[scope.$index]" disabled></el-input>
+            <!-- <el-input v-if="searchBar[scope.$index]" disabled></el-input>
             <el-input v-else-if="unwritableBar[scope.$index]" disabled
               v-model="edited[scope.$index].submitTime"></el-input>
-            <span v-else>{{ scope.row.submitTime }}</span>
+            <span v-else>{{ scope.row.submitTime }}</span> -->
+            <span>{{ scope.row.submitTimeStr }}</span>
           </template>
         </el-table-column>
 
         <el-table-column prop="" label="" width="150px">
-
           <template #header>
-            <el-button type="info" size="small" @click=";">搜索</el-button>
+            <el-button type="info" size="small" @click="searchProblemSets();">搜索</el-button>
           </template>
           <template #default="scope">
             <el-button type="warning"
@@ -125,16 +133,16 @@
           <div class="testrecord-info">
             <el-card>
               <h4>考试结果</h4>
-              <p :style="{ color: testRecordInfo.userScore / testRecordInfo.totalScore < 0.6 ? 'red' : 'black' }">
+              <p :style="{ color: testRecordDetails.userScore / testRecordDetails.totalScore < 0.6 ? 'red' : 'black' }">
                 分数：{{
-        testRecordInfo.userScore }} / {{ testRecordInfo.totalScore }}</p>
-              <p>客观题正确数：{{ testRecordInfo.objCorrectNum }} / {{ testRecordInfo.objNum }}</p>
-              <p>主观题得分率：{{ testRecordInfo.subUserScore }} / {{ testRecordInfo.subTotalScore }}</p>
+        testRecordDetails.userScore }} / {{ testRecordDetails.totalScore }}</p>
+              <p>客观题正确数：{{ testRecordDetails.objCorrectNum }} / {{ testRecordDetails.objNum }}</p>
+              <p>主观题得分率：{{ testRecordDetails.subUserScore }} / {{ testRecordDetails.subTotalScore }}</p>
               <h5>知识点掌握情况</h5>
               <div class="disease-score">
                 <ul>
-                  <li v-for="(score, name) in testRecordInfo.diseaseTotalScore" :key="name">
-                    <p>{{ name }}：{{ testRecordInfo.diseaseUserScore[name] }} / {{ score }}</p>
+                  <li v-for="(score, name) in testRecordDetails.diseaseTotalScore" :key="name">
+                    <p>{{ name }}：{{ testRecordDetails.diseaseUserScore[name] }} / {{ score }}</p>
                   </li>
                 </ul>
               </div>
@@ -184,7 +192,7 @@ import type { TestRecordPageRequest, TestRecordPageResponse, TestRecordUpdateReq
 import type { ProblemSetPageRequest, ProblemSetPageResponse } from '@/apis/problemSet/problemSet-interface';
 import type { ProblemPageRequest, ProblemPageResponse } from '@/apis/problem/problem-interface';
 import type { DiseasePageRequest, DiseasePageResponse } from '@/apis/disease/disease-interface';
-import type { TestRecordBO, ProblemSetBO, ProblemBO, DiseaseBO } from '@/apis/schemas';
+import type { TestRecordBO, GradeResultBO, ProblemSetBO, ProblemBO, DiseaseBO } from '@/apis/schemas';
 import { Personnel, TestRecord, ProblemSet, Problem, Disease } from "@/apis/class";
 
 import { throwMessage } from "@/scripts/display";
@@ -307,14 +315,14 @@ async function fetchTestRecords(pageNum?: number, pageLimit?: number, msg?: Obje
       queryData.value = TestRecordPage.value.datas;
 
       for (var rec of queryData.value) { //处理时间显示格式
+        if (rec.startTime) {
+          var time = new Date(rec.startTime);
+          rec.startTime = time.getFullYear() + '-' + (time.getMonth() + 1) + '-' + time.getDate() + ' ' + time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0');
+        }
         if (rec.submitTime) {
           var time = new Date(rec.submitTime);
           rec.submitTime = time.getFullYear() + '-' + (time.getMonth() + 1) + '-' + time.getDate() + ' ' + time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0');
         }
-
-        // if (time) {
-        //   time = time.toString().slice(0, 10) + " " + time.toString().slice(11, 16);
-        // }
       }
 
       if (search || false) {
@@ -326,20 +334,20 @@ async function fetchTestRecords(pageNum?: number, pageLimit?: number, msg?: Obje
       isSelected = isSelectGen(tabLength.value);
       edited.value = EditedGen(tabLength.value, new TestRecord()) as TestRecord[];
       // selectPage(currentPage - 1, tableData, queryData);
-      console.log('Fetched testRecords:', TestRecordPage.value.datas);
+      // console.log('Fetched testRecords:', TestRecordPage.value.datas);
     } else {
       console.error('No data returned from the API');
     }
   } catch (error) {
     console.error('Error fetching testRecords:', error);
   }
+  setTimeout(() => { handleTestRecordList(); }, 1000);
 }
 onMounted(() => {
   getPersonnelInfo();
   getProblemsetInfo();
   fetchTestRecords();
-  setTimeout(() => { testRecordLoading.value = false; }, 500);
-
+  setTimeout(() => { testRecordLoading.value = false; }, 800);
 });
 //request
 var entryNum = ref(0);
@@ -376,11 +384,11 @@ async function getProblemsetInfo() {
   try {
     var problemsetResponse = await problemsetPageQuery(request);
     if (problemsetResponse && problemsetResponse.data && problemsetResponse.data.datas) {
-      console.log('Fetched personnels:', problemsetResponse.data.datas);
+      // console.log('Fetched personnels:', problemsetResponse.data.datas);
       for (var i = 0; i < problemsetResponse.data.datas.length; i++) {
         problemsetMap.value.set(problemsetResponse.data.datas[i].problemSetId, problemsetResponse.data.datas[i].title);
       }
-      console.log('problemsetMap', problemsetMap)
+      // console.log('problemsetMap', problemsetMap)
     } else {
       console.error('No data returned from the API');
     }
@@ -397,11 +405,11 @@ async function getPersonnelInfo() {
   try {
     var personnelResponse = await personnelPageQuery(request);
     if (personnelResponse && personnelResponse.data && personnelResponse.data.datas) {
-      console.log('Fetched personnels:', personnelResponse.data.datas);
+      // console.log('Fetched personnels:', personnelResponse.data.datas);
       for (var i = 0; i < personnelResponse.data.datas.length; i++) {
         personnelMap.value.set(personnelResponse.data.datas[i].personnelId, personnelResponse.data.datas[i].name);
       }
-      console.log('personnelMap', personnelMap)
+      // console.log('personnelMap', personnelMap)
     } else {
       console.error('No data returned from the API');
     }
@@ -430,14 +438,115 @@ const gradeMap = new Map([
 const component = defineComponent({
   name: "TestRecordManagement"
 })
-//搜索
+interface TestRecordInfo {
+  testRecordId?: string;
+  problemSetId?: string;
+  problemSetTitle?: string; //试卷名
+  candidateId?: string;
+  candidateName?: string; //考试名
+  startTime?: Date;
+  startTimeStr?: string,
+  submitTime?: Date;
+  submitTimeStr?: string,
+  costTime?: number, //考试所用时间
+  costTimeStr?: string,
+  score?: number; //总分
+  graded?: boolean;
+  status?: string; // //批卷情况
+  // gradeMap?: Record<string, GradeResultBO>;
+  // answerMap?: Record<string, string>;
+}
+const testRecordList: Ref<TestRecordInfo[]> = ref<TestRecordInfo[]>([]); //所有测试记录
+const testRecordResultList: Ref<TestRecordInfo[]> = ref<TestRecordInfo[]>([]); //测试记录查询结果
+function handleTestRecordList() {
+  testRecordList.value = []; //清空缓存
+  for (var i in queryData.value) {
+    const temp: TestRecordInfo = {
+      testRecordId: "",
+      problemSetId: "",
+      problemSetTitle: "",
+      candidateId: "",
+      candidateName: "",
+      startTime: new Date(0),
+      startTimeStr: "",
+      submitTime: new Date('2077-12-31T23:59:59'),
+      submitTimeStr: "",
+      costTime: 0,
+      score: 0,
+      graded: false,
+      status: 'unsubmitted'
+    };
+    temp.testRecordId = queryData.value[i].testRecordId ?? "";
+    temp.problemSetId = queryData.value[i].problemSetId ?? "";
+    temp.problemSetTitle = problemsetMap.value.get(temp.problemSetId);
+    temp.candidateId = queryData.value[i].candidateId ?? "";
+    temp.candidateName = personnelMap.value.get(temp.candidateId);
+
+    if (queryData.value[i].startTime && (new Date(queryData.value[i].startTime) > new Date(0))) {
+      temp.startTime = new Date(queryData.value[i].startTime);
+      temp.startTimeStr = temp.startTime.getFullYear() + '-' + (temp.startTime.getMonth() + 1) + '-' + temp.startTime.getDate() + ' ' + temp.startTime.getHours().toString().padStart(2, '0') + ':' + temp.startTime.getMinutes().toString().padStart(2, '0');
+    }
+    if (queryData.value[i].submitTime && (new Date(queryData.value[i].submitTime) < new Date('2077-12-31T23:59:59'))) {
+      temp.submitTime = new Date(queryData.value[i].submitTime);
+      temp.submitTimeStr = temp.submitTime.getFullYear() + '-' + (temp.submitTime.getMonth() + 1) + '-' + temp.submitTime.getDate() + ' ' + temp.submitTime.getHours().toString().padStart(2, '0') + ':' + temp.submitTime.getMinutes().toString().padStart(2, '0');
+    }
+
+    temp.costTime = queryData.value[i].submitTime - queryData.value[i].startTime;
+    if (temp.costTime) {
+      var hour = Math.floor(temp.costTime / (1000 * 60 * 60));
+      var min = Math.floor(temp.costTime / (1000 * 60) - hour * 60);
+      temp.costTimeStr = hour + "h" + min + "min";
+      if (hour > 0) {
+        temp.costTimeStr = hour + "h" + min + "min";
+      } else if (min > 0) {
+        temp.costTimeStr = min + "min";
+      } else {
+        temp.costTimeStr = "";
+      }
+    }
+
+    temp.status = queryData.value[i].graded === true ? '已出分' : '批卷中';
+
+
+    testRecordList.value.push(temp);
+  }
+  testRecordResultList.value = testRecordList.value;
+  // console.log('testRecordResultList:',testRecordResultList.value);
+}
 const searchProblemSet = ref('');
 const searchCandidate = ref('');
-const searchStatus = ref('all');
-function loadResult(){
-
-  return queryData.value;
+const searchStatus = ref('');
+const statusOptions = [
+  {
+    label: "已出分",
+    value: true
+  },
+  {
+    label: "批卷中",
+    value: false
+  },
+  {
+    label: "全部",
+    value: null
+  }
+]
+function searchProblemSets() { //查询测试记录
+  testRecordResultList.value = [];
+  for (var i in testRecordList.value) {
+    if (searchProblemSet && testRecordList.value[i].problemSetTitle?.includes(searchProblemSet.value)) {
+      console.log('pass1');
+      if ((searchCandidate && testRecordList.value[i].candidateName?.includes(searchCandidate.value))) {
+        console.log('pass2');
+        if (searchStatus.value === '' || searchStatus.value === testRecordList.value[i].status) {
+          console.log('pass3');
+          testRecordResultList.value.push(testRecordList.value[i]);
+        }
+      }
+    }
+  }
+  console.log('testRecordResultList:',testRecordResultList.value);
 }
+
 
 
 const userTestRecordList: Ref<TestRecordBO[]> = ref([]);
@@ -480,7 +589,7 @@ async function fetchProblemSet(problemSetId: string) { //获取试卷
     console.error('获取试卷失败！', error);
   }
 }
-const testRecordInfo = ref({
+const testRecordDetails = ref({
   totalScore: 0, //试卷总分
   userScore: 0, //考生分数
   rank: 0, //排名
@@ -498,7 +607,7 @@ const testRecordInfo = ref({
 function clearInfo() {
   problemInfoLoading.value = true;
   problemInfoList.value = [];
-  testRecordInfo.value = {
+  testRecordDetails.value = {
     totalScore: 0,
     userScore: 0,
     rank: 0,
@@ -559,39 +668,39 @@ async function fetchProblemInfo() { //获取试卷题目及答题情况
       //统计题型得分情况
       if (temp.type === 'subjective') {
         info.typeName = '简答'
-        // testRecordInfo.value.subNum++;
-        testRecordInfo.value.subTotalScore += info.score ?? 0;
-        testRecordInfo.value.subUserScore += info.grade ?? 0;
+        // testRecordDetails.value.subNum++;
+        testRecordDetails.value.subTotalScore += info.score ?? 0;
+        testRecordDetails.value.subUserScore += info.grade ?? 0;
       } else {
         info.typeName = '单选'
-        testRecordInfo.value.objNum++;
+        testRecordDetails.value.objNum++;
         if (info.userAnswer === info.problem?.answer) {
-          testRecordInfo.value.objCorrectNum++;
+          testRecordDetails.value.objCorrectNum++;
         }
       }
 
       //统计病种得分情况
       info.subjectName = diseaseList.value.find(dis => dis.diseaseId === info.problem?.subjectId)?.name;
-      if (info.subjectName && testRecordInfo.value.diseaseTotalScore[info.subjectName]) {
-        testRecordInfo.value.diseaseTotalScore[info.subjectName] += info.score ?? 0;
+      if (info.subjectName && testRecordDetails.value.diseaseTotalScore[info.subjectName]) {
+        testRecordDetails.value.diseaseTotalScore[info.subjectName] += info.score ?? 0;
       } else if (info.subjectName) {
-        testRecordInfo.value.diseaseTotalScore[info.subjectName] = info.score ?? 0;
+        testRecordDetails.value.diseaseTotalScore[info.subjectName] = info.score ?? 0;
       }
-      if (info.subjectName && testRecordInfo.value.diseaseUserScore[info.subjectName]) {
-        testRecordInfo.value.diseaseUserScore[info.subjectName] += info.grade ?? 0;
+      if (info.subjectName && testRecordDetails.value.diseaseUserScore[info.subjectName]) {
+        testRecordDetails.value.diseaseUserScore[info.subjectName] += info.grade ?? 0;
       } else if (info.subjectName) {
-        testRecordInfo.value.diseaseUserScore[info.subjectName] = info.grade ?? 0;
+        testRecordDetails.value.diseaseUserScore[info.subjectName] = info.grade ?? 0;
       }
 
-      testRecordInfo.value.totalScore += info.score ?? 0; //计算试卷总分
-      testRecordInfo.value.userScore += info.grade ?? 0; //计算用户得分
+      testRecordDetails.value.totalScore += info.score ?? 0; //计算试卷总分
+      testRecordDetails.value.userScore += info.grade ?? 0; //计算用户得分
 
       // console.log('答题信息:', info);
       problemInfoList.value.push(info);
     })
 
     // setTimeout(() => {
-    //   console.log('考试情况:', testRecordInfo.value);
+    //   console.log('考试情况:', testRecordDetails.value);
     // }, 5000);
   } catch (error) {
     console.error('获取答题信息失败！', error);
@@ -632,7 +741,7 @@ async function testRecordDetail(candidateId: string, problemSetId: string, testR
   setTimeout(() => {
     fetchProblemInfo();
     problemInfoLoading.value = false;
-  }, 3000)
+  }, 2000)
 }
 
 const confirmDelete = ref(false);
