@@ -46,8 +46,8 @@
       </el-col>
 
       <div class="aitutor-entry">
-        <el-button type="warning" plain @click="dialogVisible = true">
-          智能医生
+        <el-button type="warning" size="large" plain @click="openDialog();">
+          智能医生🧐
         </el-button>
       </div>
 
@@ -64,7 +64,7 @@
 
     </el-row>
 
-    <el-dialog v-model="dialogVisible" title="智能医生" width="800px" draggable overflow :close-on-click-modal="false"
+    <el-dialog v-model="dialogVisible" title="智能医生 Ai-Tutor 👨‍⚕️💉🐈💊👩‍⚕️" width="800px" draggable overflow :close-on-click-modal="false"
       :close-on-press-escape="false">
       <div class="aitutor-content">
         <el-container>
@@ -77,9 +77,9 @@
                   </div>
                 </div>
                 <div class="ai-message">
-                  <!-- <div v-if="responceLoading && currentResponceIndex===index" v-loading="responceLoading" element-loading-text="智能医生思考中...">
+                  <!-- <div v-if="responceLoading && currentResponceIndex===index" v-loading="responceLoading" >
                   </div> -->
-                  <div class="message-wrapper-left" v-loading="responceLoading && currentResponceIndex === index">
+                  <div class="message-wrapper-left" v-loading="responceLoading && currentResponceIndex === index" element-loading-text="智能医生思考中...">
                     {{ aiDialogRecords[index] }}
                   </div>
                 </div>
@@ -91,7 +91,8 @@
       </div>
       <div class="aitutor-tool">
         <el-input type="textarea" placeholder="在此输入你的问题" v-model="userQuestion" style="width:90%;" />
-        <el-button type="primary" size="" @click="sendMessage" style="margin:0 20px;">
+        <el-button type="primary" size="" @click="sendMessage" style="margin:0 20px;" :disabled="responceLoading">
+          
           发送
         </el-button>
       </div>
@@ -132,18 +133,16 @@ function openOverlayWithComponent(componentName: string) {
 //智能医生对话
 const dialogVisible = ref(false);
 const userQuestion = ref('');
-
 //从本地读取对话历史记录
 const userDialogRecords = ref(['']);
 const aiDialogRecords = ref(['你好，我是这个虚拟宠物医院的智能医生，有关病例的问题可以向我提问~']);
 
-const currentResponceIndex = ref(1);
+const currentResponceIndex = ref(aiDialogRecords.value.length);
 const responceLoading = ref(false);
 
 async function sendMessage() {
   if (userQuestion.value !== '') {
     userDialogRecords.value.push(userQuestion.value);
-    console.log('sendMessage.userDialogRecords',userDialogRecords.value);
   }
 
   const request: AiTutorQuestionRequest = { question: userQuestion.value };
@@ -158,11 +157,15 @@ async function sendMessage() {
   currentResponceIndex.value++;
   responceLoading.value = false;
 }
+function openDialog(){ //打开对话窗口
+  // userDialogRecords.value = localStorage.getItem('userDialogRecords');
+  // aiDialogRecords.value = localStorage.getItem('aiDialogRecords');
+  // userDialogRecords.value = [''];
+  // aiDialogRecords.value = ['你好，我是这个虚拟宠物医院的智能医生，有关病例的问题可以向我提问~'];
+  dialogVisible.value = true;
+}
 function resetDialog() { //重置对话记录
-
   //重置对话记录 userDialogRecords 和 aiDialogRecords 为以下内容：
-
-
   userDialogRecords.value = [''];
   aiDialogRecords.value = ['你好，我是这个虚拟宠物医院的智能医生，有关病例的问题可以向我提问~'];
 }
@@ -228,6 +231,7 @@ watch(dialogVisible, () => {
   min-height: 20px;
   max-height: 1000px;
   max-width: 300px;
+  min-width: 200px; //等待ai回复时展示"智能医生思考中"
   // padding: 0 2px;
   word-wrap: break-word;
   background-color: rgba(119, 136, 153, 0.219);
