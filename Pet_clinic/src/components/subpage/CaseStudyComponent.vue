@@ -174,7 +174,11 @@ const form = reactive({
   fileList: [], // 这里假设 fileList 是 File 类型的数组
   videoList: [], // 同上，videoList 是 File 类型的数组
 });
-
+function clearForm(){
+  form.details='';
+  form.fileList=[];
+  form.videoList=[];
+}
 // 监控 form 对象中所有属性的变化
 watch(() => form, (newForm) => {
   console.log('Form changed:', newForm);
@@ -218,6 +222,7 @@ function submitForm() {
             type: 'success',
             duration: 3000 // 显示3秒后消失
           });
+          clearForm();//清除表单
           await refreshCurrentCase(); // 刷新当前病例
           showDialog.value = false; // 关闭对话框
         } catch (error) {
