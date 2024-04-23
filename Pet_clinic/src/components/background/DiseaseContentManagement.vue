@@ -22,7 +22,7 @@
                 <span v-else>{{ scope.row.content }}</span>
               </template>
             </el-table-column>
-            <el-table-column prop="diseaseId" label="科室">
+            <el-table-column prop="diseaseId" label="病种">
               <template #default="scope">
                 <el-select v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].diseaseId" placeholder="Select" style="width: 100%">
         <el-option
@@ -34,6 +34,15 @@
         />
       </el-select>
                 <span v-else>{{ diseaseMap.get(scope.row.diseaseId) }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="indexStatus" label="学习情况">
+              <template #default="scope">
+                <!-- <el-input v-if="isSelected[scope.$index] === true" v-model="edited[scope.$index].contentId"></el-input> -->
+                <el-input v-if="searchBar[scope.$index]" v-model="edited[0].indexStatus"></el-input>
+                <el-input v-else-if="unwritableBar[scope.$index]" disabled v-model="edited[scope.$index].indexStatus"></el-input>
+                <span v-else-if="indexMap.get(scope.row.indexStatus)==='已学习'" style="color: green;">{{ indexMap.get(scope.row.indexStatus) }}</span>
+                <span v-else style="color:grey">{{ indexMap.get(scope.row.indexStatus) }}</span>
               </template>
             </el-table-column>
             <tableOption 
@@ -84,25 +93,30 @@
         (Msg[index] as DiseaseContent).diseaseId = data[index].diseaseId;
         (Msg[index] as DiseaseContent).title = data[index].title;
         (Msg[index] as DiseaseContent).content = data[index].content;
+        (Msg[index] as DiseaseContent).indexStatus = data[index].indexStatus;
         console.log('editedDiseaseContent',Msg);
       }//更新buffer
     async  deleteRow(Msg: Object[],index:number) {
         var request:DiseaseContentUpdateRequest = {
           diseaseContent:{
             contentId:(Msg[index] as DiseaseContent).contentId,
-            title:'',
-            diseaseId:'',
-            content:'',
+            // title:'',
+            // diseaseId:'',
+            // content:'',
+            indexStatus:'DELETE'
           },
-        delete:true}
+        delete:false
+      }
         console.log('delete request',request);
         var DCDelResponse= await DCUpdate(request);
         if(DCDelResponse){//更改成功
-          throwMessage('delete fail');
-        }
-        else{
+          if(DCDelResponse)
           throwMessage('delete success');
           setTimeout(()=>{backToHome();},500);
+          
+        }
+        else{
+          throwMessage('unknown');
         }
         console.log('delete response',DCDelResponse); 
       }//删除
@@ -113,6 +127,7 @@
             diseaseId:(Msg[index] as DiseaseContent).diseaseId,
             title:(Msg[index] as DiseaseContent).title,
             content:(Msg[index] as DiseaseContent).content,
+            // indexStatus:(Msg[index] as DiseaseContent).indexStatus
           },
         delete:false}
         console.log('update request',request);
@@ -131,6 +146,7 @@
         edited.content='';
         edited.contentId='';
         edited.title='';
+        edited.indexStatus='';
       }
      async createRow(msg:Object){
         var request:DiseaseContentUpdateRequest = {
@@ -162,12 +178,9 @@
     var CRUDhandler = new diseaseContentRowCRUD();
     async function fetchDiseaseContents(pageNum?:number,pageLimit?:number,msg?:Object,search?:boolean) {
       var temp = msg||{
-        diseaseContentId:'',
-        type:'',
         diseaseId:'',
         contentId:'',
         title:'',
-        diseaseContent:0,
         content:''
       }
       var request:DiseaseContentPageRequest= {
@@ -180,7 +193,7 @@
       }
       console.log('request',request);
       try {
-        const response = await DCPageQuery(request||undefined);
+        const response = await DCPageQuery(request);
         if (response && response.data && response.data.datas) {
           DiseaseContentPage.value = response.data; // 假设响应中有data属性，且包含datas数组
           queryData.value = DiseaseContentPage.value.datas;
@@ -216,7 +229,9 @@
     var currentPage = 1;
     function pagination(val: number) {
       currentPage = val
-      backToHome();
+      if(val!=1){
+    backToHome();
+  }
       //恢复初始值
       isSelected=clearIsSelected(isSelected);
       clearPara.value = true;
@@ -255,6 +270,11 @@
     console.error('Error fetching diseases:', error);
   }
     }
+//filter && display
+const indexMap= new Map([
+  ["NO_INDEX","学习中"],
+  ["HAS_INDEX","已学习"]
+]);
     const component = defineComponent({
       name: "DiseaseContent"
     })

@@ -180,7 +180,10 @@ var queryData = ref<any[]>([]);
 var currentPage = 1;
 function pagination(val: number) {
   currentPage = val
-  fetchPrice(currentPage,defaultNum);
+  if(val!=1){
+    fetchPrice(currentPage,defaultNum);
+  }
+  
   // eslint-disable-next-line vue/no-ref-as-operand
   isSelected = clearIsSelected(isSelected);
   clearPara.value = true;
