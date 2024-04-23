@@ -23,8 +23,9 @@
                 </el-main>
                 <el-footer>
                     <div class="testButton">
-                        <el-button @click="priorProblem()" :disabled="selectedIndex===0">上一题</el-button>
-                        <el-button @click="nextProblem()" :disabled="selectedIndex===problemResultList.length-1">下一题</el-button>
+                        <el-button @click="priorProblem()" :disabled="selectedIndex === 0">上一题</el-button>
+                        <el-button @click="nextProblem()"
+                            :disabled="selectedIndex === problemResultList.length - 1">下一题</el-button>
                     </div>
 
                 </el-footer>
@@ -59,7 +60,10 @@
                     <h4 style="text-align: center">筛选题目</h4>
                     <el-input type="textarea" placeholder="在此输入题目标题" v-model="searchTitle" />
                     <p>题目类型</p>
-                    <el-cascader placeholder=" " :options="typeOptions" filterable v-model="chosenType" />
+                    <el-select v-model="chosenType" placeholder="">
+                        <el-option v-for="item in typeOptions" :key="item.value" :label="item.label"
+                            :value="item.value" />
+                    </el-select>
                     <p>病种知识点</p>
                     <el-select v-model="chosenSubject" placeholder="">
                         <el-option v-for="item in subjectOptions" :key="item.value" :label="item.label"
@@ -342,6 +346,7 @@ function loadCurrentList() {
     border: solid 1px rgb(215, 215, 215);
     border-radius: 10px;
 }
+
 .problerm-search .button {
     display: flex;
     justify-content: center;
