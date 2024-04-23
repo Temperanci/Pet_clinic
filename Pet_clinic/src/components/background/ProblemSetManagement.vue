@@ -5,7 +5,8 @@
       </p> -->
     <div style="height: 100%;display: flex;flex-flow: column;">
         <div style="height: 90%;" class="table">
-            <el-table :data="handleProblemSetList()" height="100%" empty-text="来到了没有数据的荒原...">
+            <el-table :data="problemSetResultList" v-loading="problemSetLoading" height="100%"
+                empty-text="来到了没有数据的荒原...">
                 <el-table-column prop="problemSetId" label="试卷编号">
                     <template #default="scope">
                         <el-input v-if="searchBar[scope.$index]" v-model="edited[0].problemSetId"></el-input>
@@ -16,6 +17,9 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="title" label="名称">
+                    <template #header>
+                        <el-input v-model="searchProblemSetTitle" placeholder="试卷名称"></el-input>
+                    </template>
                     <template #default="scope">
                         <el-input v-if="isSelected[scope.$index] === true"
                             v-model="edited[scope.$index].title"></el-input>
@@ -63,10 +67,11 @@
                 <el-table-column prop="" label="" width="150px">
                     <template #header>
                         <el-button type="success" size="small" @click="createProblemSet();">创建</el-button>
-                        <el-button type="info" size="small" @click=";">搜索</el-button>
+                        <el-button type="info" size="small" @click="searchProblemSets();">搜索</el-button>
                     </template>
                     <template #default="scope">
-                        <el-button type="primary" size="" @click="editProblemSet(scope.row.problemSetId);">编辑</el-button>
+                        <el-button type="primary" size=""
+                            @click="editProblemSet(scope.row.problemSetId);">编辑</el-button>
                     </template>
                 </el-table-column>
                 <!-- <el-table-column prop="problemIdList" label="" width="100px">
@@ -74,18 +79,6 @@
                         <el-button type="danger" @click="">删除</el-button>
                     </template>
                 </el-table-column> -->
-
-                <!-- <tableOption :clear=clearPara :num=tabLength :back=back
-                    @edit-confirm="(index) => { CRUDhandler.editRow(edited, index); }"
-                    @edit="(index) => { CRUDhandler.updateMsg(edited, queryData, index); isSelected[index] = !isSelected[index]; clearPara = false; }"
-                    @cancel="(index) => { isSelected[index] = !isSelected[index]; clearPara = false; unwritableBar[0] = false; searchBar[0] = false; }"
-                    @delete="(index) => { CRUDhandler.updateMsg(edited, queryData, index); clearPara = false; }"
-                    @delete-confirm="(index) => { CRUDhandler.deleteRow(edited, index); }"
-                    @create="(index) => { CRUDhandler.clear(edited[index]); isSelected[index] = true; clearPara = false; unwritableBar[0] = true; }"
-                    @create-confirm="(index) => { CRUDhandler.createRow(edited[index]); unwritableBar[0] = false; }"
-                    @search="(index) => { CRUDhandler.clear(edited[index]); isSelected[index] = true; clearPara = false; searchBar[0] = true; }"
-                    @search-confirm="(index) => { CRUDhandler.search(edited[index]); searchBar[0] = false; back = true; }"
-                    @back="backToHome(); back = false;" /> -->
             </el-table>
         </div>
         <div class="pagination-block">
@@ -135,11 +128,13 @@
                     <!-- <el-header>
                     </el-header> -->
                     <div class="problem-content">
-                        <pre style="white-space:pre;white-space:pre-wrap;">{{ selectedProblem?.content }}</pre>
+                        <pre style="font-weight:bold;white-space:pre;white-space:pre-wrap;">{{ selectedProblem?.content }}
+                    </pre>
                     </div>
                     <el-main>
                         <div class="problemlist-content">
-                            <el-table :data="loadCurrentProblemList()" :row-class-name="rowClassName" height=290px>
+                            <el-table :data="loadCurrentProblemList()" :row-class-name="rowClassName"
+                                v-loading="problemLoading" height=290px>
                                 <el-table-column fixed prop="title" label="题目" width="120px" />
                                 <el-table-column prop="subjectName" label="知识点" width="100px" />
                                 <el-table-column prop="typeName" label="题型" width="60px" />
@@ -147,13 +142,16 @@
                                 <el-table-column prop="score" label="分值" width="60px">
                                     <template #default="scope">
                                         <!-- scope.row.score -->
-                                        <el-input v-model="selectedProblemScoreMap[scope.row.problemId]" size="small" placeholder="" />
+                                        <el-input v-model="selectedProblemScoreMap[scope.row.problemId]" size="small"
+                                            placeholder="" />
                                     </template>
-                                </el-table-column>                                                              
+                                </el-table-column>
                                 <el-table-column label="" width="">
                                     <template #default="scope">
-                                        <el-button size="small"
-                                            @click="selectProblemWithId(scope.row.problemId)">选择</el-button>
+                                        <el-button size="small" :type="selectedProblemIdList.includes(scope.row.problemId) ? 'danger' : 'success'"
+                                            @click="selectProblemWithId(scope.row.problemId)">
+                                            {{ selectedProblemIdList.includes(scope.row.problemId) ? '移除' : '选择'}}
+                                        </el-button>
                                     </template>
                                 </el-table-column>
                             </el-table>
@@ -163,7 +161,7 @@
                         <div class="problemlist-pagination">
                             <el-pagination background @current-change="handleCurrentChange"
                                 @size-change="handleSizeChange" :current-page="current" :page-size="size"
-                                :total=resultList.length layout="prev, pager, next" />
+                                :total=problemResultList.length layout="prev, pager, next" />
                         </div>
                     </el-footer>
                 </el-container>
@@ -196,7 +194,7 @@
                     </div>
 
                     <div class="edit-confirm">
-                        <el-button v-if="!createNew" type="danger" size="large" @click="confirmDelete=true;">
+                        <el-button v-if="!createNew" type="danger" size="large" @click="confirmDelete = true;">
                             删除
                         </el-button>
                         <el-button :type="createNew ? 'success' : 'primary'" size="large"
@@ -212,7 +210,8 @@
         </div>
     </el-dialog>
 
-    <el-dialog v-model="confirmDelete" title="确认删除试卷？该操作无法撤销" width="400px" overflow :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-dialog v-model="confirmDelete" title="确认删除试卷？该操作无法撤销" width="400px" overflow :close-on-click-modal="false"
+        :close-on-press-escape="false">
         <template #footer>
             <div class="dialog-footer">
                 <el-button type="info" @click="confirmDelete = false">取消</el-button>
@@ -227,7 +226,7 @@
 <script setup lang="ts">
 import { defineComponent } from "vue";
 //分页
-import { ref,watch } from 'vue'
+import { ref, watch } from 'vue'
 import { getPagination, LENGTH } from '../../scripts/paginate'
 import '@/assets/table.css'
 //request
@@ -394,6 +393,7 @@ async function fetchProblemSets(pageNum?: number, pageLimit?: number, msg?: Obje
 }
 onMounted(() => {
     fetchProblemSets();
+    setTimeout(() => { handleProblemSetList(); problemSetLoading.value = false; }, 700);
 });
 //request
 var entryNum = ref(0);
@@ -421,7 +421,7 @@ function pagination(val: number) { //分页
 const component = defineComponent({
     name: "ProblemSetManagement"
 })
-
+//搜索
 interface ProblemSetInfo {
     problemSetId?: string;
     title?: string;
@@ -434,9 +434,10 @@ interface ProblemSetInfo {
     duration?: number;
     problemScoreMap?: Record<string, number>
 }
+const problemSetList: Ref<ProblemSetInfo[]> = ref([]);
+const problemSetResultList: Ref<ProblemSetInfo[]> = ref([]);
 function handleProblemSetList() { //处理起止时间和时限的显示格式
-    const problemList: ProblemSetInfo[] = [];
-    for (let i in queryData.value) {
+    for (var i in queryData.value) {
         const temp: ProblemSetInfo = {
             problemSetId: "",
             title: "",
@@ -475,16 +476,22 @@ function handleProblemSetList() { //处理起止时间和时限的显示格式
             }
             temp.duration = queryData.value[i].duration ?? 0;
         }
-        if(queryData.value[i].problemScoreMap){
+        if (queryData.value[i].problemScoreMap) {
             temp.problemScoreMap = queryData.value[i].problemScoreMap;
         }
-        
-        problemList.push(temp);
+        problemSetList.value.push(temp);
     }
-
-    return problemList;
+    problemSetResultList.value = problemSetList.value;
 }
-
+const searchProblemSetTitle = ref('');
+function searchProblemSets() {
+    problemSetResultList.value = [];
+    for (var i in problemSetList.value) {
+        if (searchProblemSetTitle && problemSetList.value[i].title?.includes(searchProblemSetTitle.value)) {
+            problemSetResultList.value.push(problemSetList.value[i]);
+        }
+    }
+}
 
 
 //编辑试卷题目
@@ -513,7 +520,7 @@ const searchTitle = ref('');
 const chosenType = ref('');
 const chosenSubject = ref('');
 const selected = ref(false); //是否只展示已选题目
-const resultList = ref<ProblemInfo[]>([]); //筛选并处理显示格式后的题目列表
+const problemResultList = ref<ProblemInfo[]>([]); //筛选并处理显示格式后的题目列表
 
 interface ProblemInfo {
     problemId?: string;
@@ -545,10 +552,15 @@ const rowClassName = ({ rowIndex }: { rowIndex: number }) => { //题目的行样
     var currentList = loadCurrentProblemList();
     // console.log('行编号:',rowIndex,'题目id:',currentList[rowIndex].problemId);
     if (selectedProblemIdList.value && currentList[rowIndex] && selectedProblemIdList.value.includes(currentList[rowIndex].problemId ?? '')) {
-        return 'selected-row';
-    } else {
-        return 'unselected-row';
+        if (selectedProblem.value?.problemId === currentList[rowIndex].problemId) {
+            return 'selected-row selecting-row';
+        } else {
+            return 'selected-row'
+        }
+    } else if (selectedProblem.value?.problemId === currentList[rowIndex].problemId) {
+        return 'selecting-row';
     }
+
 };
 function createProblemSet() { //创建新试卷
     clearEdit();
@@ -570,10 +582,10 @@ function editProblemSet(id: string) { //打开试卷修改窗口
             editHour.value = hour;
             editMin.value = min;
         }
-        if (currentSet.startTime && currentSet.startTime>new Date(0)) { //有效开始时间大于最小值
+        if (currentSet.startTime && currentSet.startTime > new Date(0)) { //有效开始时间大于最小值
             editStartTime.value = currentSet.startTime;
         }
-        if (currentSet.endTime && currentSet.endTime<new Date('2077-12-31T23:59:59')) { ////有效截止时间小于最大值
+        if (currentSet.endTime && currentSet.endTime < new Date('2077-12-31T23:59:59')) { ////有效截止时间小于最大值
             editEndTime.value = currentSet.endTime;
         }
         selectedProblemIdList.value = currentSet.problemIdList ?? [];
@@ -607,7 +619,7 @@ async function submitCreate() { //提交创建
                 desc: editDesc.value,
                 startTime: editStartTime.value ?? new Date(0),
                 endTime: editEndTime.value ?? new Date('2077-12-31T23:59:59'),
-                duration: (editHour.value ?? 0)  * 60 * 60 * 1000 + (editMin.value ?? 0) * 60 * 1000,
+                duration: (editHour.value ?? 0) * 60 * 60 * 1000 + (editMin.value ?? 0) * 60 * 1000,
                 problemIdList: selectedProblemIdList.value,
                 problemScoreMap: selectedProblemScoreMap.value
             },
@@ -627,8 +639,8 @@ async function submitCreate() { //提交创建
     }
 }
 async function submitEdit() { //提交修改
-    try {           
-        // for (var res of resultList.value) {
+    try {
+        // for (var res of problemResultList.value) {
         //     if (res.problemId && selectedProblemScoreMap.value[res.problemId] && selectedProblemScoreMap.value.hasOwnProperty(res.problemId)) {
         //         selectedProblemScoreMap.value[res.problemId] = res.score??0;
         //     }
@@ -641,12 +653,12 @@ async function submitEdit() { //提交修改
         }
         for (var index in selectedProblemIdList.value) { //未赋分时分值自动为0
             var id = selectedProblemIdList.value[index];
-            if(!selectedProblemScoreMap.value.hasOwnProperty(id)){
+            if (!selectedProblemScoreMap.value.hasOwnProperty(id)) {
                 // console.log('这道题还没赋分捏:',id,selectedProblemIdList.value[id]);
                 selectedProblemScoreMap.value[id] = 0;
             }
         }
-        console.log('selectedProblemScoreMap:',selectedProblemScoreMap.value);
+        console.log('selectedProblemScoreMap:', selectedProblemScoreMap.value);
 
         const request: ProblemSetUpdateRequest = {
             problemSet: {
@@ -674,7 +686,7 @@ async function submitEdit() { //提交修改
         console.error('Error updating problemSet:', error);
     }
 }
-async function submitDelete(){ //删除试卷
+async function submitDelete() { //删除试卷
     try {
         const request: ProblemSetUpdateRequest = {
             problemSet: {
@@ -689,7 +701,7 @@ async function submitDelete(){ //删除试卷
         else {
             throwMessage('delete success');
             console.log('删除试卷成功:', response);
-            setTimeout(() => { backToHome();confirmDelete.value=false;dialogVisible.value=false; }, 500);
+            setTimeout(() => { backToHome(); confirmDelete.value = false; dialogVisible.value = false; }, 500);
         }
     } catch (error) {
         console.error('Error deleting problemSet:', error);
@@ -714,12 +726,12 @@ async function fetchProblems() {
                 console.error('No data returned from the API');
             }
         }
-        setTimeout(() => {
-            resultList.value = JSON.parse(JSON.stringify(problemList.value));
-            searchProblems();
-            selectedProblem.value = resultList.value[0];
-            selectedIndex.value = 0;
-        }, 100);
+        // setTimeout(() => {
+        //     problemResultList.value = JSON.parse(JSON.stringify(problemList.value));
+        //     searchProblems();
+        //     selectedProblem.value = problemResultList.value[0];
+        //     selectedIndex.value = 0;
+        // }, 100);
 
     } catch (error) {
         console.error('Error fetching problems:', error);
@@ -755,40 +767,47 @@ async function fetchDiseases() {
 onMounted(async () => {
     await fetchDiseases();
     await fetchProblems();
+    setTimeout(() => {
+        problemResultList.value = JSON.parse(JSON.stringify(problemList.value));
+        searchProblems();
+        selectedProblem.value = problemResultList.value[0];
+        selectedIndex.value = 0;
+        problemLoading.value = false;
+    }, 200);
 })
 
 
 
 function searchProblems() {
-    resultList.value.splice(0, resultList.value.length);
+    problemResultList.value.splice(0, problemResultList.value.length);
     // console.log("当前试卷选题:",selectedProblemIdList);
     for (var i in problemList.value) {
         var pro = problemList.value[i];
         if (pro.type == chosenType.value && pro.subjectId == chosenSubject.value || pro.type == chosenType.value && !chosenSubject.value || !chosenType.value && pro.subjectId == chosenSubject.value || !chosenType.value && !chosenSubject.value) {
             if (!selected.value || selectedProblemIdList.value && pro.problemId && selectedProblemIdList.value && selectedProblemIdList.value.includes(pro.problemId)) {
-                resultList.value.push(problemList.value[i]);
+                problemResultList.value.push(problemList.value[i]);
             }
         }
     }
-    for (var res of resultList.value) {
+    for (var res of problemResultList.value) {
         res.subjectName = diseaseList.value.find(dis => dis.diseaseId === res.subjectId)?.name;
         if (res.type === 'subjective') {
             res.typeName = '简答';
         } else if (res.type === 'objective') {
             res.typeName = '单选';
         }
-        if(res.problemId){
-            res.score = selectedProblemScoreMap.value[res.problemId]??0;
-        } 
+        if (res.problemId) {
+            res.score = selectedProblemScoreMap.value[res.problemId] ?? 0;
+        }
     }
-    if (resultList.value[0]) {
-        selectedProblem.value = resultList.value[0];
+    if (problemResultList.value[0]) {
+        selectedProblem.value = problemResultList.value[0];
         selectedIndex.value = 0;
     } else {
         selectedProblem.value = undefined;
         selectedIndex.value = undefined;
     }
-    // console.log("resultList:", resultList.value);
+    // console.log("problemResultList:", problemResultList.value);
 }
 watch(selected, () => {
     searchProblems();
@@ -800,10 +819,10 @@ function clearConditions() { //情空题目筛选条件
     searchProblems();
 }
 function selectProblemWithId(id: string) { //从试卷添加or移除题目
-    var temp = resultList.value.find(pro => pro.problemId === id);
+    var temp = problemResultList.value.find(pro => pro.problemId === id);
     if (temp != null) {
         selectedProblem.value = temp;
-        selectedIndex.value = resultList.value.indexOf(temp);
+        selectedIndex.value = problemResultList.value.indexOf(temp);
     }
 
     if (!selectedProblemIdList.value.includes(id)) { //添加
@@ -823,6 +842,10 @@ function selectProblemWithId(id: string) { //从试卷添加or移除题目
 //     }
 // }
 
+
+//加载动画
+const problemSetLoading = ref(true);
+const problemLoading = ref(true);
 //前端分页处理
 var current = ref(1);
 var size = ref(10);
@@ -834,10 +857,10 @@ function handleSizeChange(n: number) {
 }
 function loadCurrentProblemList() {
     var currentList: ProblemInfo[] = [];
-    for (var i in resultList.value) {
-        var index = resultList.value.indexOf(resultList.value[i])
+    for (var i in problemResultList.value) {
+        var index = problemResultList.value.indexOf(problemResultList.value[i])
         if (index >= current.value * 10 - 10 && index < current.value * 10) {
-            currentList.push(resultList.value[i]);
+            currentList.push(problemResultList.value[i]);
         }
     }
     return currentList;
@@ -918,12 +941,6 @@ function loadCurrentProblemList() {
     min-height: 280px;
 }
 
-// .selected-row{
-//     background-color: rgba(173, 216, 230, 0.3) !important;
-// }
-// .unselected-row{
-
-// }
 .problemlist-pagination {
     text-align: center;
     display: flex;
@@ -960,7 +977,9 @@ function loadCurrentProblemList() {
     background-color: rgba(173, 216, 230, 0.3) !important;
 }
 
-.unselected-row {}
+.selecting-row {
+    font-weight: bold;
+}
 </style>
 
 ../../scripts/data.js../../scripts/paginate.js

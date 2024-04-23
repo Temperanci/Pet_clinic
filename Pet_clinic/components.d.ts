@@ -40,7 +40,6 @@ declare module 'vue' {
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
     ElHeader: typeof import('element-plus/es')['ElHeader']
     ElIcon: typeof import('element-plus/es')['ElIcon']
-    ElImage: typeof import('element-plus/es')['ElImage']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElMain: typeof import('element-plus/es')['ElMain']
     ElMenu: typeof import('element-plus/es')['ElMenu']
@@ -81,5 +80,8 @@ declare module 'vue' {
     TestRecord: typeof import('./src/components/testpage/TestRecord.vue')['default']
     TestRecordManagement: typeof import('./src/components/background/TestRecordManagement.vue')['default']
     VaccineManagement: typeof import('./src/components/background/VaccineManagement.vue')['default']
+  }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }
