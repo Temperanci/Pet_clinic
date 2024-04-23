@@ -2,7 +2,7 @@
     <el-container>
         <el-main>
             <div class="problemset-content">
-                <el-table :data="loadCurrentList()" border>
+                <el-table :data="loadCurrentList()" border :row-class-name="rowClassName">
                     <!-- <el-table-column prop="problemSetId" label="id" width="" /> -->
                     <el-table-column prop="title" label="名称" width="300px" />
                     <el-table-column prop="desc" label="描述" width="" />
@@ -12,10 +12,15 @@
                     <el-table-column label="" width="100px">
                         <template #default="scope">
                             <el-button v-if="!scope.row.submitted" size="small"
-                                @click="handleEnterTest(scope.row.problemSetId, scope.row.title, scope.row.startTime, scope.row.endTime, scope.row.duration)">进入测试</el-button>
-                            <el-button v-else-if="scope.row.status === 'judging'" size="small"
-                                type="warning" @click="watingDialog=true;">批卷中…</el-button>
-                            <el-button v-else size="small" type="danger" @click="enterTestRecord(scope.row.problemSetId)">查看成绩</el-button>
+                                @click="handleEnterTest(scope.row.problemSetId, scope.row.title, scope.row.startTime, scope.row.endTime, scope.row.duration)">
+                                <span v-if="new Date() > new Date(scope.row.endTime)">已截止</span>
+                                <span v-else-if="new Date() < new Date(scope.row.startTime)">未开始</span>
+                                <span v-else>进入测试</span>
+                            </el-button>
+                            <el-button v-else-if="scope.row.status === 'judging'" size="small" type="warning"
+                                @click="watingDialog = true;">批卷中…</el-button>
+                            <el-button v-else size="small" type="danger"
+                                @click="enterTestRecord(scope.row.problemSetId)">查看成绩</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -157,12 +162,12 @@ function handleProblemSetList() {
         temp.title = problemSetList.value[i].title ?? "";
         temp.desc = problemSetList.value[i].desc ?? "";
         if (problemSetList.value[i].startTime && new Date(problemSetList.value[i].startTime) > new Date(0)) {
-            temp.startTime = new Date(problemSetList.value[i].startTime??0);
+            temp.startTime = new Date(problemSetList.value[i].startTime ?? 0);
             temp.startTimeStr = temp.startTime.getFullYear() + '-' + (temp.startTime.getMonth() + 1) + '-' + temp.startTime.getDate() + ' ' + temp.startTime.getHours().toString().padStart(2, '0') + ':' + temp.startTime.getMinutes().toString().padStart(2, '0');
             // temp.startTimeStr = problemSetList.value[i].startTime?.toString().slice(0, 10) + ' ' + problemSetList.value[i].startTime?.toString().slice(11, 16);
         }
         if (problemSetList.value[i].endTime && new Date(problemSetList.value[i].endTime) < new Date('2077-12-31T23:59:59')) {
-            temp.endTime = new Date(problemSetList.value[i].endTime??'2077-12-31T23:59:59');
+            temp.endTime = new Date(problemSetList.value[i].endTime ?? '2077-12-31T23:59:59');
             temp.endTimeStr = temp.endTime.getFullYear() + '-' + (temp.endTime.getMonth() + 1) + '-' + temp.endTime.getDate() + ' ' + temp.endTime.getHours().toString().padStart(2, '0') + ':' + temp.endTime.getMinutes().toString().padStart(2, '0');
             // temp.endTimeStr = problemSetList.value[i].endTime?.toString().slice(0, 10) + ' ' + problemSetList.value[i].endTime?.toString().slice(11, 16);;
         }
@@ -189,7 +194,15 @@ function handleProblemSetList() {
     }
     console.log('resultList:', resultList.value);
 }
-
+//试卷的行样式随选择情况更改
+const rowClassName = ({ rowIndex }: { rowIndex: number }) => {
+    var currentList = loadCurrentList();
+    if (currentList[rowIndex].startTime && currentList[rowIndex].startTime.getTime() > new Date().getTime()) {
+        return 'early-row'
+    } else if (currentList[rowIndex].endTime && currentList[rowIndex].endTime.getTime() < new Date().getTime()) {
+        return 'late-row'
+    }
+}
 
 
 // 进入测试
@@ -232,8 +245,8 @@ const enterTest = () => {
     emit('content', 'Test');
 }
 // 查看成绩
-function enterTestRecord(problemSetId: string){
-    emit('id',problemSetId);
+function enterTestRecord(problemSetId: string) {
+    emit('id', problemSetId);
     emit('content', 'TestRecord');
 }
 // 前端分页处理
@@ -269,5 +282,14 @@ function loadCurrentList() {
     text-align: center;
     display: flex;
     justify-content: center;
+}
+</style>
+<style lang="scss">
+.early-row {
+    background-color: rgba(173, 216, 230, 0.3) !important;
+}
+
+.late-row {
+    background-color: rgba(240, 128, 128, 0.2) !important;
 }
 </style>

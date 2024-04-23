@@ -2,13 +2,13 @@
   <div class="testrecord-layout">
     <el-container>
       <el-container width="80%">
+        <el-header style="display: flex; justify-content: center;">
+          <h3>{{ problemSet?.title }}</h3>
+          <!-- {{ new Date(userTestRecord?.submitTime??0) }} -->
+        </el-header>
         <el-main>
-          <el-header style="display: flex; justify-content: center;">
-            <h3>{{ problemSet?.title }}</h3>
-            <!-- {{ new Date(userTestRecord?.submitTime??0) }} -->
-          </el-header>
           <div class="probleminfo-content">
-            <el-table :data="loadCurrentList()" border height="450px" style="overflow: auto;">
+            <el-table :data="loadCurrentList()" border height="400px" style="overflow: auto;">
               <el-table-column prop="problem.title" label="题目" width="90px" />
               <el-table-column prop="problem.content" label="内容" width="" />
               <el-table-column prop="subjectName" label="知识点" width="100px" />
@@ -37,8 +37,9 @@
         <div class="testrecord-info">
           <el-card>
             <h4>考试结果</h4>
-            <p :style="{ color: testRecordDetails.userScore / testRecordDetails.totalScore < 0.6 ? 'red' : 'black' }">分数：{{
-              testRecordDetails.userScore }} / {{ testRecordDetails.totalScore }}</p>
+            <p :style="{ color: testRecordDetails.userScore / testRecordDetails.totalScore < 0.6 ? 'red' : 'black' }">
+              分数：{{
+            testRecordDetails.userScore }} / {{ testRecordDetails.totalScore }}</p>
             <p>客观题正确数：{{ testRecordDetails.objCorrectNum }} / {{ testRecordDetails.objNum }}</p>
             <p>主观题得分率：{{ testRecordDetails.subUserScore }} / {{ testRecordDetails.subTotalScore }}</p>
             <h5>知识点掌握情况</h5>

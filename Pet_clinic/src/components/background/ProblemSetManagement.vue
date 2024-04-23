@@ -9,11 +9,11 @@
                 empty-text="来到了没有数据的荒原...">
                 <el-table-column prop="problemSetId" label="试卷编号">
                     <template #default="scope">
-                        <!-- <el-input v-if="searchBar[scope.$index]" v-model="edited[0].problemSetId"></el-input>
+                        <el-input v-if="searchBar[scope.$index]" v-model="edited[0].problemSetId"></el-input>
                         <el-input v-else-if="unwritableBar[scope.$index]" disabled
                             v-model="edited[scope.$index].problemSetId"></el-input>
-                        <span v-else>{{ scope.row.problemSetId }}</span> -->
-                        <span>{{ scope.row.problemSetId }}</span>
+                        <span v-else>{{ scope.row.problemSetId }}</span>
+                        <!-- <span>{{ scope.row.problemSetId }}</span> -->
                     </template>
                 </el-table-column>
                 <el-table-column prop="title" label="名称">
@@ -21,50 +21,46 @@
                         <el-input v-model="searchProblemSetTitle" placeholder="试卷名称"></el-input>
                     </template>
                     <template #default="scope">
-                        <!-- <el-input v-if="isSelected[scope.$index] === true"
+                        <el-input v-if="isSelected[scope.$index] === true"
                             v-model="edited[scope.$index].title"></el-input>
-                        <span v-else>{{ scope.row.title }}</span> -->
-                        <span>{{ scope.row.title }}</span>
+                        <span v-else>{{ scope.row.title }}</span>
+                        <!-- <span>{{ scope.row.title }}</span> -->
                     </template>
                 </el-table-column>
                 <el-table-column prop="desc" label="描述" width="200px">
                     <template #default="scope">
-                        <!-- <el-input v-if="isSelected[scope.$index] === true"
+                        <el-input v-if="isSelected[scope.$index] === true"
                             v-model="edited[scope.$index].desc"></el-input>
-                        <span v-else>{{ scope.row.desc }}</span> -->
-                        <span>{{ scope.row.desc }}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="" label="总分" width="80px">
-                    <template #default="scope">
-                        <!-- <el-input v-if="isSelected[scope.$index] === true"
-                            v-model="edited[scope.$index].desc"></el-input>
-                        <span v-else>{{ scope.row.totalScore }}</span> -->
-                        <span v-if="scope.row.totalScore>0">{{ scope.row.totalScore }}</span>
+                        <span v-else>{{ scope.row.desc }}</span>
+                        <!-- <span>{{ scope.row.desc }}</span> -->
                     </template>
                 </el-table-column>
                 <el-table-column prop="startTimeStr" label="开始时间">
                     <template #default="scope">
-                        <!-- <el-input v-if="searchBar[scope.$index]" disabled></el-input>
+                        <el-input v-if="searchBar[scope.$index]" disabled></el-input>
                         <el-input v-else-if="unwritableBar[scope.$index]" disabled
                             v-model="edited[scope.$index].startTime"></el-input>
-                        <span v-else>{{ scope.row.startTimeStr }}</span> -->
-                        <span>{{ scope.row.startTimeStr }}</span>
+                        <!-- <el-input v-else-if="isSelected[scope.$index] === true" disabled
+                            v-model="edited[scope.$index].startTime"></el-input> -->
+                        <span v-else>{{ scope.row.startTimeStr }}</span>
+                        <!-- <span>{{ scope.row.startTimeStr }}</span> -->
                     </template>
                 </el-table-column>
                 <el-table-column prop="endTimeStr" label="截止时间">
                     <template #default="scope">
-                        <!-- <el-input v-if="searchBar[scope.$index]" disabled></el-input>
-                        <span v-else>{{ scope.row.endTimeStr }}</span> -->
-                        <span>{{ scope.row.endTimeStr }}</span>
+                        <el-input v-if="searchBar[scope.$index]" disabled></el-input>
+                        <!-- <el-input v-else-if="isSelected[scope.$index] === true" disabled
+                            v-model="edited[scope.$index].endTime"></el-input> -->
+                        <span v-else>{{ scope.row.endTimeStr }}</span>
+                        <!-- <span>{{ scope.row.endTimeStr }}</span> -->
                     </template>
                 </el-table-column>
-                <el-table-column prop="durationStr" label="限时" width="100px">
+                <el-table-column prop="durationStr" label="限时">
                     <template #default="scope">
-                        <!-- <el-input v-if="isSelected[scope.$index] === true" disabled
+                        <el-input v-if="isSelected[scope.$index] === true" disabled
                             v-model="edited[scope.$index].duration"></el-input>
-                        <span v-else>{{ scope.row.durationStr }}</span> -->
-                        <span>{{ scope.row.durationStr }}</span>
+                        <span v-else>{{ scope.row.durationStr }}</span>
+                        <!-- <span>{{ scope.row.durationStr }}</span> -->
                     </template>
                 </el-table-column>
 
@@ -75,7 +71,7 @@
                     </template>
                     <template #default="scope">
                         <el-button type="primary" size=""
-                            @click="editProblemSet(scope.row.problemSetId);">编辑试卷</el-button>
+                            @click="editProblemSet(scope.row.problemSetId);">编辑</el-button>
                     </template>
                 </el-table-column>
                 <!-- <el-table-column prop="problemIdList" label="" width="100px">
@@ -413,7 +409,7 @@ function backToHome() {
 }
 function pagination(val: number) { //分页
     currentPage = val
-    if(!back.value){
+    if(val!=1){
     backToHome();
   }
     //恢复初始值
@@ -437,8 +433,7 @@ interface ProblemSetInfo {
     endTime?: Date;
     durationStr?: string;
     duration?: number;
-    problemScoreMap?: Record<string, number>;
-    totalScore?: number;
+    problemScoreMap?: Record<string, number>
 }
 const problemSetList: Ref<ProblemSetInfo[]> = ref<ProblemSetInfo[]>([]); //所有试卷
 const problemSetResultList: Ref<ProblemSetInfo[]> = ref<ProblemSetInfo[]>([]); //试卷查询结果
@@ -455,8 +450,7 @@ function handleProblemSetList() { //处理试卷信息的显示格式
             endTime: new Date('2077-12-31T23:59:59'),
             durationStr: "",
             duration: 0,
-            problemScoreMap: {},
-            totalScore: 0
+            problemScoreMap: {}
         };
         temp.problemSetId = queryData.value[i].problemSetId ?? "";
         temp.title = queryData.value[i].title ?? "";
@@ -488,12 +482,10 @@ function handleProblemSetList() { //处理试卷信息的显示格式
         }
         if (queryData.value[i].problemScoreMap) {
             temp.problemScoreMap = queryData.value[i].problemScoreMap;
-            temp.totalScore = temp.problemScoreMap?Object.values(temp.problemScoreMap).reduce((id, score) => id + score, 0):0; //计算试卷总分
         }
         problemSetList.value.push(temp);
     }
     problemSetResultList.value = problemSetList.value;
-    console.log('problemSetResultList:',problemSetResultList.value);
 }
 const searchProblemSetTitle = ref('');
 function searchProblemSets() { //查询试卷
@@ -572,7 +564,7 @@ const rowClassName = ({ rowIndex }: { rowIndex: number }) => { //题目的行样
         return 'selecting-row';
     }
 
-};
+}
 function createProblemSet() { //创建新试卷
     clearEdit();
     createNew.value = true;
@@ -816,7 +808,7 @@ function clearConditions() { //情空题目筛选条件
     searchTitle.value = '';
     chosenType.value = '';
     chosenSubject.value = '';
-    // searchProblems();
+    searchProblems();
 }
 function selectProblemWithId(id: string) { //从试卷添加or移除题目
     var temp = problemResultList.value.find(pro => pro.problemId === id);

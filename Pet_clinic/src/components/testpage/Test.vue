@@ -28,8 +28,8 @@
                 </el-main>
                 <el-footer>
                     <div class="test-button">
-                        <el-button @click="priorProblem()">上一题</el-button>
-                        <el-button @click="nextProblem()">下一题</el-button>
+                        <el-button @click="priorProblem()" :disabled="selectedIndex===0">上一题</el-button>
+                        <el-button @click="nextProblem()" :disabled="selectedIndex===problemList.length-1">下一题</el-button>
                     </div>
                 </el-footer>
             </el-container>
@@ -44,7 +44,7 @@
                 <div class="problem-table">
                     <div class="problem-number" v-for="(pro, index) in problemList">
                         <el-button style="width: 45px" @click="jumpProblem(index)" :style="{
-                        background: index === selectedIndex ? 'aqua' : (answer[index] !== undefined && answer[index] !== '' ? 'aquamarine' : '')
+                        background: index === selectedIndex ? '#b46cf577' : (answer[index] !== undefined && answer[index] !== '' ? '#7fffd466' : '')
                     }">
                             {{ index + 1 }}
                         </el-button>
