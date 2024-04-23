@@ -1,37 +1,59 @@
 <template>
+  <div class="testrecord-layout">
+    <el-container>
+      <el-container width="80%">
+        <el-main>
+          <el-header style="display: flex; justify-content: center;">
+            <h3>{{ problemSet?.title }}</h3>
+            <!-- {{ new Date(userTestRecord?.submitTime??0) }} -->
+          </el-header>
+          <div class="probleminfo-content">
+            <el-table :data="loadCurrentList()" border height="450px" style="overflow: auto;">
+              <el-table-column prop="problem.title" label="题目" width="90px" />
+              <el-table-column prop="problem.content" label="内容" width="" />
+              <el-table-column prop="subjectName" label="知识点" width="100px" />
+              <!-- <el-table-column prop="typeName" label="题型" width="" /> -->
+              <el-table-column prop="problem.answer" label="参考答案" width="200px" />
+              <el-table-column prop="userAnswer" label="考生答案" width="200px" />
+              <el-table-column prop="ratio" label="得分" width="90px" />
+              <el-table-column prop="reason" label="评分理由" width="300px" />
 
-
-  <el-container>
-    <el-main>
-      <div class="probleminfo-content">
-        <el-table :data="problemInfoList" border>
-          <el-table-column prop="problem.title" label="题目" width="" />
-          <el-table-column prop="problem.content" label="内容" width="" />
-          <el-table-column prop="subjectName" label="知识点" width="" />
-          <el-table-column prop="typeName" label="题型" width="" />
-          <!-- <el-table-column prop="problem.answer" label="参考答案" width="" /> -->
-          <el-table-column prop="userAnswer" label="考生答案" width="" />
-          <el-table-column prop="score" label="分值" width="" />
-
-          <el-table-column prop="grade" label="得分" width="" />
-          <!-- <el-table-column prop="reason" label="评分理由" width="" /> -->
-          
-          <!-- <el-table-column label="" width="100px">
+              <!-- <el-table-column label="" width="100px">
             <template #default="scope">
               <el-button size="small" @click="console.log()">查看详情</el-button>
             </template>
-          </el-table-column> -->
-        </el-table>
-      </div>
-    </el-main>
-    <el-footer>
-      <div class="probleminfo-pagination">
-        <el-pagination background @current-change="handleCurrentChange" @size-change="handleSizeChange"
-          :current-page="current" :page-size="size" :total=problemInfoList.length layout="prev, pager, next" />
-      </div>
-    </el-footer>
-  </el-container>
-
+</el-table-column> -->
+            </el-table>
+          </div>
+        </el-main>
+        <el-footer>
+          <div class="probleminfo-pagination">
+            <el-pagination background @current-change="handleCurrentChange" @size-change="handleSizeChange"
+              :current-page="current" :page-size="size" :total=problemInfoList.length layout="prev, pager, next" />
+          </div>
+        </el-footer>
+      </el-container>
+      <el-aside width="20%">
+        <div class="testrecord-info">
+          <el-card>
+            <h4>考试结果</h4>
+            <p :style="{ color: testRecordInfo.userScore / testRecordInfo.totalScore < 0.6 ? 'red' : 'black' }">分数：{{
+              testRecordInfo.userScore }} / {{ testRecordInfo.totalScore }}</p>
+            <p>客观题正确数：{{ testRecordInfo.objCorrectNum }} / {{ testRecordInfo.objNum }}</p>
+            <p>主观题得分率：{{ testRecordInfo.subUserScore }} / {{ testRecordInfo.subTotalScore }}</p>
+            <h5>知识点掌握情况</h5>
+            <div class="disease-score">
+              <ul>
+                <li v-for="(score, name) in testRecordInfo.diseaseTotalScore" :key="name">
+                  <p>{{ name }}：{{ testRecordInfo.diseaseUserScore[name] }} / {{ score }}</p>
+                </li>
+              </ul>
+            </div>
+          </el-card>
+        </div>
+      </el-aside>
+    </el-container>
+  </div>
 
 </template>
 
@@ -99,6 +121,24 @@ async function fetchProblemSet() { //获取试卷
     console.error('获取试卷失败！', error);
   }
 }
+
+const testRecordInfo = ref({
+  totalScore: 0, //试卷总分
+  userScore: 0, //考生分数
+  rank: 0, //排名
+  diseaseTotalScore: {} as Record<string, number>, //病种知识点-->总分
+  diseaseUserScore: {} as Record<string, number>, //病种知识点-->得分
+  diseaseRatio: {} as Record<string, number>, //病种知识点-->得分率
+  objNum: 0, //客观题数量
+  objCorrectNum: 0, //客观题正确数
+  subNum: 0, //主观题数量
+  subTotalScore: 0, //主观题总分
+  subUserScore: 0, //主观题得分
+  subCorrectRatio: 0 //主观题得分率
+
+})
+
+
 interface ProblemInfo {
   problem?: ProblemBO;
   // problemId?: string;
@@ -114,13 +154,12 @@ interface ProblemInfo {
   score?: number //题目分值
   userAnswer?: string; //考生答案
   grade?: number; //考生得分
+  ratio?: string;
   reason?: string //主观题批分理由
 }
 const problemInfoList = ref<ProblemInfo[]>([]);
 async function fetchProblemInfo() { //获取试卷题目及答题情况
   try {
-    // console.log('试卷:',problemSet.value);
-    // console.log('试卷题目:',problemSet.value?.problemIdList);
     const idList = problemSet.value?.problemIdList;
     const scoreMap = problemSet.value?.problemScoreMap;
     const answerMap = userTestRecord.value?.answerMap;
@@ -131,22 +170,56 @@ async function fetchProblemInfo() { //获取试卷题目及答题情况
       const temp = problemResponse.data.datas[0];
       const info: ProblemInfo = {
         problem: temp,
-
       };
       temp.content = (temp.content ?? '').replace(/(A\.|B\.|C\.|D\.)/g, '\n$1'); //单选题选项换行
       info.problem = temp;
-      info.typeName = temp === 'subjective' ? '主观题' : '客观题';
-      info.subjectName = diseaseList.value.find(dis => dis.diseaseId === info.problem?.subjectId)?.name;
       info.score = scoreMap?.[temp.problemId];
       info.userAnswer = answerMap?.[temp.problemId];
-      info.grade = (gradeMap?.[temp.problemId].scores ?? 0) * (info.score ?? 0) / 10;
+      info.grade = gradeMap?.[temp.problemId].scores ?? 0;
+      if (info.score) {
+        info.ratio = (info.grade ?? 0) + ' / ' + info.score;
+      }
+      // info.grade = Math.floor((gradeMap?.[temp.problemId].scores ?? 0) * (info.score ?? 0) / 10);
       info.reason = gradeMap?.[temp.problemId].reason;
 
-      console.log('题目信息:', info);
+      //统计题型得分情况
+      if (temp.type === 'subjective') {
+        info.typeName = '简答'
+        testRecordInfo.value.subNum++;
+        testRecordInfo.value.subTotalScore += info.score ?? 0;
+        testRecordInfo.value.subUserScore += info.grade ?? 0;
+      } else {
+        info.typeName = '单选'
+        testRecordInfo.value.objNum++;
+        if (info.userAnswer === info.problem?.answer) {
+          testRecordInfo.value.objCorrectNum++;
+        }
+      }
+
+      //统计病种得分情况
+      info.subjectName = diseaseList.value.find(dis => dis.diseaseId === info.problem?.subjectId)?.name;
+      if (info.subjectName && testRecordInfo.value.diseaseTotalScore[info.subjectName]) {
+        testRecordInfo.value.diseaseTotalScore[info.subjectName] += info.score ?? 0;
+      } else if (info.subjectName) {
+        testRecordInfo.value.diseaseTotalScore[info.subjectName] = info.score ?? 0;
+      }
+      if (info.subjectName && testRecordInfo.value.diseaseUserScore[info.subjectName]) {
+        testRecordInfo.value.diseaseUserScore[info.subjectName] += info.grade ?? 0;
+      } else if (info.subjectName) {
+        testRecordInfo.value.diseaseUserScore[info.subjectName] = info.grade ?? 0;
+      }
+
+      testRecordInfo.value.totalScore += info.score ?? 0; //计算试卷总分
+      testRecordInfo.value.userScore += info.grade ?? 0; //计算用户得分
+
+      // console.log('答题信息:', info);
       problemInfoList.value.push(info);
     })
 
-    // setTimeout(() => { jumpProblem(selectedIndex.value); }, 1000);
+    setTimeout(() => {
+      // testRecordInfo.value.subCorrectRatio = Number((testRecordInfo.value.subUserScore / testRecordInfo.value.subTotalScore).toFixed(2));
+      console.log('考试情况:', testRecordInfo.value);
+    }, 5000);
   } catch (error) {
     console.error('获取答题信息失败！', error);
   }
@@ -175,14 +248,10 @@ onMounted(async () => {
   await fetchProblemSet();
   await fetchUserTestRecord();
   await fetchDiseases();
-  // await fetchProblemInfo();
   setTimeout(() => {
     fetchProblemInfo();
   }, 200)
 });
-
-
-
 
 
 
@@ -197,28 +266,46 @@ function handleCurrentChange(n: number) {
 function handleSizeChange(n: number) {
   size.value = n;
 }
-// function loadCurrentList() {
-//     var currentList: any[] = [];
-//     for (var i in queryData.value) {
-//         var index = queryData.value.indexOf(queryData.value[i])
-//         if (index >= current.value * 10 - 10 && index < current.value * 10) {
-//             currentList.push(queryData.value[i]);
-//         }
-//     }
-//     return currentList;
-// }
+function loadCurrentList() {
+  var currentList: any[] = [];
+  for (var i in problemInfoList.value) {
+    var index = problemInfoList.value.indexOf(problemInfoList.value[i])
+    if (index >= current.value * 10 - 10 && index < current.value * 10) {
+      currentList.push(problemInfoList.value[i]);
+    }
+  }
+  return currentList;
+}
 
 </script>
 
 <style scoped lang="scss">
+.testrecord-layout {}
+
 .probleminfo-content {
-    min-height: 500px;
-    max-height: 500px;
-    padding: 10px 50px;
+  min-height: 500px;
+  max-height: 500px;
+  // padding: 10px;
+  // margin: 10px 0;
 }
+
 .probleminfo-pagination {
-    text-align: center;
-    display: flex;
-    justify-content: center;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
+
+.testrecord-info {
+  display: flex;
+  margin: 50px 10px;
+  // padding: 10px 5px;
+  min-height: 450px;
+  max-height: 450px;
+}
+
+.testrecord-info .disease-score {
+  overflow: scroll;
+  min-height: 200px;
+  max-height: 200px;
 }
 </style>

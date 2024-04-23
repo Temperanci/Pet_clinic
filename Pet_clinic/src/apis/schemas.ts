@@ -117,3 +117,8 @@ export interface GradeResultBO{
     scores?: number;
     reason?: string;
 }
+
+export interface AiTutorBO{
+    question?: string;
+    responce: string;
+}
