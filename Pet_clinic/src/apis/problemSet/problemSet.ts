@@ -21,7 +21,7 @@ const temp = {
 export async function pageNoQuery(pageNo:number){ //前端分页用的
     try {
         temp.currPageNo=pageNo;
-        const response = await axios.post(`${API_BASE_URL}/problemSet/pageQuery`, problemSet);
+        const response = await axios.post(`${API_BASE_URL}/problemSet/pageQuery`, temp);
         return response.data;
     } catch (error) {
         console.error('Error occurred during the pageSet query:', error);

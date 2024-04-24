@@ -2,13 +2,13 @@
   <div class="testrecord-layout">
     <el-container>
       <el-container width="80%">
+        <el-header style="display: flex; justify-content: center;">
+          <h3>{{ problemSet?.title }}</h3>
+          <!-- {{ new Date(userTestRecord?.submitTime??0) }} -->
+        </el-header>
         <el-main>
-          <el-header style="display: flex; justify-content: center;">
-            <h3>{{ problemSet?.title }}</h3>
-            <!-- {{ new Date(userTestRecord?.submitTime??0) }} -->
-          </el-header>
           <div class="probleminfo-content">
-            <el-table :data="loadCurrentList()" border height="450px" style="overflow: auto;">
+            <el-table :data="loadCurrentList()" border height="490px" style="overflow: auto;">
               <el-table-column prop="problem.title" label="题目" width="90px" />
               <el-table-column prop="problem.content" label="内容" width="" />
               <el-table-column prop="subjectName" label="知识点" width="100px" />
@@ -37,15 +37,16 @@
         <div class="testrecord-info">
           <el-card>
             <h4>考试结果</h4>
-            <p :style="{ color: testRecordInfo.userScore / testRecordInfo.totalScore < 0.6 ? 'red' : 'black' }">分数：{{
-              testRecordInfo.userScore }} / {{ testRecordInfo.totalScore }}</p>
-            <p>客观题正确数：{{ testRecordInfo.objCorrectNum }} / {{ testRecordInfo.objNum }}</p>
-            <p>主观题得分率：{{ testRecordInfo.subUserScore }} / {{ testRecordInfo.subTotalScore }}</p>
+            <p :style="{ color: testRecordDetails.userScore / testRecordDetails.totalScore < 0.6 ? 'red' : 'black' }">
+              分数：{{
+            testRecordDetails.userScore }} / {{ testRecordDetails.totalScore }}</p>
+            <p>客观题正确数：{{ testRecordDetails.objCorrectNum }} / {{ testRecordDetails.objNum }}</p>
+            <p>主观题得分率：{{ testRecordDetails.subUserScore }} / {{ testRecordDetails.subTotalScore }}</p>
             <h5>知识点掌握情况</h5>
             <div class="disease-score">
               <ul>
-                <li v-for="(score, name) in testRecordInfo.diseaseTotalScore" :key="name">
-                  <p>{{ name }}：{{ testRecordInfo.diseaseUserScore[name] }} / {{ score }}</p>
+                <li v-for="(score, name) in testRecordDetails.diseaseTotalScore" :key="name">
+                  <p>{{ name }}：{{ testRecordDetails.diseaseUserScore[name] }} / {{ score }}</p>
                 </li>
               </ul>
             </div>
@@ -122,7 +123,7 @@ async function fetchProblemSet() { //获取试卷
   }
 }
 
-const testRecordInfo = ref({
+const testRecordDetails = ref({
   totalScore: 0, //试卷总分
   userScore: 0, //考生分数
   rank: 0, //排名
@@ -175,51 +176,50 @@ async function fetchProblemInfo() { //获取试卷题目及答题情况
       info.problem = temp;
       info.score = scoreMap?.[temp.problemId];
       info.userAnswer = answerMap?.[temp.problemId];
-      info.grade = gradeMap?.[temp.problemId].scores ?? 0;
+      // info.grade = gradeMap?.[temp.problemId].scores ?? 0;
+      info.grade = Math.floor((gradeMap?.[temp.problemId].scores ?? 0) * (info.score ?? 0) / 10); //分数换算
+      info.reason = gradeMap?.[temp.problemId].reason;
       if (info.score) {
         info.ratio = (info.grade ?? 0) + ' / ' + info.score;
       }
-      // info.grade = Math.floor((gradeMap?.[temp.problemId].scores ?? 0) * (info.score ?? 0) / 10);
-      info.reason = gradeMap?.[temp.problemId].reason;
 
       //统计题型得分情况
       if (temp.type === 'subjective') {
         info.typeName = '简答'
-        testRecordInfo.value.subNum++;
-        testRecordInfo.value.subTotalScore += info.score ?? 0;
-        testRecordInfo.value.subUserScore += info.grade ?? 0;
+        testRecordDetails.value.subNum++;
+        testRecordDetails.value.subTotalScore += info.score ?? 0;
+        testRecordDetails.value.subUserScore += info.grade ?? 0;
       } else {
         info.typeName = '单选'
-        testRecordInfo.value.objNum++;
+        testRecordDetails.value.objNum++;
         if (info.userAnswer === info.problem?.answer) {
-          testRecordInfo.value.objCorrectNum++;
+          testRecordDetails.value.objCorrectNum++;
         }
       }
 
       //统计病种得分情况
       info.subjectName = diseaseList.value.find(dis => dis.diseaseId === info.problem?.subjectId)?.name;
-      if (info.subjectName && testRecordInfo.value.diseaseTotalScore[info.subjectName]) {
-        testRecordInfo.value.diseaseTotalScore[info.subjectName] += info.score ?? 0;
+      if (info.subjectName && testRecordDetails.value.diseaseTotalScore[info.subjectName]) {
+        testRecordDetails.value.diseaseTotalScore[info.subjectName] += info.score ?? 0;
       } else if (info.subjectName) {
-        testRecordInfo.value.diseaseTotalScore[info.subjectName] = info.score ?? 0;
+        testRecordDetails.value.diseaseTotalScore[info.subjectName] = info.score ?? 0;
       }
-      if (info.subjectName && testRecordInfo.value.diseaseUserScore[info.subjectName]) {
-        testRecordInfo.value.diseaseUserScore[info.subjectName] += info.grade ?? 0;
+      if (info.subjectName && testRecordDetails.value.diseaseUserScore[info.subjectName]) {
+        testRecordDetails.value.diseaseUserScore[info.subjectName] += info.grade ?? 0;
       } else if (info.subjectName) {
-        testRecordInfo.value.diseaseUserScore[info.subjectName] = info.grade ?? 0;
+        testRecordDetails.value.diseaseUserScore[info.subjectName] = info.grade ?? 0;
       }
 
-      testRecordInfo.value.totalScore += info.score ?? 0; //计算试卷总分
-      testRecordInfo.value.userScore += info.grade ?? 0; //计算用户得分
+      testRecordDetails.value.totalScore += info.score ?? 0; //计算试卷总分
+      testRecordDetails.value.userScore += info.grade ?? 0; //计算用户得分
 
       // console.log('答题信息:', info);
       problemInfoList.value.push(info);
     })
 
-    setTimeout(() => {
-      // testRecordInfo.value.subCorrectRatio = Number((testRecordInfo.value.subUserScore / testRecordInfo.value.subTotalScore).toFixed(2));
-      console.log('考试情况:', testRecordInfo.value);
-    }, 5000);
+    // setTimeout(() => {
+    //   console.log('考试情况:', testRecordDetails.value);
+    // }, 5000);
   } catch (error) {
     console.error('获取答题信息失败！', error);
   }

@@ -35,6 +35,11 @@
                         <!-- <span>{{ scope.row.desc }}</span> -->
                     </template>
                 </el-table-column>
+                <el-table-column prop="" label="总分" width="80px">
+                    <template #default="scope">
+                        <span v-if="scope.row.totalScore > 0">{{ scope.row.totalScore }}</span>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="startTimeStr" label="开始时间">
                     <template #default="scope">
                         <el-input v-if="searchBar[scope.$index]" disabled></el-input>
@@ -123,6 +128,36 @@
                         </div>
                     </div>
 
+
+
+                    <div class="whitelist-info">
+                        <el-button size="large" type="warning" @click="showWhitelist = true;">
+                            编辑考试人员
+                        </el-button>
+                        <el-dialog v-model="showWhitelist" title="考试人员" draggable overflow :close-on-click-modal="false"
+                            :close-on-press-escape="false" height="300px" width="350px">
+                            <el-table :data="personnelList" v-loading="problemLoading" height="300px">
+                                <el-table-column prop="role" label="角色" width="100px" />
+                                <el-table-column prop="name" label="人员" width="100px" />
+                                <el-table-column label="" width="">
+                                    <template #header>
+                                        <el-switch v-model="allInWhite" />
+                                        <span>全选</span>
+                                    </template>
+                                    <template #default="scope">
+                                        <el-button size="small" :disabled="allInWhite"
+                                            :type="selectedWhiteList && selectedWhiteList.includes(scope.row.personnelId) ? 'info' : ''"
+                                            @click="selectPersonnel(scope.row.personnelId)">
+                                            {{ selectedWhiteList && selectedWhiteList.includes(scope.row.personnelId) ?
+                '屏蔽' : '添加' }}
+                                        </el-button>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </el-dialog>
+
+                    </div>
+
                 </el-aside>
                 <el-container width="40%">
                     <!-- <el-header>
@@ -148,9 +183,10 @@
                                 </el-table-column>
                                 <el-table-column label="" width="">
                                     <template #default="scope">
-                                        <el-button size="small" :type="selectedProblemIdList.includes(scope.row.problemId) ? 'danger' : 'success'"
+                                        <el-button size="small"
+                                            :type="selectedProblemIdList.includes(scope.row.problemId) ? 'danger' : 'success'"
                                             @click="selectProblemWithId(scope.row.problemId)">
-                                            {{ selectedProblemIdList.includes(scope.row.problemId) ? '移除' : '选择'}}
+                                            {{ selectedProblemIdList.includes(scope.row.problemId) ? '移除' : '选择' }}
                                         </el-button>
                                     </template>
                                 </el-table-column>
@@ -240,8 +276,9 @@ import { pageQuery as diseaseQuery } from '@/apis/disease/disease';
 import type { ProblemSetPageRequest, ProblemSetPageResponse, ProblemSetUpdateRequest } from "@/apis/problemSet/problemSet-interface"
 import type { ProblemPageRequest, ProblemPageResponse, ProblemUpdateRequest } from "@/apis/problem/problem-interface"
 import type { DiseasePageRequest, DiseasePageResponse, DiseaseUpdateRequest } from '@/apis/disease/disease-interface';
-import type { ProblemBO, DiseaseBO } from '@/apis/schemas';
-import { ProblemSet, Problem } from "@/apis/class";
+import type { PersonnelPageRequest, PersonnelPageResponse, PersonnelUpdateRequest } from '@/apis/personnel/personnel-interface';
+import type { PersonnelBO, ProblemBO, DiseaseBO } from '@/apis/schemas';
+import { Personnel, ProblemSet, Problem } from "@/apis/class";
 import { type rowCRUD } from '../../scripts/tableOpt'
 import { throwMessage } from "@/scripts/display";
 
@@ -389,7 +426,7 @@ async function fetchProblemSets(pageNum?: number, pageLimit?: number, msg?: Obje
     } catch (error) {
         console.error('Error fetching problemSets:', error);
     }
-    setTimeout(() => { handleProblemSetList(); console.log(problemResultList.value);}, 100);
+    setTimeout(() => { handleProblemSetList(); console.log(problemResultList.value); }, 100);
 }
 onMounted(async () => {
     await fetchProblemSets();
@@ -409,9 +446,9 @@ function backToHome() {
 }
 function pagination(val: number) { //分页
     currentPage = val
-    if(!back.value){
-    backToHome();
-  }
+    if (val != 1) {
+        backToHome();
+    }
     //恢复初始值
     // eslint-disable-next-line vue/no-ref-as-operand
     isSelected = clearIsSelected(isSelected);
@@ -434,11 +471,12 @@ interface ProblemSetInfo {
     durationStr?: string;
     duration?: number;
     problemScoreMap?: Record<string, number>
+    totalScore?: number;
 }
 const problemSetList: Ref<ProblemSetInfo[]> = ref<ProblemSetInfo[]>([]); //所有试卷
 const problemSetResultList: Ref<ProblemSetInfo[]> = ref<ProblemSetInfo[]>([]); //试卷查询结果
 function handleProblemSetList() { //处理试卷信息的显示格式
-    problemSetList.value=[]; //清空缓存
+    problemSetList.value = []; //清空缓存
     for (var i in queryData.value) {
         const temp: ProblemSetInfo = {
             problemSetId: "",
@@ -450,7 +488,8 @@ function handleProblemSetList() { //处理试卷信息的显示格式
             endTime: new Date('2077-12-31T23:59:59'),
             durationStr: "",
             duration: 0,
-            problemScoreMap: {}
+            problemScoreMap: {},
+            totalScore: 0
         };
         temp.problemSetId = queryData.value[i].problemSetId ?? "";
         temp.title = queryData.value[i].title ?? "";
@@ -482,6 +521,7 @@ function handleProblemSetList() { //处理试卷信息的显示格式
         }
         if (queryData.value[i].problemScoreMap) {
             temp.problemScoreMap = queryData.value[i].problemScoreMap;
+            temp.totalScore = temp.problemScoreMap ? Object.values(temp.problemScoreMap).reduce((id, score) => id + score, 0) : 0; //计算试卷总分
         }
         problemSetList.value.push(temp);
     }
@@ -510,12 +550,13 @@ const editHour = ref();
 const editMin = ref();
 const editStartTime = ref();
 const editEndTime = ref();
+const selectedWhiteList = ref<string[]>([]); //可参加测试名单
 
 const selectedProblemIdList = ref<string[]>([]); //已选题目
 const selectedProblemScoreMap = ref<Record<string, number>>({}); //已选题目分值
 const totalScore = ref(0); //试卷总分
 const selectedProblem = ref<ProblemBO>(); //当前选中的题目
-const selectedIndex = ref(); 
+const selectedIndex = ref();
 const problemList = ref<ProblemBO[]>([]);
 const diseaseList = ref<DiseaseBO[]>([]);
 // const showAnswer = ref(false);
@@ -564,7 +605,7 @@ const rowClassName = ({ rowIndex }: { rowIndex: number }) => { //题目的行样
         return 'selecting-row';
     }
 
-};
+}
 function createProblemSet() { //创建新试卷
     clearEdit();
     createNew.value = true;
@@ -585,14 +626,22 @@ function editProblemSet(id: string) { //打开试卷修改窗口
             editHour.value = hour;
             editMin.value = min;
         }
-        if (currentSet.startTime &&  new Date(currentSet.startTime) > new Date(0)) { //有效开始时间大于最小值
+        if (currentSet.startTime && new Date(currentSet.startTime) > new Date(0)) { //有效开始时间大于最小值
             editStartTime.value = currentSet.startTime;
         }
-        if (currentSet.endTime &&  new Date(currentSet.endTime) < new Date('2077-12-31T23:59:59')) { ////有效截止时间小于最大值
+        if (currentSet.endTime && new Date(currentSet.endTime) < new Date('2077-12-31T23:59:59')) { ////有效截止时间小于最大值
             editEndTime.value = currentSet.endTime;
         }
         selectedProblemIdList.value = currentSet.problemIdList ?? [];
         selectedProblemScoreMap.value = currentSet.problemScoreMap ?? {};
+
+        if(currentSet.whiteList===null){
+            allInWhite.value=true;
+        } else {
+            allInWhite.value=false;
+        }
+        selectedWhiteList.value = currentSet.whiteList??[];
+        console.log('白名单:', selectedWhiteList.value);
     }
     dialogVisible.value = true;
 }
@@ -604,6 +653,7 @@ function clearEdit() { //清除修改项数据
     editMin.value = undefined;
     editStartTime.value = undefined;
     editEndTime.value = undefined;
+    selectedWhiteList.value = [];
     // editStartTime.value = new Date();
     // editEndTime.value = new Date('2077-12-31T23:59:59');
     selectedProblemIdList.value = [];
@@ -624,7 +674,8 @@ async function submitCreate() { //提交创建
                 endTime: editEndTime.value ?? new Date('2077-12-31T23:59:59'),
                 duration: (editHour.value ?? 0) * 60 * 60 * 1000 + (editMin.value ?? 0) * 60 * 1000,
                 problemIdList: selectedProblemIdList.value,
-                problemScoreMap: selectedProblemScoreMap.value
+                problemScoreMap: selectedProblemScoreMap.value,
+                whiteList: allInWhite===true?null:selectedWhiteList.value
             },
             delete: false
         }
@@ -672,10 +723,12 @@ async function submitEdit() { //提交修改
                 endTime: editEndTime.value ?? new Date('2077-12-31T23:59:59'),
                 duration: (editHour.value ?? 0) * 60 * 60 * 1000 + (editMin.value ?? 0) * 60 * 1000,
                 problemIdList: selectedProblemIdList.value,
-                problemScoreMap: selectedProblemScoreMap.value
+                problemScoreMap: selectedProblemScoreMap.value,
+                whiteList: allInWhite===true?null:selectedWhiteList.value
             },
             delete: false
         }
+        console.log('修改白名单',request.problemSet.whiteList);
         var response = await updateProblemSet(request);
         if (response) {//更改成功
             throwMessage('update success');
@@ -763,6 +816,7 @@ async function fetchDiseases() {
 onMounted(async () => {
     await fetchDiseases();
     await fetchProblems();
+    await fetchPersonnels();
     setTimeout(() => {
         problemResultList.value = JSON.parse(JSON.stringify(problemList.value));
         // console.log('problemResultList:',problemResultList.value);
@@ -772,11 +826,11 @@ onMounted(async () => {
 })
 function searchProblems() {
     problemResultList.value.splice(0, problemResultList.value.length);
-    console.log("当前试卷选题:",selectedProblemIdList);
+    console.log("当前试卷选题:", selectedProblemIdList);
     for (var i in problemList.value) {
         var temp = problemList.value[i];
         if ((chosenType.value === '' || temp.type === chosenType.value) && (chosenSubject.value === '' || temp.subjectId === chosenSubject.value) && (searchTitle.value === '' || temp.title?.includes(searchTitle.value))) {
-            if(!selected.value || selectedProblemIdList.value && temp.problemId && selectedProblemIdList.value && selectedProblemIdList.value.includes(temp.problemId)){
+            if (!selected.value || selectedProblemIdList.value && temp.problemId && selectedProblemIdList.value && selectedProblemIdList.value.includes(temp.problemId)) {
                 problemResultList.value.push(temp);
             }
         }
@@ -808,7 +862,7 @@ function clearConditions() { //情空题目筛选条件
     searchTitle.value = '';
     chosenType.value = '';
     chosenSubject.value = '';
-    // searchProblems();
+    searchProblems();
 }
 function selectProblemWithId(id: string) { //从试卷添加or移除题目
     var temp = problemResultList.value.find(pro => pro.problemId === id);
@@ -832,6 +886,45 @@ function selectProblemWithId(id: string) { //从试卷添加or移除题目
 //         showOrHide.value = '隐藏答案';
 //     }
 // }
+import { pageQuery as personnelPageQuery } from "@/apis/personnel/personnel";
+const personnelList = ref<PersonnelBO[]>([]);
+const showWhitelist = ref(false);
+const allInWhite = ref(false);
+// let roleOptions = ref([{ //用户角色选项
+//     value: '',
+//     label: ''
+// }]);
+async function fetchPersonnels() {
+    try {
+        const request: PersonnelPageRequest = { currPageNo: 1 };
+        const response = await personnelPageQuery(request);
+        const pages = Math.ceil(response.data.total / response.data.limit); //总页数
+        for (var i = 1; i <= pages; i++) {
+            request.currPageNo = i;
+            const response = await personnelPageQuery(request);
+            if (response && response.data && response.data.datas) {
+                personnelList.value = personnelList.value.concat(response.data.datas);
+            } else {
+                console.error('没有人员数据！');
+            }
+        }
+        console.log('获取人员数据:', personnelList.value);
+    } catch (error) {
+        console.error('获取人员数据失败！', error);
+    }
+}
+function selectPersonnel(id: string) {
+    // var temp = personnelList.value.find(per => per.personnelId === id);
+    console.log('selectedWhiteList',selectedWhiteList.value);
+    if (selectedWhiteList && selectedWhiteList.value.includes(id)) {
+        selectedWhiteList.value = selectedWhiteList.value.filter(item => item !== id);
+    } else {
+        selectedWhiteList.value.push(id);
+
+    }
+}
+
+
 
 
 //加载动画
@@ -910,6 +1003,10 @@ function loadCurrentProblemList() {
 
 .datetime-picker .demonstration {
     font-size: 14px;
+}
+
+.whitelist-info {
+    margin: 50px 0;
 }
 
 .problem-content {

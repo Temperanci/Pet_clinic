@@ -11,11 +11,11 @@
                 <el-result title="套题考试" sub-title="选择试卷参加测试，ai自动批卷及时反馈">
                   <template #icon>
                     <el-icon size="50">
-                      <Checked />
+                      <Edit />
                     </el-icon>
                   </template>
                   <template #extra>
-                    <el-button type="primary" size="large" @click="changeContent('ProblemSet')">进入</el-button>
+                    <el-button type="warning" size="large" @click="changeContent('ProblemSet')">进入</el-button>
                   </template>
                 </el-result>
               </el-card>
@@ -25,30 +25,15 @@
                 <el-result title="单题练习" sub-title="按病种知识点筛选题目，自主练习巩固弱项">
                   <template #icon>
                     <el-icon size="50">
-                      <Checked />
+                      <Reading/>
                     </el-icon>
                   </template>
                   <template #extra>
-                    <el-button type="primary" size="large" @click="changeContent('SingleProblem')">进入</el-button>
+                    <el-button type="success" size="large" @click="changeContent('SingleProblem')">进入</el-button>
                   </template>
                 </el-result>
               </el-card>
             </el-col>
-<!-- 
-            <el-col :span="8">
-              <el-card shadow="hover">
-                <el-result title="智能医生" sub-title="">
-                  <template #icon>
-                    <el-icon size="50">
-                      <Checked />
-                    </el-icon>
-                  </template>
-                  <template #extra>
-                    <el-button type="primary" size="large" @click="testId='b3495e38-1c8d-4707-9cf4-93ea68424968';changeContent('TestRecord')">进入</el-button>
-                  </template>
-                </el-result>
-              </el-card>
-            </el-col> -->
 
           </el-row>
         </div>
@@ -56,10 +41,22 @@
       <SingleProblem v-if="content === 'SingleProblem'" @content="(c: string) => content = c" />
       <ProblemSet v-if="content === 'ProblemSet'" @content="(c: string) => content = c"
         @id="(id: string) => testId = id" @time="(time: Date) => enterTime = time" />
-      <Test v-if="content === 'Test'" @content="(c: string) => content = c" :testId="testId" :enterTime="enterTime" />
+      <Test v-if="content === 'Test'" @content="(c: string) => content = c" :testId="testId" :enterTime="enterTime" :autoSubmit="autoSubmit"/>
       <TestRecord v-if="content === 'TestRecord'" @content="(c: string) => content = c" :testId="testId" />
     </div>
   </div>
+
+  <el-dialog v-model="dialogVisible" title="警告" width="400px" draggable overflow :close-on-click-modal="false" :close-on-press-escape="false">
+    <span>考试中途离开后无法再次进入，确定要退出吗？</span>
+    <template #footer>
+            <div class="dialog-footer">
+                <el-button type="info" @click="dialogVisible = false">取消</el-button>
+                <el-button type="danger" @click="autoSubmit = true; console.log('点击退出'); dialogVisible = false;">
+                    退出
+                </el-button>
+            </div>
+        </template>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
@@ -78,9 +75,17 @@ defineComponent({
     TestRecord
   }
 })
+// const emit = defineEmits(['update:modelValue'])
 
+// const closeOverlay = () => {
+//   emit('update:modelValue', false) // 当点击返回按钮时，更新 modelValue 为 false
+// }
+
+const dialogVisible = ref(false);
+const autoSubmit = ref(false);
 const testId = ref(''); //所选测试id
 const enterTime = ref(new Date()); //进入测试时间
+
 
 const content = ref('Menu');
 function changeContent(c: string) { //改变测试页面内容
@@ -99,7 +104,8 @@ function returnUpper() { //返回测试页面上一级
       changeContent('Menu');
       break;
     case 'Test':
-      changeContent('ProblemSet');
+      dialogVisible.value = true; //退出考试时弹窗确认
+      // changeContent('ProblemSet');
       break;
     default:
       changeContent('Menu');
