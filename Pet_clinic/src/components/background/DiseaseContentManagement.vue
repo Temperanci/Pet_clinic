@@ -119,7 +119,7 @@
         delete:true
       }
         console.log('delete request',request);
-        if((Msg[index] as DiseaseContent).indexStatus==='已学习'){
+        if((Msg[index] as DiseaseContent).indexStatus==='HAS_INDEX'){
           var DCDelResponse= await DCUpdate(request);
                   if(DCDelResponse){//更改成功
                     if(DCDelResponse.data.indexStatus==='DELETE'){
