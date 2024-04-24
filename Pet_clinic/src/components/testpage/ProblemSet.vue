@@ -11,16 +11,41 @@
                     <el-table-column prop="durationStr" label="时长限制" width="100px" />
                     <el-table-column label="" width="100px">
                         <template #default="scope">
-                            <el-button v-if="!scope.row.submitted" size="small"
+                            <el-button v-if="scope.row.status === 'judging'" size="small" type="warning"
+                                @click="watingDialog = true;">批卷中…</el-button>
+                            <el-button v-else-if="scope.row.status === 'judged'" size="small" type="danger"
+                                @click="enterTestRecord(scope.row.problemSetId)">查看成绩</el-button>
+
+                            <el-button v-else-if="new Date() > new Date(scope.row.endTime)" size="small"
+                                @click="handleEnterTest(scope.row.problemSetId, scope.row.title, scope.row.startTime, scope.row.endTime, scope.row.duration)">
+                                <span>已截止</span>
+                            </el-button>
+
+                            <el-button v-else-if="new Date() < new Date(scope.row.startTime)" size="small"
+                                @click="handleEnterTest(scope.row.problemSetId, scope.row.title, scope.row.startTime, scope.row.endTime, scope.row.duration)">
+                                <span>未开始</span>
+                            </el-button>
+
+                            <el-button v-else-if="!scope.row.allowed" size="small" type="info" disabled>
+                                <span>无权限</span>
+                            </el-button>
+
+                            <el-button v-else size="small"
+                                    @click="handleEnterTest(scope.row.problemSetId, scope.row.title, scope.row.startTime, scope.row.endTime, scope.row.duration)">
+                                <span>进入测试</span>
+                            </el-button>
+
+
+                            <!-- 
+                            <el-button v-else-if="!scope.row.submitted" size="small" 
                                 @click="handleEnterTest(scope.row.problemSetId, scope.row.title, scope.row.startTime, scope.row.endTime, scope.row.duration)">
                                 <span v-if="new Date() > new Date(scope.row.endTime)">已截止</span>
                                 <span v-else-if="new Date() < new Date(scope.row.startTime)">未开始</span>
+                                <span v-else-if="scope.row.allowed"></span>
                                 <span v-else>进入测试</span>
-                            </el-button>
-                            <el-button v-else-if="scope.row.status === 'judging'" size="small" type="warning"
-                                @click="watingDialog = true;">批卷中…</el-button>
-                            <el-button v-else size="small" type="danger"
-                                @click="enterTestRecord(scope.row.problemSetId)">查看成绩</el-button>
+                            </el-button> -->
+
+
                         </template>
                     </el-table-column>
                 </el-table>
@@ -139,6 +164,7 @@ interface problemSetInfo {
     duration?: number;
     status?: string;
     submitted?: boolean;
+    allowed?: boolean
 }
 
 // 处理试卷列表
@@ -156,7 +182,8 @@ function handleProblemSetList() {
             durationStr: "",
             duration: 0,
             status: "unsubmitted",
-            submitted: false
+            submitted: false,
+            allowed: true
         };
         temp.problemSetId = problemSetList.value[i].problemSetId ?? "";
         temp.title = problemSetList.value[i].title ?? "";
@@ -183,6 +210,7 @@ function handleProblemSetList() {
             }
             temp.duration = problemSetList.value[i].duration ?? 0;
         }
+
         if (userTestRecordList.value.some(record => record.problemSetId === temp.problemSetId)) { //批卷情况
             temp.status = userTestRecordList.value.find(record => record.problemSetId === temp.problemSetId)?.graded ? 'judged' : 'judging';
             temp.submitted = true;
@@ -190,6 +218,19 @@ function handleProblemSetList() {
             temp.status = 'unsubmitted';
             temp.submitted = false;
         }
+
+        // if (problemSetList.value[i].whiteList?.includes(userInfo.value.personnelId)) {
+        //     temp.allowed = true;
+        // } else {
+        //     temp.allowed = false;
+        // }
+        // console.log('白名单',problemSetList.value[i].whiteList);
+        if (problemSetList.value[i].whiteList!==null && !problemSetList.value[i].whiteList?.includes(userInfo.value.personnelId)) {
+            temp.allowed = false;
+        } else {
+            temp.allowed = true;
+        }
+
         resultList.value.push(temp);
     }
     console.log('resultList:', resultList.value);
@@ -202,6 +243,8 @@ const rowClassName = ({ rowIndex }: { rowIndex: number }) => {
     } else if (currentList[rowIndex].endTime && currentList[rowIndex].endTime.getTime() < new Date().getTime()) {
         return 'late-row'
     }
+
+
 }
 
 

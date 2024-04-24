@@ -35,7 +35,7 @@
                 <el-main>
                     <div class="result-content">
                         <el-table :data="loadCurrentList()" :row-class-name="rowClassName" v-loading="problemLoading">
-                            <el-table-column prop="title" label="题目" width="120px" />
+                            <el-table-column fixed prop="title" label="题目" width="120px" />
                             <el-table-column prop="subjectName" label="知识点" width="100px" />
                             <el-table-column prop="typeName" label="题型" width="60px" />
                             <el-table-column label="" width="80px">
