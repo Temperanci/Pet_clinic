@@ -8,7 +8,7 @@
         </el-header>
         <el-main>
           <div class="probleminfo-content">
-            <el-table :data="loadCurrentList()" border height="400px" style="overflow: auto;">
+            <el-table :data="loadCurrentList()" border height="490px" style="overflow: auto;">
               <el-table-column prop="problem.title" label="题目" width="90px" />
               <el-table-column prop="problem.content" label="内容" width="" />
               <el-table-column prop="subjectName" label="知识点" width="100px" />

@@ -41,7 +41,7 @@
       <SingleProblem v-if="content === 'SingleProblem'" @content="(c: string) => content = c" />
       <ProblemSet v-if="content === 'ProblemSet'" @content="(c: string) => content = c"
         @id="(id: string) => testId = id" @time="(time: Date) => enterTime = time" />
-      <Test v-if="content === 'Test'" @content="(c: string) => content = c" :testId="testId" :enterTime="enterTime" />
+      <Test v-if="content === 'Test'" @content="(c: string) => content = c" :testId="testId" :enterTime="enterTime" :autoSubmit="autoSubmit"/>
       <TestRecord v-if="content === 'TestRecord'" @content="(c: string) => content = c" :testId="testId" />
     </div>
   </div>
@@ -51,7 +51,7 @@
     <template #footer>
             <div class="dialog-footer">
                 <el-button type="info" @click="dialogVisible = false">取消</el-button>
-                <el-button type="danger" @click="dialogVisible = false;changeContent('ProblemSet');">
+                <el-button type="danger" @click="autoSubmit = true; console.log('点击退出'); dialogVisible = false;">
                     退出
                 </el-button>
             </div>
@@ -75,9 +75,17 @@ defineComponent({
     TestRecord
   }
 })
+// const emit = defineEmits(['update:modelValue'])
+
+// const closeOverlay = () => {
+//   emit('update:modelValue', false) // 当点击返回按钮时，更新 modelValue 为 false
+// }
+
 const dialogVisible = ref(false);
+const autoSubmit = ref(false);
 const testId = ref(''); //所选测试id
 const enterTime = ref(new Date()); //进入测试时间
+
 
 const content = ref('Menu');
 function changeContent(c: string) { //改变测试页面内容
@@ -96,7 +104,7 @@ function returnUpper() { //返回测试页面上一级
       changeContent('Menu');
       break;
     case 'Test':
-      dialogVisible.value = true;
+      dialogVisible.value = true; //退出考试时弹窗确认
       // changeContent('ProblemSet');
       break;
     default:

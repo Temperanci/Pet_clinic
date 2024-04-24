@@ -58,14 +58,15 @@
         </el-container>
     </div>
 
-    <el-dialog v-model="submitDialog" title="" width="400" :close-on-click-modal="false" :close-on-press-escape="false">
+    <el-dialog v-model="submitDialog" title="" width="400" :close-on-click-modal="false" :close-on-press-escape="false" :show-close="false">
         <span>{{ warningMsg }}</span>
         <template #footer>
             <div class="dialog-footer">
                 <el-button v-if="clock !== 0" @click="submitDialog = false">取消</el-button>
-                <el-button type="primary" @click="submitDialog = false; submit();">
+                <el-button type="primary" @click="checkAnswerMap(); submit(); submitDialog = false; ">
                     提交
                 </el-button>
+
             </div>
         </template>
     </el-dialog>
@@ -93,7 +94,8 @@ defineComponent({
 const emit = defineEmits(['content']);
 const props = defineProps({
     testId: String,
-    enterTime: Date
+    enterTime: Date,
+    autoSubmit: Boolean
 });
 
 const warningMsg = ref('确认提交试卷？');
@@ -153,7 +155,6 @@ onMounted(async () => {
             if(pro.problem.problemId){
                 answerMap.set(pro.problem.problemId, '');
             }
-            console.log('默认空值',pro.problem.problemId);
         });
     }, 100)
 
@@ -212,7 +213,7 @@ function checkAnswerMap() {
             answerMap.set(pro.problem.problemId ?? '', '');
         }
     })
-    console.log('answerMap:', answerMap);
+    // console.log('answerMap:', answerMap);
 }
 
 //提交试卷
@@ -261,9 +262,15 @@ async function submit() {
     }
 
 }
-// watch(submitDialog, () => {
-//     warningMsg.value = '确认提交试卷？';
-// });
+
+watch(() => props.autoSubmit, async (auto) => {
+    if (auto) {
+        console.log('退出强制提交',props.autoSubmit);
+        checkAnswerMap();
+        await submit();
+    }
+});
+
 
 </script>
 
