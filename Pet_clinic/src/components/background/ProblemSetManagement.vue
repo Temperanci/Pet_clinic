@@ -35,6 +35,11 @@
                         <!-- <span>{{ scope.row.desc }}</span> -->
                     </template>
                 </el-table-column>
+                <el-table-column prop="" label="总分" width="80px">
+                    <template #default="scope">
+                        <span v-if="scope.row.totalScore>0">{{ scope.row.totalScore }}</span>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="startTimeStr" label="开始时间">
                     <template #default="scope">
                         <el-input v-if="searchBar[scope.$index]" disabled></el-input>
@@ -434,6 +439,7 @@ interface ProblemSetInfo {
     durationStr?: string;
     duration?: number;
     problemScoreMap?: Record<string, number>
+        totalScore?: number;
 }
 const problemSetList: Ref<ProblemSetInfo[]> = ref<ProblemSetInfo[]>([]); //所有试卷
 const problemSetResultList: Ref<ProblemSetInfo[]> = ref<ProblemSetInfo[]>([]); //试卷查询结果
@@ -450,7 +456,8 @@ function handleProblemSetList() { //处理试卷信息的显示格式
             endTime: new Date('2077-12-31T23:59:59'),
             durationStr: "",
             duration: 0,
-            problemScoreMap: {}
+            problemScoreMap: {},
+            totalScore: 0
         };
         temp.problemSetId = queryData.value[i].problemSetId ?? "";
         temp.title = queryData.value[i].title ?? "";
@@ -482,6 +489,7 @@ function handleProblemSetList() { //处理试卷信息的显示格式
         }
         if (queryData.value[i].problemScoreMap) {
             temp.problemScoreMap = queryData.value[i].problemScoreMap;
+            temp.totalScore = temp.problemScoreMap?Object.values(temp.problemScoreMap).reduce((id, score) => id + score, 0):0; //计算试卷总分
         }
         problemSetList.value.push(temp);
     }
